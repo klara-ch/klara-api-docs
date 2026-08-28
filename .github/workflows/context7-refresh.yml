@@ -1,0 +1,26 @@
+name: Refresh Context7 docs
+
+# Traegt der Push die neuen Markdown-Dateien ein, holt Context7 sie sich nicht
+# von allein sofort, sondern nach Popularitaet. Dieser Aufruf stoesst den
+# Refresh an. Ohne das Geheimnis CONTEXT7_API_KEY laeuft der Schritt ins Leere,
+# statt den Lauf rot zu faerben.
+on:
+  push:
+    branches: [main, master]
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Context7 refresh
+        env:
+          CONTEXT7_API_KEY: ${{ secrets.CONTEXT7_API_KEY }}
+        run: |
+          if [ -z "$CONTEXT7_API_KEY" ]; then
+            echo "CONTEXT7_API_KEY is not set, skipping the refresh."
+            exit 0
+          fi
+          curl -s -X POST https://context7.com/api/v1/refresh \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+            -d '{"libraryName": "/${{ github.repository }}"}'

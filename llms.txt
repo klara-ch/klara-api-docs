@@ -1,0 +1,52 @@
+# KLARA Public API documentation
+
+> REST API for KLARA business software: accounting, finance, articles, customers, payroll and document delivery. Authentication with an API key or a bearer token. Every endpoint states the permission it requires and the KLARA roles that carry it.
+
+## Machine-readable formats
+
+- [OpenAPI specification](https://developer.klara.ch/klara-openapi.json): the contract, 97 operations, OpenAPI 3.0.3
+- [Build information](https://developer.klara.ch/build-info.json): when this was built and from which source
+
+## Guides
+
+- [Getting started](https://developer.klara.ch/md/getting-started.md)
+- [API basics](https://developer.klara.ch/md/api-basics.md)
+- [Authentication](https://developer.klara.ch/md/authentication.md)
+- [Keeping your API key safe](https://developer.klara.ch/md/key-security.md)
+- [Roles & permissions](https://developer.klara.ch/md/roles.md)
+- [Common integration flows](https://developer.klara.ch/md/use-cases.md)
+- [Sending documents with smart delivery](https://developer.klara.ch/md/delivery.md)
+- [Submitting variable payroll data](https://developer.klara.ch/md/payroll.md)
+- [Getting responses in German, French, Italian or English](https://developer.klara.ch/md/languages.md)
+- [Limits, pagination and environments](https://developer.klara.ch/md/limits.md)
+- [Changelog](https://developer.klara.ch/md/changelog.md)
+- [Known limitations](https://developer.klara.ch/md/roadmap.md)
+- [FAQ](https://developer.klara.ch/md/faq.md)
+- [Support](https://developer.klara.ch/md/support.md)
+
+## Endpoint reference
+
+Each file lists the operations of one area with parameters, request and response bodies, and the permission each operation needs.
+
+- [Accounting](https://developer.klara.ch/md/reference-accounting.md): 24 operations
+- [Accounting Interface](https://developer.klara.ch/md/reference-accounting-interface.md): 1 operation
+- [Article](https://developer.klara.ch/md/reference-article.md): 28 operations
+- [Authentication](https://developer.klara.ch/md/reference-authentication.md): 3 operations
+- [Company](https://developer.klara.ch/md/reference-company.md): 3 operations
+- [Company documents](https://developer.klara.ch/md/reference-company-documents.md): 1 operation
+- [Company general](https://developer.klara.ch/md/reference-company-general.md): 4 operations
+- [Customer](https://developer.klara.ch/md/reference-customer.md): 14 operations
+- [Finance](https://developer.klara.ch/md/reference-finance.md): 11 operations
+- [Individual](https://developer.klara.ch/md/reference-individual.md): 2 operations
+- [KLARA authentication generic](https://developer.klara.ch/md/reference-klara-authentication-generic.md): 1 operation
+- [Location](https://developer.klara.ch/md/reference-location.md): 1 operation
+- [Payroll](https://developer.klara.ch/md/reference-payroll.md): 3 operations
+- [Subscription](https://developer.klara.ch/md/reference-subscription.md): 1 operation
+
+## Notes for agents
+
+- The HTML page and these files are generated from one source in the same build. Where they disagree, the OpenAPI specification is the contract.
+- Every guide file names its canonical page, so a citation can point a human at the same content.
+- There is no test environment for KLARA. Every call goes to production, so treat writing calls as chargeable and irreversible.
+- The rate limit is counted per calling IP address, not per API key.
+- Most operations require exactly one permission. Do not infer a permission from a path; each operation states its own.
