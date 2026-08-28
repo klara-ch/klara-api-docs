@@ -6,8 +6,12 @@
   "folders": [
     "md"
   ],
-  "excludeFiles": [],
-  "excludeFolders": [],
+  "excludeFiles": [
+    "LICENSE.md"
+  ],
+  "excludeFolders": [
+    "node_modules"
+  ],
   "rules": [
     "There is no test environment for KLARA. Every call goes to production, so treat writing calls as chargeable and irreversible.",
     "The rate limit is counted per calling IP address, not per API key.",
