@@ -1,5 +1,7 @@
 {
   "$schema": "https://context7.com/schema/context7.json",
+  "url": "https://context7.com/klara-ch/klara-api-docs",
+  "public_key": "pk_sG7l8UtuAw9WTLFcgoJYv",
   "projectTitle": "KLARA Public API documentation",
   "description": "REST API for KLARA business software: accounting, finance, articles, customers, payroll and document delivery. Authentication with an API key or a bearer token. Every endpoint states the permission it requires and the KLARA roles that carry it.",
   "folders": [
