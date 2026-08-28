@@ -1,20 +1,4 @@
 {
   "url": "https://context7.com/klara-ch/klara-api-docs",
-  "public_key": "pk_sG7l8UtuAw9WTLFcgoJYv",
-  "projectTitle": "KLARA Public API documentation",
-  "description": "REST API for KLARA business software: accounting, finance, articles, customers, payroll and document delivery. Authentication with an API key or a bearer token. Every endpoint states the permission it requires and the KLARA roles that carry it.",
-  "folders": [
-    "md"
-  ],
-  "excludeFiles": [
-    "LICENSE.md"
-  ],
-  "excludeFolders": [
-    "node_modules"
-  ],
-  "rules": [
-    "There is no test environment for KLARA. Every call goes to production, so treat writing calls as chargeable and irreversible.",
-    "The rate limit is counted per calling IP address, not per API key.",
-    "Most operations require exactly one permission. Do not infer a permission from a path; each operation states its own."
-  ]
+  "public_key": "pk_sG7l8UtuAw9WTLFcgoJYv"
 }
