@@ -6,6 +6,7 @@
 
 Returns all customers of a company
 
+- operationId: `listCustomers`
 - Required permission: `FINANCE_GET_CUSTOMER`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -22,6 +23,7 @@ Returns all customers of a company
 
 Create a new customer
 
+- operationId: `createCustomer`
 - Required permission: `FINANCE_CREATE_CUSTOMER`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn
 
@@ -50,6 +52,7 @@ Create a new customer
 
 Delete a customer
 
+- operationId: `deleteCustomer`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -74,6 +77,7 @@ Delete a customer
 
 Returns a customer of a company based on given id
 
+- operationId: `getCustomer`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -97,6 +101,7 @@ Returns a customer of a company based on given id
 
 Update an existing customer
 
+- operationId: `updateCustomer`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -132,6 +137,7 @@ Update an existing customer
 
 Gets all additional addresses of a customer
 
+- operationId: `listCustomerAdditionalAddresses`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -154,6 +160,7 @@ Gets all additional addresses of a customer
 
 Creates a new customer's additional address
 
+- operationId: `createCustomerAdditionalAddress`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -195,7 +202,7 @@ Creates a new customer's additional address
 
 Delete an additional-address data by customer's id and customer's contact-id
 
-- operationId: `delete additional-address`
+- operationId: `deleteCustomerAdditionalAddress`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -220,7 +227,7 @@ Delete an additional-address data by customer's id and customer's contact-id
 
 Updates a Address
 
-- operationId: `update additional-addresses`
+- operationId: `updateCustomerAdditionalAddress`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -264,6 +271,7 @@ Updates a Address
 
 Gets all contacts of a customer
 
+- operationId: `listCustomerContacts`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -286,6 +294,7 @@ Gets all contacts of a customer
 
 Creates a new customer's contact
 
+- operationId: `createCustomerContact`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -329,7 +338,7 @@ Creates a new customer's contact
 
 Delete a CustomerContact data by customer's id and customer's contact-id
 
-- operationId: `delete CustomerContact`
+- operationId: `deleteCustomerContact`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -354,7 +363,7 @@ Delete a CustomerContact data by customer's id and customer's contact-id
 
 Updates a CustomerContact
 
-- operationId: `update CustomerContact`
+- operationId: `updateCustomerContact`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -402,6 +411,7 @@ Search and page the customers of the caller's company.
 
 Returns a page of customers (`Persons` + `Companies`) of the caller's company, with optional free-text search (`search-key`) and status filter (`status`). Results are paged with `offset` and `limit`: to retrieve every customer, iterate `offset=0, limit, 2×limit, …` until a response returns fewer than `limit` rows. All query parameters are optional; without any, the endpoint returns the first `50` active customers (downstream default ordering). This is a read-only, idempotent operation. The tenant and company are derived from the JWT (`@CurrentSession Token`) and are never accepted as parameters. The caller must be authenticated (`apiKeyAuth` + `bearerAuth`) and must hold the `FINANCE_GET_CUSTOMER` permission on that company; otherwise the endpoint returns `403`.
 
+- operationId: `listCustomersV1`
 - Required permission: `FINANCE_GET_CUSTOMER`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 

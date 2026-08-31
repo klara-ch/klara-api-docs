@@ -8,6 +8,7 @@ Return payroll interface file
 
 Return the payroll accounting interface file for a given salary run or payslips in CSV or JSON format
 
+- operationId: `generatePayrollInterfaceFile`
 - Required permission: `ACCOUNTING_INTERFACE`
 - Roles that carry it: Administrator, External user, Mitarbeiter und Lohn
 

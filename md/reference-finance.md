@@ -8,6 +8,7 @@ List the bank accounts of the authenticated company.
 
 Returns the bank accounts of the company resolved from the bearer JWT, optionally filtered by business `type`. The caller must hold the `FINANCE_BANK_ACCOUNT` permission on the target company. The result is sorted by Swiss-bank name then IBAN. This operation is idempotent and read-only — it can be safely retried.
 
+- operationId: `listCompanyBankAccounts`
 - Required permission: `FINANCE_BANK_ACCOUNT`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
 
@@ -35,6 +36,7 @@ Create a new KLARA invoice for the authenticated company.
 
 Creates a new invoice for an existing customer under the company resolved from the bearer JWT. The request body's `id` must be `0` or omitted — this endpoint does not support updating existing invoices. Typical flow:Call `GET /core/v1/invoices/next-invoice-number` to obtain the next invoice number.Look up the customer via `GET /core/v1/customers` (with search filters and pagination).Look up company bank accounts via `GET /core/v1/company-bank-accounts`.Search articles via `GET /core/latest/articles/search` or `GET /core/latest/articles/article-numbers` to populate order items.(Optional) Look up open positions via `GET /core/v1/bank-reconciliation/open-positions` to reconcile prepayments / credit notes.(Optional) Call `POST /core/v1/orders/next-order-number` to obtain the next `order.orderNumber`.(Optional) Call `GET /core/latest/company-configuration/including-vat` to determine the company default for `usingVAT`.Build the invoice payload with order items.Call this endpoint with `status=INVOICED` to save and book, or `status=DRAFT` to save without booking.On status `INVOICED` or `SENT` the invoice is also booked into KLARA accounting, inventory transactions are created and the HubSpot indicator is synchronised. This endpoint does not send/deliver the invoice (no email/ePost/eBill/print&send), regardless of `postMethod` or a `SENT` status; retrieve the PDF via `POST /core/v1/invoices/{id}/printed-document` and deliver it yourself. The caller must hold the `FINANCE` permission on the target company. Status is caller-controlled. The KLARA GUI keeps an invoice in `DRAFT` until the user posts it in the final step; via the API you choose — send `status=DRAFT` to save without booking, or `status=INVOICED` (or `SENT`) to book immediately. A DRAFT can be finalized later with `PUT /core/v1/invoices` (`status=INVOICED`). Important — booking is created without a printed invoice. When you book via this endpoint (`status=INVOICED`/`SENT`), the accounting booking is created but no PDF is rendered or stored — the invoice and its booking have no printed document (unlike the GUI, which renders, stores and books in one step). To attach the printed invoice, run two follow-up calls: (1) `POST /core/v1/invoices/{id}/printed-document` to render the PDF and store its `printedFileId` on the invoice, then (2) `PUT /core/v1/bookings/{id}/documents` to link that `printedFileId` (in `documentIds`) to the booking returned in `bookingNumbers`.
 
+- operationId: `createInvoice`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -108,6 +110,7 @@ Update an existing DRAFT invoice for the authenticated company.
 
 Updates a DRAFT invoice identified by `invoice.id` in the request body. Only invoices in `DRAFT` status can be updated — any other status returns 400. If the incoming `status` is `INVOICED` or `SENT`, the invoice is booked into KLARA accounting and inventory transactions are created, identical to the booking behavior of `POST /core/v1/invoices`. This is the call that finalizes a DRAFT — the GUI equivalent of posting in the final step; status is caller-controlled, so keep it `DRAFT` to re-save without booking. This endpoint does not send/deliver the invoice (no email/ePost/eBill/print&send), regardless of `postMethod`; retrieve the PDF via `POST /core/v1/invoices/{id}/printed-document` and deliver it yourself. The caller must hold the `FINANCE` permission on the target company. Important — finalizing a DRAFT books it without a printed invoice. Setting `status=INVOICED`/`SENT` here creates the accounting booking but renders/stores no PDF. To attach the printed invoice to the booking, after this call run (1) `POST /core/v1/invoices/{id}/printed-document` to render and store the `printedFileId`, then (2) `PUT /core/v1/bookings/{id}/documents` to link that `printedFileId` (in `documentIds`) to the booking from `bookingNumbers`.
 
+- operationId: `updateInvoice`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -180,6 +183,7 @@ Get the next available invoice number for the authenticated company.
 
 Returns the next available invoice number for the company resolved from the bearer JWT. The caller must hold the `FINANCE` permission on the target company. This operation is NOT idempotent — each successful call advances the persisted next-invoice-number counter on luzfin_finance, so the returned value is reserved and will not be returned again. Do not retry on success.
 
+- operationId: `getNextInvoiceNumber`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -200,6 +204,7 @@ Get a single invoice by its numeric id.
 
 Returns the fully-enriched invoice document for the given `id` under the company resolved from the bearer JWT. The response includes order items enriched with inventory selection data and accounting booking-status fields (`bookingStatus`, `bookingDueDate`, `bookingSealed`) populated by `an internal service`. The caller must hold the `FINANCE` permission on the target company.
 
+- operationId: `getInvoiceById`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -226,6 +231,7 @@ Return the invoice as a PDF (rendering it if needed).
 
 Returns the invoice document as a binary `application/pdf` stream via the internal KLARA printing pipeline (`an internal service` + Aspose Words), mirroring the behaviour of the KLARA GUI. The caller must hold the `FINANCE` permission on the target company. Reuse vs. render (mirrors the KLARA GUI): if the invoice was already printed, the previously rendered PDF is fetched from storage and returned as-is; if it was not yet printed, it is rendered now and the `printedFileId` is stored on the invoice record. In both cases the response body is the binary PDF with a `Content-Disposition: attachment` header containing the suggested filename. This is a `POST` (not `GET`) because the first print persists the `printedFileId`.
 
+- operationId: `printInvoice`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -252,6 +258,7 @@ Send a booked invoice (smart delivery or a forced channel).
 
 Sends an already-booked invoice to its recipient, synchronously, under the company resolved from the bearer JWT. Omit `channel` for smart delivery: the system auto-routes through `EPOST`, `EBILL`, `SEND_EMAIL` and Print&Send and only fails if none can deliver. Provide `channel` to force that exact channel: if the recipient is not eligible (e.g. no email on file, not eBill-registered, Print&Send not subscribed) the call fails with 400. The invoice PDF is rendered on demand when it has not been printed yet. Prerequisites: the invoice must already be booked — `DRAFT` and cancelled invoices are rejected with 400. Create/book it via `POST /core/v1/invoices` (`status=INVOICED`) first. Not idempotent: each successful call performs a real delivery (sends an email / hands a letter to the postal channel) and overwrites the invoice's recorded post method — do not retry blindly on success. `channel` uses the same values as `Invoice.postMethod`, except `PRINT_AND_MANUAL_SEND`, which is not a deliverable channel and is rejected with 400. Authentication is API key + bearer JWT; the caller must hold the `FINANCE` permission on the target company.
 
+- operationId: `sendInvoice`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -280,6 +287,7 @@ List order-management documents by type and order number.
 
 Returns every order-management document of the company resolved from the bearer JWT that has the given `type` and business `order-number`. Used to discover sibling documents on the same order chain (e.g. find the `DELIVERY_NOTE`s for an order number before creating an `INVOICE` from them). The caller must hold the `FINANCE` permission on the target company. This operation is idempotent and read-only — it can be safely retried.
 
+- operationId: `listOrderDocumentsByTypeAndOrderNumber`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -307,6 +315,7 @@ Get the next document number for a given order-document type.
 
 Returns the next available sequence number and its formatted document code for the authenticated company and the given `order-type`. Use the returned `documentCode` as `invoiceCode` / `offerCode` when subsequently creating a document with `POST /core/v1/invoices`. Side effect for `INVOICE`: the persisted counter is advanced on every call — do not call speculatively. Only meaningful for `OFFER`, `CONFIRMATION`, `DELIVERY_NOTE`, and `INVOICE`; other types always return `documentNumber = 0`. If the company has configured `MANUAL` numbering for the requested type, the downstream service returns HTTP 500 — check `GET /core/v1/order-numbering-configurations` first. The caller must hold the `FINANCE` permission on the target company.
 
+- operationId: `getNextDocumentNumber`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -333,6 +342,7 @@ Get the order-numbering configuration for a document type.
 
 Returns the numbering strategy configured for the given `order-type` of the company resolved from the bearer JWT. Use this before creating a document to decide how to supply the document number in `POST /core/v1/invoices`: `STANDARD` — server auto-assigns; `MANUAL` — set `invoiceCode` yourself; `CUSTOMISED` — set `invoiceCode` to a value matching the returned `format` pattern. If no configuration has been saved by the company administrator, a default `STANDARD` configuration is returned. The caller must hold the `FINANCE` permission on the target company. This operation is idempotent and read-only.
 
+- operationId: `getOrderNumberingConfiguration`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -359,6 +369,7 @@ Get the next available order number for the authenticated company.
 
 Returns the next available business order number for the company resolved from the bearer JWT. Use the returned `nextOrderNumber` as the `orderNumber` field when subsequently creating an order. Not idempotent: each call reserves and advances the in-memory counter — call this immediately before creating the order and do not call speculatively. Gaps may appear in the sequence if the subsequent order creation fails. The caller must hold the `FINANCE` permission on the target company.
 
+- operationId: `getNextOrderNumber`
 - Required permission: `FINANCE`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 

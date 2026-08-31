@@ -8,6 +8,150 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
+#### 31 August 2026
+
+72 changed
+
+#### Changed
+
+- **68 endpoints** — operationId added, `…`. A generated client used to invent a method name from the path and will now use this idShow the endpointsDELETE `/core/latest/article-categories/{category-id}`
+
+- DELETE `/core/latest/article-filters/{filter-id}`
+
+- DELETE `/core/latest/articles/{article-id}`
+
+- DELETE `/core/latest/articles/{article-id}/images/{image-id}`
+
+- DELETE `/core/latest/customers/{customer-id}`
+
+- GET `/core/latest/article-categories`
+
+- GET `/core/latest/article-categories/{category-id}`
+
+- GET `/core/latest/article-filters`
+
+- GET `/core/latest/article-filters/{filter-id}`
+
+- GET `/core/latest/articles`
+
+- GET `/core/latest/articles/article-and-variants`
+
+- GET `/core/latest/articles/article-numbers`
+
+- GET `/core/latest/articles/search`
+
+- GET `/core/latest/articles/{article-id}`
+
+- GET `/core/latest/articles/{article-id}/article-set-items`
+
+- GET `/core/latest/articles/{article-id}/images/{image-id}`
+
+- GET `/core/latest/articles/{article-id}/variants`
+
+- GET `/core/latest/articles/{article-id}/variants/{variant-id}`
+
+- GET `/core/latest/cities/{city-id}`
+
+- GET `/core/latest/company-configuration/including-vat`
+
+- GET `/core/latest/company-vats`
+
+- GET `/core/latest/customers`
+
+- GET `/core/latest/customers/{customer-id}`
+
+- GET `/core/latest/customers/{customer-id}/additional-addresses`
+
+- GET `/core/latest/customers/{customer-id}/contacts`
+
+- GET `/core/latest/vat-cases`
+
+- GET `/core/latest/vat-cases/{vat-case-id}`
+
+- GET `/core/v1/company-bank-accounts`
+
+- GET `/core/v1/customers`
+
+- GET `/core/v1/employees/short-info`
+
+- GET `/core/v1/invoices/next-invoice-number`
+
+- GET `/core/v1/invoices/{id}`
+
+- GET `/core/v1/order-documents/filter/type-and-order-number`
+
+- GET `/core/v1/order-documents/{order-type}/next-document-number`
+
+- GET `/core/v1/order-numbering-configurations`
+
+- GET `/core/v1/orders/next-order-number`
+
+- GET `/core/v1/payroll/employees/{employeeId}/addable-salary-items`
+
+- GET `/core/v2/tenants/companies`
+
+- GET `/core/v2/tenants/individuals/profile`
+
+- POST `/core/latest/article-categories`
+
+- POST `/core/latest/article-categories/{category-id}/assign-to-articles`
+
+- POST `/core/latest/article-filters`
+
+- POST `/core/latest/article-filters/{filter-id}/assign-to-articles`
+
+- POST `/core/latest/articles`
+
+- POST `/core/latest/articles/bulk`
+
+- POST `/core/latest/articles/{article-id}/images`
+
+- POST `/core/latest/customers`
+
+- POST `/core/latest/customers/{customer-id}/additional-addresses`
+
+- POST `/core/latest/customers/{customer-id}/contacts`
+
+- POST `/core/latest/generic-token`
+
+- POST `/core/latest/payroll-interface-file`
+
+- POST `/core/latest/subscriptions`
+
+- POST `/core/latest/tenants`
+
+- POST `/core/latest/token`
+
+- POST `/core/latest/token/by-microsoft`
+
+- POST `/core/v1/invoices`
+
+- POST `/core/v1/invoices/{id}/printed-document`
+
+- POST `/core/v1/invoices/{id}/send`
+
+- POST `/core/v1/payroll/contracts/{contractId}/payslips/{payslipId}/salary-items`
+
+- POST `/core/v2/tenants/companies`
+
+- POST `/core/v2/tenants/individuals/profile`
+
+- PUT `/core/latest/article-categories/{category-id}`
+
+- PUT `/core/latest/article-filters/{filter-id}`
+
+- PUT `/core/latest/articles/{article-id}`
+
+- PUT `/core/latest/articles/{article-id}/images/{image-id}`
+
+- PUT `/core/latest/customers/{customer-id}`
+
+- PUT `/core/v1/invoices`
+
+- PUT `/core/v2/tenants/companies`
+
+PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` — operationId renamed from `update additional-addresses` to `updateCustomerAdditionalAddress`. Generated method names change with it DELETE `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` — operationId renamed from `delete additional-address` to `deleteCustomerAdditionalAddress`. Generated method names change with it PUT `/core/latest/customers/{customer-id}/contacts/{contact-id}` — operationId renamed from `update CustomerContact` to `updateCustomerContact`. Generated method names change with it DELETE `/core/latest/customers/{customer-id}/contacts/{contact-id}` — operationId renamed from `delete CustomerContact` to `deleteCustomerContact`. Generated method names change with it
+
 #### 28 August 2026
 
 1 changed
@@ -17,6 +161,18 @@ What changed and when. Changes that can break an existing integration are marked
 - POST `/core/latest/generic-token` — moved from area Klara authentication generic to KLARA authentication generic
 
 ### Documentation changes
+
+#### 31 August 2026
+
+Every endpoint now has a stable operationId
+
+- **All 97 operations carry an `operationId`**, 68 of them for the first time. Until now a client generator had to invent method names from the path, and those names changed whenever a path changed. From now on the id is the name.
+
+- **If you generate a client, expect method names to change once.** Where no `operationId` existed, your generator invented one; it will now use ours. Paths, parameters, request bodies and responses are untouched, so nothing changes on the wire. Regenerate, fix the names in your code, and you are done.
+
+- Four ids that contained spaces and could not be used in generated code are corrected: `update additional-addresses` is now `updateCustomerAdditionalAddress`, `delete additional-address` is `deleteCustomerAdditionalAddress`, `update CustomerContact` is `updateCustomerContact`, and `delete CustomerContact` is `deleteCustomerContact`.
+
+- The endpoint set is unchanged: 97 operations, same paths, same permissions.
 
 #### 28 August 2026
 

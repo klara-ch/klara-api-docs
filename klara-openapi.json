@@ -74,6 +74,7 @@
           "Article"
         ],
         "summary": "Get all categories",
+        "operationId": "listArticleCategories",
         "parameters": [
           {
             "name": "active-status",
@@ -166,6 +167,7 @@
           "Article"
         ],
         "summary": "Create a new category",
+        "operationId": "createArticleCategory",
         "requestBody": {
           "content": {
             "application/json": {
@@ -229,6 +231,7 @@
           "Article"
         ],
         "summary": "Get category by id",
+        "operationId": "getArticleCategoryById",
         "parameters": [
           {
             "name": "category-id",
@@ -284,6 +287,7 @@
           "Article"
         ],
         "summary": "Update category by Id",
+        "operationId": "updateArticleCategory",
         "parameters": [
           {
             "name": "category-id",
@@ -358,6 +362,7 @@
           "Article"
         ],
         "summary": "Delete category by Id",
+        "operationId": "deleteArticleCategory",
         "parameters": [
           {
             "name": "category-id",
@@ -419,6 +424,7 @@
         ],
         "summary": "Assign category to articles",
         "description": "Assign the specified <b>article category</b> to multiple <b>articles</b> for usage in Online Booking, Online shop, and Point of sale.<br /><b>Only the articles entered in the request body</b> will have the specified <b>article category</b> added to their respective filters.<br />Other articles will not be affected",
+        "operationId": "assignArticleCategoryToArticles",
         "parameters": [
           {
             "name": "category-id",
@@ -488,6 +494,7 @@
           "Article"
         ],
         "summary": "Search article filters",
+        "operationId": "listArticleFilters",
         "parameters": [
           {
             "name": "active-status",
@@ -570,6 +577,7 @@
           "Article"
         ],
         "summary": "Create a article filter",
+        "operationId": "createArticleFilter",
         "requestBody": {
           "description": "Filter data",
           "content": {
@@ -635,6 +643,7 @@
           "Article"
         ],
         "summary": "Get article filter by id",
+        "operationId": "getArticleFilterById",
         "parameters": [
           {
             "name": "filter-id",
@@ -690,6 +699,7 @@
           "Article"
         ],
         "summary": "Update article filter by id",
+        "operationId": "updateArticleFilter",
         "parameters": [
           {
             "name": "filter-id",
@@ -767,6 +777,7 @@
         ],
         "summary": "Delete article filter by id",
         "description": "This filter will be removed from all articles",
+        "operationId": "deleteArticleFilter",
         "parameters": [
           {
             "name": "filter-id",
@@ -818,6 +829,7 @@
         ],
         "summary": "Assign filter to articles",
         "description": "Assign the specified <b>article filter</b> to multiple <b>articles</b> for usage in Online Booking, Online shop, and Point of sale.<br /><b>Only the articles entered in the request body</b> will have the specified <b>article filter</b> added to their respective filters.<br />Other articles will not be affected",
+        "operationId": "assignArticleFilterToArticles",
         "parameters": [
           {
             "name": "filter-id",
@@ -889,6 +901,7 @@
           "Article"
         ],
         "summary": "Returns article list of a company",
+        "operationId": "listArticles",
         "parameters": [
           {
             "name": "limit",
@@ -967,6 +980,7 @@
           "Article"
         ],
         "summary": "Create a new article",
+        "operationId": "createArticle",
         "requestBody": {
           "description": "The article object with the information that needs to be created",
           "content": {
@@ -1032,6 +1046,7 @@
           "Article"
         ],
         "summary": "Get article by article id",
+        "operationId": "getArticleById",
         "parameters": [
           {
             "name": "article-id",
@@ -1094,6 +1109,7 @@
           "Article"
         ],
         "summary": "Update an existing article",
+        "operationId": "updateArticle",
         "parameters": [
           {
             "name": "article-id",
@@ -1167,6 +1183,7 @@
           "Article"
         ],
         "summary": "Delete an article",
+        "operationId": "deleteArticle",
         "parameters": [
           {
             "name": "article-id",
@@ -1239,6 +1256,7 @@
           "Article"
         ],
         "summary": "Get list of items from article set",
+        "operationId": "getArticleSetWithItemsById",
         "parameters": [
           {
             "name": "article-id",
@@ -1307,6 +1325,7 @@
         ],
         "summary": "Add an image to an article",
         "description": "Image size limit: 5MB<br />Supported image type: PNG, JPG, JPEG",
+        "operationId": "addArticleImage",
         "parameters": [
           {
             "name": "article-id",
@@ -1394,6 +1413,7 @@
           "Article"
         ],
         "summary": "Get the content of an article image",
+        "operationId": "getArticleImage",
         "parameters": [
           {
             "name": "article-id",
@@ -1468,6 +1488,7 @@
         ],
         "summary": "Update an article image",
         "description": "Image size limit: 5MB<br />Supported image type: PNG, JPG, JPEG",
+        "operationId": "updateArticleImage",
         "parameters": [
           {
             "name": "article-id",
@@ -1573,6 +1594,7 @@
           "Article"
         ],
         "summary": "Delete an article image",
+        "operationId": "deleteArticleImage",
         "parameters": [
           {
             "name": "article-id",
@@ -1655,6 +1677,7 @@
           "Article"
         ],
         "summary": "Get variants of an article",
+        "operationId": "getVariantsByArticleId",
         "parameters": [
           {
             "name": "article-id",
@@ -1722,6 +1745,7 @@
           "Article"
         ],
         "summary": "Get variants of an article with id",
+        "operationId": "getVariantById",
         "parameters": [
           {
             "name": "article-id",
@@ -1794,6 +1818,7 @@
           "Article"
         ],
         "summary": "Returns list of articles and treat a variant combination same as an article",
+        "operationId": "listArticlesWithVariants",
         "parameters": [
           {
             "name": "include-quantity",
@@ -1899,6 +1924,7 @@
         ],
         "summary": "Find articles by article numbers",
         "description": "Batch-resolve a list of article numbers to their priced article rows of the caller's company. Returns each row enriched with the price valid on `price-date` and the appropriate VAT rate. Unknown article numbers are silently skipped (returned list contains only matching rows). Requires permission `ARTICLE_READ_ONLY`.",
+        "operationId": "listArticlesByArticleNumbers",
         "parameters": [
           {
             "name": "article-numbers",
@@ -1999,6 +2025,7 @@
           "Article"
         ],
         "summary": "Create articles",
+        "operationId": "createArticlesBulk",
         "requestBody": {
           "description": "The list of articles",
           "content": {
@@ -2058,6 +2085,7 @@
         ],
         "summary": "Search articles by keyword",
         "description": "Free-text search across sellable articles (and their variants) of the caller's company. Matches by name, article number, barcode, variant number and set-header name. Returns each row enriched with the price valid on `price-date` and the appropriate VAT rate. Requires permission `ARTICLE_READ_ONLY`.",
+        "operationId": "searchSellableArticles",
         "parameters": [
           {
             "name": "export-vat",
@@ -2182,6 +2210,7 @@
         ],
         "summary": "Returns city details",
         "description": "Returns a City details with given id.",
+        "operationId": "getCityById",
         "parameters": [
           {
             "name": "city-id",
@@ -2342,6 +2371,7 @@
         ],
         "summary": "Get the VAT inclusion setting for the authenticated company.",
         "description": "Returns whether invoice amounts for the company resolved from the bearer JWT are displayed and calculated <em>including</em> VAT (<code>includingVat: true</code>) or <em>excluding</em> VAT (<code>includingVat: false</code>). Use this value before creating or displaying invoices to apply the correct pricing model. When no configuration record exists for the company, the endpoint returns <code>false</code> (excluding VAT) as the default. The caller must hold the <code>FINANCE</code> permission on the target company.",
+        "operationId": "getCompanyIncludingVatSetting",
         "responses": {
           "200": {
             "description": "VAT inclusion setting for the authenticated company.",
@@ -2396,6 +2426,7 @@
           "Company general"
         ],
         "summary": "Returns vat list of a company",
+        "operationId": "listCompanyVatLiabilities",
         "parameters": [
           {
             "name": "Accept-Language",
@@ -2449,6 +2480,7 @@
           "Customer"
         ],
         "summary": "Returns all customers of a company",
+        "operationId": "listCustomers",
         "responses": {
           "200": {
             "description": "Customers",
@@ -2494,6 +2526,7 @@
           "Customer"
         ],
         "summary": "Create a new customer",
+        "operationId": "createCustomer",
         "requestBody": {
           "description": "The customer object with the information that needs to be created",
           "content": {
@@ -2559,6 +2592,7 @@
           "Customer"
         ],
         "summary": "Returns a customer of a company based on given id",
+        "operationId": "getCustomer",
         "parameters": [
           {
             "name": "customer-id",
@@ -2616,6 +2650,7 @@
           "Customer"
         ],
         "summary": "Update an existing customer",
+        "operationId": "updateCustomer",
         "parameters": [
           {
             "name": "customer-id",
@@ -2694,6 +2729,7 @@
           "Customer"
         ],
         "summary": "Delete a customer",
+        "operationId": "deleteCustomer",
         "parameters": [
           {
             "name": "customer-id",
@@ -2756,6 +2792,7 @@
           "Customer"
         ],
         "summary": "Gets all additional addresses of a customer",
+        "operationId": "listCustomerAdditionalAddresses",
         "parameters": [
           {
             "name": "customer-id",
@@ -2813,6 +2850,7 @@
           "Customer"
         ],
         "summary": "Creates a new customer's additional address",
+        "operationId": "createCustomerAdditionalAddress",
         "parameters": [
           {
             "name": "customer-id",
@@ -2890,7 +2928,7 @@
           "Customer"
         ],
         "summary": "Updates a Address",
-        "operationId": "update additional-addresses",
+        "operationId": "updateCustomerAdditionalAddress",
         "parameters": [
           {
             "name": "address-id",
@@ -2979,7 +3017,7 @@
           "Customer"
         ],
         "summary": "Delete an additional-address data by customer's id and customer's contact-id",
-        "operationId": "delete additional-address",
+        "operationId": "deleteCustomerAdditionalAddress",
         "parameters": [
           {
             "name": "address-id",
@@ -3042,6 +3080,7 @@
           "Customer"
         ],
         "summary": "Gets all contacts of a customer",
+        "operationId": "listCustomerContacts",
         "parameters": [
           {
             "name": "customer-id",
@@ -3099,6 +3138,7 @@
           "Customer"
         ],
         "summary": "Creates a new customer's contact",
+        "operationId": "createCustomerContact",
         "parameters": [
           {
             "name": "customer-id",
@@ -3176,7 +3216,7 @@
           "Customer"
         ],
         "summary": "Updates a CustomerContact",
-        "operationId": "update CustomerContact",
+        "operationId": "updateCustomerContact",
         "parameters": [
           {
             "name": "contact-id",
@@ -3265,7 +3305,7 @@
           "Customer"
         ],
         "summary": "Delete a CustomerContact data by customer's id and customer's contact-id",
-        "operationId": "delete CustomerContact",
+        "operationId": "deleteCustomerContact",
         "parameters": [
           {
             "name": "contact-id",
@@ -3329,6 +3369,7 @@
         ],
         "summary": "Generate tokens to use KLARA specific endpoint",
         "description": "Use this endpoint to get the access token for a specific user, and refresh token. <br />A grant_type of password is used for a Password grant, which requires username, password, access token, refresh token from scratch.<br />A grant_type of refresh_token is used for a Refresh token grant, which is used for acquiring the access token using refresh token.",
+        "operationId": "createGenericApiToken",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -3389,6 +3430,7 @@
         ],
         "summary": "Return payroll interface file",
         "description": "Return the payroll accounting interface file for a given salary run or payslips in CSV or JSON format",
+        "operationId": "generatePayrollInterfaceFile",
         "parameters": [
           {
             "name": "file-format",
@@ -3488,6 +3530,7 @@
         ],
         "summary": "Create subscriptions for KLARA tenants.",
         "description": "A KLARA user might have multiple subscriptions. Each subscription will enable a set of feature inside KLARA platform. This endpoint allows to create subscriptions for a KLARA tenant. <p>Each subscription is subjective to its own terms and conditions. Please ask your KLARA contacts or see more details using the KLARA webclient.</p>",
+        "operationId": "createSubscription",
         "parameters": [
           {
             "name": "marketing-code",
@@ -3577,6 +3620,7 @@
         ],
         "summary": "Returns all tenants of a user",
         "description": "A KLARA user might have multiple tenants. Use this endpoint to get the list of tenants containing tenant id, company id.<br /> The tenant and company id returned by this endpoint can be used to generate tokens to access other endpoints. Use your KLARA username and password <strong> OR </strong> access-token to get the list of tenants. <br />",
+        "operationId": "listTenants",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -3675,6 +3719,7 @@
         ],
         "summary": "Generate tokens to access other KLARA core endpoints",
         "description": "After obtaining tenant id and company id for the desired tenant, use this endpoint to get the access token for a specific tenant, and refresh token. <br />A grant_type of <strong>password</strong> is used for a Password grant, which requires username, password, tenant and company id to produce access token, refresh token from scratch.<br />A grant_type of <strong>refresh_token</strong> is used for a Refresh token grant, which is used for acquiring the access token using refresh token.<br />A grant_type of <strong>token_exchange</strong> performs an OAuth 2.0 Token Exchange (RFC 8693). Provide <strong>subject_token</strong> (the raw upstream Bearer token, without the 'Bearer ' prefix) and <strong>audience</strong> to identify the target token type.<br />Supported audience values:<ul><li><strong>cossa</strong> &mdash; exchanges a COSSA bearer token for a ePost access token.</li></ul><strong>Note:</strong> subject_token must be the raw token value without the 'Bearer ' prefix.",
+        "operationId": "createPublicApiToken",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -3751,6 +3796,7 @@
         ],
         "summary": "Exchange Microsoft access token for system token",
         "description": "Provide a Microsoft access token and tenant id to exchange for a system token.",
+        "operationId": "createPublicApiTokenByMicrosoft",
         "requestBody": {
           "content": {
             "application/x-www-form-urlencoded": {
@@ -3800,6 +3846,7 @@
           "Company general"
         ],
         "summary": "Returns VAT case list.",
+        "operationId": "listVatCases",
         "parameters": [
           {
             "name": "applicability",
@@ -3860,6 +3907,7 @@
           "Company general"
         ],
         "summary": "Get the VAT case by Id.",
+        "operationId": "getVatCaseById",
         "parameters": [
           {
             "name": "vat-case-id",
@@ -6666,6 +6714,7 @@
         ],
         "summary": "List the bank accounts of the authenticated company.",
         "description": "Returns the bank accounts of the company resolved from the bearer JWT, optionally filtered by business <code>type</code>. The caller must hold the <code>FINANCE_BANK_ACCOUNT</code> permission on the target company. The result is sorted by Swiss-bank name then IBAN. This operation is idempotent and read-only — it can be safely retried.",
+        "operationId": "listCompanyBankAccounts",
         "parameters": [
           {
             "name": "iban-number",
@@ -6749,6 +6798,7 @@
         ],
         "summary": "Search and page the customers of the caller's company.",
         "description": "Returns a page of customers (<code>Persons</code> + <code>Companies</code>) of the caller's company, with optional free-text search (<code>search-key</code>) and status filter (<code>status</code>). Results are paged with <code>offset</code> and <code>limit</code>: to retrieve every customer, iterate <code>offset=0,&nbsp;limit,&nbsp;2&times;limit,&nbsp;…</code> until a response returns fewer than <code>limit</code> rows. All query parameters are optional; without any, the endpoint returns the first <code>50</code> active customers (downstream default ordering). This is a read-only, idempotent operation. <br/><br/>The tenant and company are derived from the JWT (<code>@CurrentSession Token</code>) and are never accepted as parameters. The caller must be authenticated (<code>apiKeyAuth</code> + <code>bearerAuth</code>) and must hold the <code>FINANCE_GET_CUSTOMER</code> permission on that company; otherwise the endpoint returns <code>403</code>.",
+        "operationId": "listCustomersV1",
         "parameters": [
           {
             "name": "limit",
@@ -6857,6 +6907,7 @@
         ],
         "summary": "List the company's employees as short-info entries, filtered and sorted.",
         "description": "Returns a lightweight directory of the authenticated company's employees (id, name, email, employee number, workplace, status), resolved from the compensation and person records. Each entry's <code>id</code> is the <code>employeeId</code> consumed by other employee-scoped endpoints (e.g. <code>GET /payroll/employees/{employeeId}/addable-salary-items</code>) — call this endpoint first to resolve an employee's id. Results can be narrowed with a free-text <code>search-key</code> (matched against name, employee number and email), restricted to specific workplaces via <code>workplace-ids</code>, and filtered by contract <code>filter-by-status</code>; ordering is controlled by <code>sort-field</code> and <code>sort-direction</code>. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION_TIME_TRACKING</code> permission on that company.",
+        "operationId": "listEmployeesShortInfo",
         "parameters": [
           {
             "name": "filter-by-status",
@@ -6999,6 +7050,7 @@
         ],
         "summary": "Update an existing DRAFT invoice for the authenticated company.",
         "description": "Updates a DRAFT invoice identified by <code>invoice.id</code> in the request body. Only invoices in <code>DRAFT</code> status can be updated — any other status returns 400. If the incoming <code>status</code> is <code>INVOICED</code> or <code>SENT</code>, the invoice is booked into KLARA accounting and inventory transactions are created, identical to the booking behavior of <code>POST /core/v1/invoices</code>. This is the call that finalizes a DRAFT — the GUI equivalent of posting in the final step; <strong>status is caller-controlled</strong>, so keep it <code>DRAFT</code> to re-save without booking. <strong>This endpoint does not send/deliver the invoice</strong> (no email/ePost/eBill/print&amp;send), regardless of <code>postMethod</code>; retrieve the PDF via <code>POST /core/v1/invoices/{id}/printed-document</code> and deliver it yourself. The caller must hold the <code>FINANCE</code> permission on the target company.<br/><br/><strong>Important — finalizing a DRAFT books it without a printed invoice.</strong> Setting <code>status=INVOICED</code>/<code>SENT</code> here creates the accounting booking but <strong>renders/stores no PDF</strong>. To attach the printed invoice to the booking, after this call run (1) <code>POST /core/v1/invoices/{id}/printed-document</code> to render and store the <code>printedFileId</code>, then (2) <code>PUT /core/v1/bookings/{id}/documents</code> to link that <code>printedFileId</code> (in <code>documentIds</code>) to the booking from <code>bookingNumbers</code>.",
+        "operationId": "updateInvoice",
         "parameters": [
           {
             "name": "confirmDontMindClosingFiscalYear",
@@ -7164,6 +7216,7 @@
         ],
         "summary": "Create a new KLARA invoice for the authenticated company.",
         "description": "Creates a new invoice for an existing customer under the company resolved from the bearer JWT. The request body's <code>id</code> must be <code>0</code> or omitted — this endpoint does not support updating existing invoices.<br/><br/><strong>Typical flow:</strong><ol><li>Call <code>GET /core/v1/invoices/next-invoice-number</code> to obtain the next invoice number.</li><li>Look up the customer via <code>GET /core/v1/customers</code> (with search filters and pagination).</li><li>Look up company bank accounts via <code>GET /core/v1/company-bank-accounts</code>.</li><li>Search articles via <code>GET /core/latest/articles/search</code> or <code>GET /core/latest/articles/article-numbers</code> to populate order items.</li><li>(Optional) Look up open positions via <code>GET /core/v1/bank-reconciliation/open-positions</code> to reconcile prepayments / credit notes.</li><li>(Optional) Call <code>POST /core/v1/orders/next-order-number</code> to obtain the next <code>order.orderNumber</code>.</li><li>(Optional) Call <code>GET /core/latest/company-configuration/including-vat</code> to determine the company default for <code>usingVAT</code>.</li><li>Build the invoice payload with order items.</li><li>Call this endpoint with <code>status=INVOICED</code> to save and book, or <code>status=DRAFT</code> to save without booking.</li></ol>On status <code>INVOICED</code> or <code>SENT</code> the invoice is also booked into KLARA accounting, inventory transactions are created and the HubSpot indicator is synchronised. <strong>This endpoint does not send/deliver the invoice</strong> (no email/ePost/eBill/print&amp;send), regardless of <code>postMethod</code> or a <code>SENT</code> status; retrieve the PDF via <code>POST /core/v1/invoices/{id}/printed-document</code> and deliver it yourself. The caller must hold the <code>FINANCE</code> permission on the target company.<br/><br/><strong>Status is caller-controlled.</strong> The KLARA GUI keeps an invoice in <code>DRAFT</code> until the user posts it in the final step; via the API you choose — send <code>status=DRAFT</code> to save without booking, or <code>status=INVOICED</code> (or <code>SENT</code>) to book immediately. A DRAFT can be finalized later with <code>PUT /core/v1/invoices</code> (<code>status=INVOICED</code>).<br/><br/><strong>Important — booking is created without a printed invoice.</strong> When you book via this endpoint (<code>status=INVOICED</code>/<code>SENT</code>), the accounting booking is created but <strong>no PDF is rendered or stored</strong> — the invoice and its booking have no printed document (unlike the GUI, which renders, stores and books in one step). To attach the printed invoice, run two follow-up calls: (1) <code>POST /core/v1/invoices/{id}/printed-document</code> to render the PDF and store its <code>printedFileId</code> on the invoice, then (2) <code>PUT /core/v1/bookings/{id}/documents</code> to link that <code>printedFileId</code> (in <code>documentIds</code>) to the booking returned in <code>bookingNumbers</code>.",
+        "operationId": "createInvoice",
         "parameters": [
           {
             "name": "confirmDontMindClosingFiscalYear",
@@ -7655,6 +7708,7 @@
         ],
         "summary": "Get a single invoice by its numeric id.",
         "description": "Returns the fully-enriched invoice document for the given <code>id</code> under the company resolved from the bearer JWT. The response includes order items enriched with inventory selection data and accounting booking-status fields (<code>bookingStatus</code>, <code>bookingDueDate</code>, <code>bookingSealed</code>) populated by <code>an internal service</code>. The caller must hold the <code>FINANCE</code> permission on the target company.",
+        "operationId": "getInvoiceById",
         "parameters": [
           {
             "name": "id",
@@ -7726,6 +7780,7 @@
         ],
         "summary": "Return the invoice as a PDF (rendering it if needed).",
         "description": "Returns the invoice document as a binary <code>application/pdf</code> stream via the internal KLARA printing pipeline (<code>an internal service</code> + Aspose Words), mirroring the behaviour of the KLARA GUI. The caller must hold the <code>FINANCE</code> permission on the target company.<br/><br/><strong>Reuse vs. render</strong> (mirrors the KLARA GUI): if the invoice was already printed, the previously rendered PDF is fetched from storage and returned as-is; if it was not yet printed, it is rendered now and the <code>printedFileId</code> is stored on the invoice record. In both cases the response body is the binary PDF with a <code>Content-Disposition: attachment</code> header containing the suggested filename. This is a <code>POST</code> (not <code>GET</code>) because the first print persists the <code>printedFileId</code>.",
+        "operationId": "printInvoice",
         "parameters": [
           {
             "name": "id",
@@ -7786,6 +7841,7 @@
         ],
         "summary": "Send a booked invoice (smart delivery or a forced channel).",
         "description": "Sends an already-booked invoice to its recipient, synchronously, under the company resolved from the bearer JWT.<br/><br/>Omit <code>channel</code> for <strong>smart delivery</strong>: the system auto-routes through <code>EPOST</code>, <code>EBILL</code>, <code>SEND_EMAIL</code> and Print&amp;Send and only fails if none can deliver. Provide <code>channel</code> to <strong>force</strong> that exact channel: if the recipient is not eligible (e.g. no email on file, not eBill-registered, Print&amp;Send not subscribed) the call fails with 400. The invoice PDF is rendered on demand when it has not been printed yet.<br/><br/><strong>Prerequisites:</strong> the invoice must already be booked — <code>DRAFT</code> and cancelled invoices are rejected with 400. Create/book it via <code>POST /core/v1/invoices</code> (<code>status=INVOICED</code>) first.<br/><br/><strong>Not idempotent:</strong> each successful call performs a real delivery (sends an email / hands a letter to the postal channel) and overwrites the invoice's recorded post method — do not retry blindly on success.<br/><br/><code>channel</code> uses the same values as <code>Invoice.postMethod</code>, except <code>PRINT_AND_MANUAL_SEND</code>, which is not a deliverable channel and is rejected with 400. Authentication is API key + bearer JWT; the caller must hold the <code>FINANCE</code> permission on the target company.",
+        "operationId": "sendInvoice",
         "parameters": [
           {
             "name": "id",
@@ -7884,6 +7940,7 @@
         ],
         "summary": "Get the next available invoice number for the authenticated company.",
         "description": "Returns the next available invoice number for the company resolved from the bearer JWT. The caller must hold the <code>FINANCE</code> permission on the target company. <strong>This operation is NOT idempotent</strong> — each successful call advances the persisted next-invoice-number counter on luzfin_finance, so the returned value is reserved and will not be returned again. Do not retry on success.",
+        "operationId": "getNextInvoiceNumber",
         "responses": {
           "200": {
             "description": "Next available invoice number returned.",
@@ -7935,6 +7992,7 @@
         ],
         "summary": "Get the next document number for a given order-document type.",
         "description": "Returns the next available sequence number and its formatted document code for the authenticated company and the given <code>order-type</code>. Use the returned <code>documentCode</code> as <code>invoiceCode</code> / <code>offerCode</code> when subsequently creating a document with <code>POST /core/v1/invoices</code>. <strong>Side effect for <code>INVOICE</code></strong>: the persisted counter is advanced on every call — do not call speculatively. Only meaningful for <code>OFFER</code>, <code>CONFIRMATION</code>, <code>DELIVERY_NOTE</code>, and <code>INVOICE</code>; other types always return <code>documentNumber = 0</code>. If the company has configured <code>MANUAL</code> numbering for the requested type, the downstream service returns HTTP 500 — check <code>GET /core/v1/order-numbering-configurations</code> first. The caller must hold the <code>FINANCE</code> permission on the target company.",
+        "operationId": "getNextDocumentNumber",
         "parameters": [
           {
             "name": "order-type",
@@ -8027,6 +8085,7 @@
         ],
         "summary": "List order-management documents by type and order number.",
         "description": "Returns every order-management document of the company resolved from the bearer JWT that has the given <code>type</code> and business <code>order-number</code>. Used to discover sibling documents on the same order chain (e.g. find the <code>DELIVERY_NOTE</code>s for an order number before creating an <code>INVOICE</code> from them). The caller must hold the <code>FINANCE</code> permission on the target company. This operation is idempotent and read-only — it can be safely retried.",
+        "operationId": "listOrderDocumentsByTypeAndOrderNumber",
         "parameters": [
           {
             "name": "order-number",
@@ -8127,6 +8186,7 @@
         ],
         "summary": "Get the order-numbering configuration for a document type.",
         "description": "Returns the numbering strategy configured for the given <code>order-type</code> of the company resolved from the bearer JWT. Use this before creating a document to decide how to supply the document number in <code>POST /core/v1/invoices</code>: <code>STANDARD</code> — server auto-assigns; <code>MANUAL</code> — set <code>invoiceCode</code> yourself; <code>CUSTOMISED</code> — set <code>invoiceCode</code> to a value matching the returned <code>format</code> pattern. If no configuration has been saved by the company administrator, a default <code>STANDARD</code> configuration is returned. The caller must hold the <code>FINANCE</code> permission on the target company. This operation is idempotent and read-only.",
+        "operationId": "getOrderNumberingConfiguration",
         "parameters": [
           {
             "name": "order-type",
@@ -8218,6 +8278,7 @@
         ],
         "summary": "Get the next available order number for the authenticated company.",
         "description": "Returns the next available business order number for the company resolved from the bearer JWT. Use the returned <code>nextOrderNumber</code> as the <code>orderNumber</code> field when subsequently creating an order. <strong>Not idempotent</strong>: each call reserves and advances the in-memory counter — call this immediately before creating the order and do not call speculatively. Gaps may appear in the sequence if the subsequent order creation fails. The caller must hold the <code>FINANCE</code> permission on the target company.",
+        "operationId": "getNextOrderNumber",
         "responses": {
           "200": {
             "description": "Next available order number for the authenticated company.",
@@ -8273,6 +8334,7 @@
         ],
         "summary": "Add a salary item to an employee's payslip.",
         "description": "Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the employee's editable (non-sealed) payslip identified by <code>payslipId</code>, then recalculates that month unless <code>recalculate=false</code>. Returns the added salary item with its server-assigned <code>id</code>. This operation is <strong>not idempotent</strong>: repeated calls append duplicate items or throw an error when the item is not duplicatable (subject to the item's duplicatable flag). <strong>Prerequisite:</strong> call <code>GET /payroll/employees/{employeeId}/addable-salary-items</code> first — its response provides the <code>contractId</code> and <code>payslipId</code> to target and the addable <code>code</code>s; resolve <code>employeeId</code> beforehand via <code>GET /employees/short-info</code>. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION</code> permission on that company.",
+        "operationId": "addSalaryItem",
         "parameters": [
           {
             "name": "contractId",
@@ -8388,6 +8450,7 @@
         ],
         "summary": "Get the salary items that can be added to an employee's payslip.",
         "description": "Resolves the employee's main (latest) contract and its editable payslip, then returns the salary-item types that can be added to that payslip as blank templates (numeric value fields cleared, distinct by <code>code</code>), together with the resolved <code>contractId</code> and <code>payslipId</code> so the response can be chained into the add-salary-item call. <strong>Prerequisite:</strong> call <code>GET /employees/short-info</code> first to resolve the <code>employeeId</code> path parameter from the returned entries' <code>id</code> field. When <code>month</code> is provided the specified month's payslip is used (read-only); when it is omitted the employee's current editable payslip is used, which may be computed on first access. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION</code> permission on that company.",
+        "operationId": "listAddableSalaryItems",
         "parameters": [
           {
             "name": "employeeId",
@@ -8600,6 +8663,7 @@
         ],
         "summary": "Find KLARA business company of tenant",
         "description": "Retrieve the business company of a tenant. Use your KLARA token from your username & password & tenant-id.",
+        "operationId": "findCompany",
         "responses": {
           "201": {
             "description": "Company found",
@@ -8660,6 +8724,7 @@
         ],
         "summary": "Update a KLARA business company",
         "description": "A KLARA user might have multiple tenants. Use this endpoint to update a KLARA business company. Use your KLARA token from your username & password & tenant-id.",
+        "operationId": "updateCompany",
         "requestBody": {
           "description": "The updated company information",
           "content": {
@@ -8740,6 +8805,7 @@
         ],
         "summary": "Create a KLARA business company",
         "description": "A KLARA user might have multiple company tenants. Use this endpoint to create a business company and its correspondence tenant. Use your KLARA token from your username & password & tenant-id.",
+        "operationId": "createTenantAndBusinessCompany",
         "requestBody": {
           "description": "The company information",
           "content": {
@@ -8824,6 +8890,7 @@
           "Individual"
         ],
         "summary": "[PREVIEW_API] Get profile from tenant's ID",
+        "operationId": "getIndividualProfile",
         "responses": {
           "200": {
             "description": "Retrieved profile successfully",
@@ -8908,6 +8975,7 @@
           "Individual"
         ],
         "summary": "[PREVIEW_API] Create profile",
+        "operationId": "createIndividualProfile",
         "responses": {
           "200": {
             "description": "Created profile successfully",

@@ -8,6 +8,7 @@ Generate tokens to use KLARA specific endpoint
 
 Use this endpoint to get the access token for a specific user, and refresh token. A grant_type of password is used for a Password grant, which requires username, password, access token, refresh token from scratch. A grant_type of refresh_token is used for a Refresh token grant, which is used for acquiring the access token using refresh token.
 
+- operationId: `createGenericApiToken`
 - Required permission: none, this endpoint is how a token is obtained
 
 **Request body** (`application/x-www-form-urlencoded`, not marked required in the specification)

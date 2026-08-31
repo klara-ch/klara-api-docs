@@ -6,6 +6,7 @@
 
 Get all categories
 
+- operationId: `listArticleCategories`
 - Required permission: `ARTICLE_READ_ONLY`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung, Zeit- und Materialrapporte
 
@@ -32,6 +33,7 @@ Get all categories
 
 Create a new category
 
+- operationId: `createArticleCategory`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -63,6 +65,7 @@ Create a new category
 
 Delete category by Id
 
+- operationId: `deleteArticleCategory`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -87,6 +90,7 @@ Delete category by Id
 
 Get category by id
 
+- operationId: `getArticleCategoryById`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -110,6 +114,7 @@ Get category by id
 
 Update category by Id
 
+- operationId: `updateArticleCategory`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -150,6 +155,7 @@ Assign category to articles
 
 Assign the specified article category to multiple articles for usage in Online Booking, Online shop, and Point of sale. Only the articles entered in the request body will have the specified article category added to their respective filters. Other articles will not be affected
 
+- operationId: `assignArticleCategoryToArticles`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -182,6 +188,7 @@ Assign the specified article category to multiple articles for usage in Online B
 
 Search article filters
 
+- operationId: `listArticleFilters`
 - Required permission: `ARTICLE_READ_ONLY`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung, Zeit- und Materialrapporte
 
@@ -207,6 +214,7 @@ Search article filters
 
 Create a article filter
 
+- operationId: `createArticleFilter`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -240,6 +248,7 @@ Delete article filter by id
 
 This filter will be removed from all articles
 
+- operationId: `deleteArticleFilter`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -263,6 +272,7 @@ This filter will be removed from all articles
 
 Get article filter by id
 
+- operationId: `getArticleFilterById`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -286,6 +296,7 @@ Get article filter by id
 
 Update article filter by id
 
+- operationId: `updateArticleFilter`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -326,6 +337,7 @@ Assign filter to articles
 
 Assign the specified article filter to multiple articles for usage in Online Booking, Online shop, and Point of sale. Only the articles entered in the request body will have the specified article filter added to their respective filters. Other articles will not be affected
 
+- operationId: `assignArticleFilterToArticles`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -358,6 +370,7 @@ Assign the specified article filter to multiple articles for usage in Online Boo
 
 Returns article list of a company
 
+- operationId: `listArticles`
 - Required permission: `ARTICLE_READ_ONLY`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung, Zeit- und Materialrapporte
 
@@ -382,6 +395,7 @@ Returns article list of a company
 
 Create a new article
 
+- operationId: `createArticle`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -444,6 +458,7 @@ Create a new article
 
 Returns list of articles and treat a variant combination same as an article
 
+- operationId: `listArticlesWithVariants`
 - Required permission: `ARTICLE_READ_ONLY`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung, Zeit- und Materialrapporte
 
@@ -473,6 +488,7 @@ Find articles by article numbers
 
 Batch-resolve a list of article numbers to their priced article rows of the caller's company. Returns each row enriched with the price valid on `price-date` and the appropriate VAT rate. Unknown article numbers are silently skipped (returned list contains only matching rows). Requires permission `ARTICLE_READ_ONLY`.
 
+- operationId: `listArticlesByArticleNumbers`
 - Required permission: `ARTICLE_READ_ONLY`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung, Zeit- und Materialrapporte
 
@@ -500,6 +516,7 @@ Batch-resolve a list of article numbers to their priced article rows of the call
 
 Create articles
 
+- operationId: `createArticlesBulk`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -563,6 +580,7 @@ Search articles by keyword
 
 Free-text search across sellable articles (and their variants) of the caller's company. Matches by name, article number, barcode, variant number and set-header name. Returns each row enriched with the price valid on `price-date` and the appropriate VAT rate. Requires permission `ARTICLE_READ_ONLY`.
 
+- operationId: `searchSellableArticles`
 - Required permission: `ARTICLE_READ_ONLY`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung, Zeit- und Materialrapporte
 
@@ -592,6 +610,7 @@ Free-text search across sellable articles (and their variants) of the caller's c
 
 Delete an article
 
+- operationId: `deleteArticle`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -617,6 +636,7 @@ Delete an article
 
 Get article by article id
 
+- operationId: `getArticleById`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -640,6 +660,7 @@ Get article by article id
 
 Update an existing article
 
+- operationId: `updateArticle`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -708,6 +729,7 @@ Update an existing article
 
 Get list of items from article set
 
+- operationId: `getArticleSetWithItemsById`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -733,6 +755,7 @@ Add an image to an article
 
 Image size limit: 5MB Supported image type: PNG, JPG, JPEG
 
+- operationId: `addArticleImage`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -764,6 +787,7 @@ Image size limit: 5MB Supported image type: PNG, JPG, JPEG
 
 Delete an article image
 
+- operationId: `deleteArticleImage`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -790,6 +814,7 @@ Delete an article image
 
 Get the content of an article image
 
+- operationId: `getArticleImage`
 - Required permission: `ARTICLE_READ_ONLY`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung, Zeit- und Materialrapporte
 
@@ -817,6 +842,7 @@ Update an article image
 
 Image size limit: 5MB Supported image type: PNG, JPG, JPEG
 
+- operationId: `updateArticleImage`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -850,6 +876,7 @@ Image size limit: 5MB Supported image type: PNG, JPG, JPEG
 
 Get variants of an article
 
+- operationId: `getVariantsByArticleId`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 
@@ -873,6 +900,7 @@ Get variants of an article
 
 Get variants of an article with id
 
+- operationId: `getVariantById`
 - Required permission: `ARTICLE`
 - Roles that carry it: Administrator, External user, Kundenbeziehungen
 

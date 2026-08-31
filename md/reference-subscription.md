@@ -8,6 +8,7 @@ Create subscriptions for KLARA tenants.
 
 A KLARA user might have multiple subscriptions. Each subscription will enable a set of feature inside KLARA platform. This endpoint allows to create subscriptions for a KLARA tenant. Each subscription is subjective to its own terms and conditions. Please ask your KLARA contacts or see more details using the KLARA webclient.
 
+- operationId: `createSubscription`
 - Required permission: `STORE_CUSTOMER`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 

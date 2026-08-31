@@ -6,6 +6,8 @@
 
 [PREVIEW_API] Get profile from tenant's ID
 
+- operationId: `getIndividualProfile`
+
 **Responses**
 
 | Status | Body | Meaning |
@@ -19,6 +21,8 @@
 ### POST /core/v2/tenants/individuals/profile
 
 [PREVIEW_API] Create profile
+
+- operationId: `createIndividualProfile`
 
 **Responses**
 

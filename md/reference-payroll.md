@@ -8,6 +8,7 @@ List the company's employees as short-info entries, filtered and sorted.
 
 Returns a lightweight directory of the authenticated company's employees (id, name, email, employee number, workplace, status), resolved from the compensation and person records. Each entry's `id` is the `employeeId` consumed by other employee-scoped endpoints (e.g. `GET /payroll/employees/{employeeId}/addable-salary-items`) — call this endpoint first to resolve an employee's id. Results can be narrowed with a free-text `search-key` (matched against name, employee number and email), restricted to specific workplaces via `workplace-ids`, and filtered by contract `filter-by-status`; ordering is controlled by `sort-field` and `sort-direction`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION_TIME_TRACKING` permission on that company.
 
+- operationId: `listEmployeesShortInfo`
 - Required permission: `COMPENSATION_TIME_TRACKING`
 - Roles that carry it: Administrator, External user, Mitarbeiter und Lohn, Zeit- und Materialrapporte
 
@@ -39,6 +40,7 @@ Add a salary item to an employee's payslip.
 
 Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the employee's editable (non-sealed) payslip identified by `payslipId`, then recalculates that month unless `recalculate=false`. Returns the added salary item with its server-assigned `id`. This operation is not idempotent: repeated calls append duplicate items or throw an error when the item is not duplicatable (subject to the item's duplicatable flag). Prerequisite: call `GET /payroll/employees/{employeeId}/addable-salary-items` first — its response provides the `contractId` and `payslipId` to target and the addable `code`s; resolve `employeeId` beforehand via `GET /employees/short-info`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION` permission on that company.
 
+- operationId: `addSalaryItem`
 - Required permission: `COMPENSATION`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 
@@ -76,6 +78,7 @@ Get the salary items that can be added to an employee's payslip.
 
 Resolves the employee's main (latest) contract and its editable payslip, then returns the salary-item types that can be added to that payslip as blank templates (numeric value fields cleared, distinct by `code`), together with the resolved `contractId` and `payslipId` so the response can be chained into the add-salary-item call. Prerequisite: call `GET /employees/short-info` first to resolve the `employeeId` path parameter from the returned entries' `id` field. When `month` is provided the specified month's payslip is used (read-only); when it is omitted the employee's current editable payslip is used, which may be computed on first access. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION` permission on that company.
 
+- operationId: `listAddableSalaryItems`
 - Required permission: `COMPENSATION`
 - Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
 

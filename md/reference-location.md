@@ -8,6 +8,7 @@ Returns city details
 
 Returns a City details with given id.
 
+- operationId: `getCityById`
 - Required permission: none, this endpoint is how a token is obtained
 
 **Parameters**

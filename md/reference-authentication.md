@@ -8,6 +8,7 @@ Returns all tenants of a user
 
 A KLARA user might have multiple tenants. Use this endpoint to get the list of tenants containing tenant id, company id. The tenant and company id returned by this endpoint can be used to generate tokens to access other endpoints. Use your KLARA username and password OR access-token to get the list of tenants.
 
+- operationId: `listTenants`
 - Required permission: none, this endpoint is how a token is obtained
 
 **Request body** (`application/x-www-form-urlencoded`, not marked required in the specification)
@@ -35,6 +36,7 @@ Generate tokens to access other KLARA core endpoints
 
 After obtaining tenant id and company id for the desired tenant, use this endpoint to get the access token for a specific tenant, and refresh token. A grant_type of password is used for a Password grant, which requires username, password, tenant and company id to produce access token, refresh token from scratch. A grant_type of refresh_token is used for a Refresh token grant, which is used for acquiring the access token using refresh token. A grant_type of token_exchange performs an OAuth 2.0 Token Exchange (RFC 8693). Provide subject_token (the raw upstream Bearer token, without the 'Bearer ' prefix) and audience to identify the target token type. Supported audience values:cossa — exchanges a COSSA bearer token for a ePost access token.Note: subject_token must be the raw token value without the 'Bearer ' prefix.
 
+- operationId: `createPublicApiToken`
 - Required permission: none, this endpoint is how a token is obtained
 
 **Request body** (`application/x-www-form-urlencoded`, not marked required in the specification)
@@ -66,6 +68,7 @@ Exchange Microsoft access token for system token
 
 Provide a Microsoft access token and tenant id to exchange for a system token.
 
+- operationId: `createPublicApiTokenByMicrosoft`
 - Required permission: none, this endpoint is how a token is obtained
 
 **Request body** (`application/x-www-form-urlencoded`, not marked required in the specification)
