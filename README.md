@@ -23,3 +23,8 @@ source.
 
 Where a Markdown file and the specification disagree, the specification is the
 contract.
+
+## License
+
+Documentation under CC BY 4.0, the specification file and the code samples under
+MIT. See `LICENSE`. Brand names and logos are not licensed.
