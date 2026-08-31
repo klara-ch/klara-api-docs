@@ -1,8 +1,8 @@
 {
   "url": "https://context7.com/klara-ch/klara-api-docs",
   "public_key": "pk_sG7l8UtuAw9WTLFcgoJYv",
-  "projectTitle": "KLARA Public API documentation",
-  "description": "REST API for KLARA business software: accounting, finance, articles, customers, payroll and document delivery. Authentication with an API key or a bearer token. Every endpoint states the permission it requires and the KLARA roles that carry it.",
+  "projectTitle": "KLARA Public API",
+  "description": "REST API of KLARA business software, operated by ePost Service AG: accounting, invoicing, articles, customers, payroll and document delivery for Swiss SMEs. Authentication with an API key or a bearer token, and every endpoint states the permission it requires together with the KLARA roles that carry it. This repository mirrors the official documentation at developer.klara.ch in Markdown, generated from the published OpenAPI specification.",
   "folders": [
     "md"
   ],
