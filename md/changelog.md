@@ -8,6 +8,26 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
+#### 7 September 2026
+
+7 changed
+
+#### Changed
+
+- **7 endpoints** — new status codes: 404Show the endpointsGET `/core/latest/customers`
+
+- GET `/core/latest/customers/{customer-id}/additional-addresses`
+
+- GET `/core/latest/customers/{customer-id}/contacts`
+
+- GET `/core/v1/customers`
+
+- POST `/core/latest/customers`
+
+- POST `/core/latest/customers/{customer-id}/additional-addresses`
+
+- POST `/core/latest/customers/{customer-id}/contacts`
+
 #### 31 August 2026
 
 72 changed
@@ -161,6 +181,16 @@ PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` —
 - POST `/core/latest/generic-token` — moved from area Klara authentication generic to KLARA authentication generic
 
 ### Documentation changes
+
+#### 7 September 2026
+
+Roles for the document upload, and 404 on the customer endpoints
+
+- **The document upload now names the roles that may call it.** `POST /core/latest/companies/{company-id}/documents` lists `COMPANY_ADMINISTRATOR`, `TRUSTED_USER`, `ACCOUNTANT`, `CUSTOMER_RELATIONSHIP_MANAGER`, `EMPLOYEE` and `MYKLARA_USER`, and one of them is enough. Until now this endpoint said the requirement was not established. The statement comes from the specification text rather than from the source analysis behind the other permission statements, and the endpoint says so.
+
+- **Seven customer endpoints now declare `404`**: reading and creating customers under both `/core/latest` and `/core/v1`, plus their additional addresses and contacts. No response body, as with the other error statuses there. If you generate a client, it gains a `404` branch on those calls.
+
+- Nothing was added or removed. 97 endpoints, same paths, same request and response shapes.
 
 #### 31 August 2026
 

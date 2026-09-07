@@ -17,6 +17,7 @@ Returns all customers of a company
 | `200` | application/json | Customers |
 | `401` | none declared | No Authorization header found or invalid token |
 | `403` | ErrorMessage | The current user is not allowed to access this company data |
+| `404` | none declared | Resource not found |
 | `429` | none declared | API rate limit exceeded |
 
 ### POST /core/latest/customers
@@ -46,6 +47,7 @@ Create a new customer
 | `400` | ErrorMessage | Data invalid |
 | `401` | none declared | No Authorization header found or invalid token |
 | `403` | ErrorMessage | The current user is not allowed to access this company data |
+| `404` | none declared | Resource not found |
 | `429` | none declared | API rate limit exceeded |
 
 ### DELETE /core/latest/customers/{customer-id}
@@ -154,6 +156,7 @@ Gets all additional addresses of a customer
 | `200` | application/json | List of all additional addresses |
 | `401` | none declared | No Authorization header found or invalid token |
 | `403` | ErrorMessage | The current user is not allowed to access this company data |
+| `404` | none declared | Resource not found |
 | `429` | none declared | API rate limit exceeded |
 
 ### POST /core/latest/customers/{customer-id}/additional-addresses
@@ -196,6 +199,7 @@ Creates a new customer's additional address
 | `400` | ErrorMessage | Data invalid |
 | `401` | none declared | No Authorization header found or invalid token |
 | `403` | ErrorMessage | The current user is not allowed to access this company data |
+| `404` | none declared | Resource not found |
 | `429` | none declared | API rate limit exceeded |
 
 ### DELETE /core/latest/customers/{customer-id}/additional-addresses/{address-id}
@@ -288,6 +292,7 @@ Gets all contacts of a customer
 | `200` | application/json | List of contacts |
 | `401` | none declared | No Authorization header found or invalid token |
 | `403` | ErrorMessage | The current user is not allowed to access this company data |
+| `404` | none declared | Resource not found |
 | `429` | none declared | API rate limit exceeded |
 
 ### POST /core/latest/customers/{customer-id}/contacts
@@ -332,6 +337,7 @@ Creates a new customer's contact
 | `400` | ErrorMessage | Data invalid |
 | `401` | none declared | No Authorization header found or invalid token |
 | `403` | ErrorMessage | The current user is not allowed to access this company data |
+| `404` | none declared | Resource not found |
 | `429` | none declared | API rate limit exceeded |
 
 ### DELETE /core/latest/customers/{customer-id}/contacts/{contact-id}
@@ -432,4 +438,5 @@ Returns a page of customers (`Persons` + `Companies`) of the caller's company, w
 | `400` | ErrorMessage | Data invalid |
 | `401` | none declared | No Authorization header found or invalid token |
 | `403` | ErrorMessage | The current user is not allowed to access this company data |
+| `404` | none declared | Resource not found |
 | `429` | none declared | API rate limit exceeded |

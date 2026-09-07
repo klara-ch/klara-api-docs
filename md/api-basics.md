@@ -101,13 +101,13 @@ Ask for what the endpoint returns. `Accept: application/json` is correct almost 
 
 ### What an error body contains
 
-The specification declares 433 error responses on 97 operations. 234 of them declare no body at all, which is why the shape matters less than the status code.
+The specification declares 440 error responses on 97 operations. 241 of them declare no body at all, which is why the shape matters less than the status code.
 
 | Schema | Fields | Error responses | Operations |
 |---|---|---|---|
 | `ErrorMessage`, `ErrorMessage1` | `code`, `createdTime`, `detail`, `message`, `uuid` | 179 | 88 |
 | `ErrorResponse` | `error`, `error_description` | 20 | 6 |
-| no body declared | — | 234 | 97 |
+| no body declared | — | 241 | 97 |
 
 The OAuth-style pair `error` and `error_description` is declared on 6 operations:
 

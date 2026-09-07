@@ -6,7 +6,7 @@
 
 Upload a document for a company
 
-Uploads a single file under one of a fixed set of document categories. The tenant is derived from the bearer token; only the authenticated company's id may be used in the path. Maximum file size: 25 MB. For category LIABILITY_UPLOAD the downstream service additionally triggers asynchronous AI analysis (the upload response is returned regardless of the AI outcome). Required caller roles (enforced by the API gateway): COMPANY_ADMINISTRATOR, TRUSTED_USER or CUSTOMER_RELATIONSHIP_MANAGER. Important: When uploading documents as part of the create booking functionality only the `LIABILITY_UPLOAD` category is allowed (the documents are automatically moved to `LIABILITIES` when the booking is created successfully via `POST /core/v1/bookings`).
+Uploads a single file under one of a fixed set of document categories. The tenant is derived from the bearer token; only the authenticated company's id may be used in the path. Maximum file size: 25 MB. For category LIABILITY_UPLOAD the downstream service additionally triggers asynchronous AI analysis (the upload response is returned regardless of the AI outcome). Required caller roles (enforced by the downstream service): COMPANY_ADMINISTRATOR, TRUSTED_USER, ACCOUNTANT, CUSTOMER_RELATIONSHIP_MANAGER, EMPLOYEE or MYKLARA_USER. Important: When uploading documents as part of the create booking functionality only the `LIABILITY_UPLOAD` category is allowed (the documents are automatically moved to `LIABILITIES` when the booking is created successfully via `POST /core/v1/bookings`).
 
 - operationId: `uploadCompanyDocument`
 

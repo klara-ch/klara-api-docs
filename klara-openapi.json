@@ -845,7 +845,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/FilterAssigningGroup"
+                "$ref": "#/components/schemas/FilterAssigningGroup1"
               }
             }
           },
@@ -2260,7 +2260,7 @@
           "Company documents"
         ],
         "summary": "Upload a document for a company",
-        "description": "Uploads a single file under one of a fixed set of document categories. The tenant is derived from the bearer token; only the authenticated company's id may be used in the path. Maximum file size: 25 MB. For category LIABILITY_UPLOAD the downstream service additionally triggers asynchronous AI analysis (the upload response is returned regardless of the AI outcome). Required caller roles (enforced by the API gateway): COMPANY_ADMINISTRATOR, TRUSTED_USER or CUSTOMER_RELATIONSHIP_MANAGER.<br/><br/><strong>Important:</strong> When uploading documents as part of the <strong>create booking</strong> functionality only the <code>LIABILITY_UPLOAD</code> category is allowed (the documents are automatically moved to <code>LIABILITIES</code> when the booking is created successfully via <code>POST /core/v1/bookings</code>).",
+        "description": "Uploads a single file under one of a fixed set of document categories. The tenant is derived from the bearer token; only the authenticated company's id may be used in the path. Maximum file size: 25 MB. For category LIABILITY_UPLOAD the downstream service additionally triggers asynchronous AI analysis (the upload response is returned regardless of the AI outcome). Required caller roles (enforced by the downstream service): COMPANY_ADMINISTRATOR, TRUSTED_USER, ACCOUNTANT, CUSTOMER_RELATIONSHIP_MANAGER, EMPLOYEE or MYKLARA_USER.<br/><br/><strong>Important:</strong> When uploading documents as part of the <strong>create booking</strong> functionality only the <code>LIABILITY_UPLOAD</code> category is allowed (the documents are automatically moved to <code>LIABILITIES</code> when the booking is created successfully via <code>POST /core/v1/bookings</code>).",
         "operationId": "uploadCompanyDocument",
         "parameters": [
           {
@@ -2508,6 +2508,9 @@
               }
             }
           },
+          "404": {
+            "description": "Resource not found"
+          },
           "429": {
             "description": "API rate limit exceeded"
           }
@@ -2571,6 +2574,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "429": {
             "description": "API rate limit exceeded"
@@ -2832,6 +2838,9 @@
               }
             }
           },
+          "404": {
+            "description": "Resource not found"
+          },
           "429": {
             "description": "API rate limit exceeded"
           }
@@ -2907,6 +2916,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "429": {
             "description": "API rate limit exceeded"
@@ -3120,6 +3132,9 @@
               }
             }
           },
+          "404": {
+            "description": "Resource not found"
+          },
           "429": {
             "description": "API rate limit exceeded"
           }
@@ -3195,6 +3210,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "429": {
             "description": "API rate limit exceeded"
@@ -6885,6 +6903,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Resource not found"
           },
           "429": {
             "description": "API rate limit exceeded"
@@ -10940,7 +10961,7 @@
         ],
         "type": "string"
       },
-      "FilterAssigningGroup": {
+      "FilterAssigningGroup1": {
         "description": "A bunch of article ids need to be assigned the filter",
         "type": "object",
         "properties": {
@@ -12778,14 +12799,16 @@
           },
           "numberOfChildren": {
             "format": "int64",
-            "description": "Number of children registered for the employee.",
+            "description": "<b>Deprecated and not populated. Always returns <code>0</code>; do not read this field.</b> It was published in error — the employee directory does not carry family data — and the compensation service has never supplied a value for it. Scheduled for removal in <code>/core/v2</code>; it is retained here only so the published <code>/core/v1</code> response shape is not altered.",
             "type": "integer",
-            "example": 2
+            "example": 0,
+            "deprecated": true
           },
           "cashPayment": {
-            "description": "Whether the employee is paid in cash.",
+            "description": "<b>Deprecated and not populated. Always returns <code>false</code>; do not read this field.</b> It was published in error — the employee directory does not carry payment arrangements — and the compensation service has never supplied a value for it. Scheduled for removal in <code>/core/v2</code>; it is retained here only so the published <code>/core/v1</code> response shape is not altered.",
             "type": "boolean",
-            "example": false
+            "example": false,
+            "deprecated": true
           },
           "status": {
             "description": "Contract status of the employee. Allowed values: ACTIVE, INACTIVE, DRAFT.",
