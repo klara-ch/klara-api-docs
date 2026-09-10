@@ -12,4 +12,4 @@ Questions and problem reports: [support.klara.ch](https://support.klara.ch). Whe
 
 Every release is recorded in the [changelog](https://developer.klara.ch/#changelog), including breaking changes.
 
-KLARA is a product of ePost Service AG. Looking for the ePost Communication Platform APIs? Go to [developer.epost.ch](https://developer.epost.ch). Generated from the KLARA OpenAPI specification on 7 September 2026. Updated when a new API version is released.
+KLARA is a product of ePost Service AG. Looking for the ePost Communication Platform APIs? Go to [developer.epost.ch](https://developer.epost.ch). Generated from the KLARA OpenAPI specification on 10 September 2026. Updated when a new API version is released.
