@@ -8,9 +8,7 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
-#### 18 September 2026
-
-1 new · 97 changed
+#### 18 September 2026 · 1 new · 97 changed
 
 #### New
 
@@ -194,9 +192,7 @@ GET `/core/v1/accounting/business-case-templates` — new parameter `query:sort-
 
 GET `/core/v1/employees/short-info` — new parameter `query:status`; response body now documented for 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage); response schema renamed, 400: `ErrorMessage1` to `ErrorMessage`; 403: `ErrorMessage1` to `ErrorMessage`; 404: `ErrorMessage1` to `ErrorMessage`. Generated client type names change with it POST `/core/v1/payroll/contracts/{contractId}/payslips/{payslipId}/salary-items` — response body now documented for 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage); response schema renamed, 400: `ErrorMessage1` to `ErrorMessage`; 403: `ErrorMessage1` to `ErrorMessage`; 404: `ErrorMessage1` to `ErrorMessage`. Generated client type names change with it GET `/core/v1/payroll/employees/{employeeId}/addable-salary-items` — response body now documented for 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage); response schema renamed, 400: `ErrorMessage1` to `ErrorMessage`; 403: `ErrorMessage1` to `ErrorMessage`; 404: `ErrorMessage1` to `ErrorMessage`. Generated client type names change with it
 
-#### 7 September 2026
-
-7 changed
+#### 7 September 2026 · 7 changed
 
 #### Changed
 
@@ -214,9 +210,7 @@ GET `/core/v1/employees/short-info` — new parameter `query:status`; response b
 
 - POST `/core/latest/customers/{customer-id}/contacts`
 
-#### 31 August 2026
-
-72 changed
+#### 31 August 2026 · 72 changed
 
 #### Changed
 
@@ -358,9 +352,7 @@ GET `/core/v1/employees/short-info` — new parameter `query:status`; response b
 
 PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` — operationId renamed from `update additional-addresses` to `updateCustomerAdditionalAddress`. Generated method names change with it DELETE `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` — operationId renamed from `delete additional-address` to `deleteCustomerAdditionalAddress`. Generated method names change with it PUT `/core/latest/customers/{customer-id}/contacts/{contact-id}` — operationId renamed from `update CustomerContact` to `updateCustomerContact`. Generated method names change with it DELETE `/core/latest/customers/{customer-id}/contacts/{contact-id}` — operationId renamed from `delete CustomerContact` to `deleteCustomerContact`. Generated method names change with it
 
-#### 28 August 2026
-
-1 changed
+#### 28 August 2026 · 1 changed
 
 #### Changed
 
@@ -368,9 +360,7 @@ PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` —
 
 ### Documentation changes
 
-#### 18 September 2026
-
-Invoice list, one search pattern, sunset dates and error bodies
+#### 18 September 2026 · Invoice list, one search pattern, sunset dates and error bodies
 
 - **New: `GET /core/v1/invoices`** returns a page of invoices with free-text search, paging and sorting, so you no longer have to keep every invoice id in your own system. It needs the `FINANCE` permission. **Read the note on `status` before you build on it:** that parameter is the filter from the KLARA invoice overview, not an equality check on the field. `status=OPEN` returns rows that read `INVOICED` or `PAID`. Use `booking-status` to filter on the payment state exactly.
 
@@ -386,9 +376,7 @@ Invoice list, one search pattern, sunset dates and error bodies
 
 - The specification names the real host `https://api.klara.ch` instead of `/`, and states in its own description that this is the only environment customers can reach.
 
-#### 7 September 2026
-
-Roles for the document upload, and 404 on the customer endpoints
+#### 7 September 2026 · Roles for the document upload, and 404 on the customer endpoints
 
 - **The document upload now names the roles that may call it.** `POST /core/latest/companies/{company-id}/documents` lists `COMPANY_ADMINISTRATOR`, `TRUSTED_USER`, `ACCOUNTANT`, `CUSTOMER_RELATIONSHIP_MANAGER`, `EMPLOYEE` and `MYKLARA_USER`, and one of them is enough. Until now this endpoint said the requirement was not established. The statement comes from the specification text rather than from the source analysis behind the other permission statements, and the endpoint says so.
 
@@ -396,9 +384,7 @@ Roles for the document upload, and 404 on the customer endpoints
 
 - Nothing was added or removed. 97 endpoints, same paths, same request and response shapes.
 
-#### 31 August 2026
-
-Every endpoint now has a stable operationId
+#### 31 August 2026 · Every endpoint now has a stable operationId
 
 - **All 97 operations carry an `operationId`**, 68 of them for the first time. Until now a client generator had to invent method names from the path, and those names changed whenever a path changed. From now on the id is the name.
 
@@ -408,9 +394,7 @@ Every endpoint now has a stable operationId
 
 - The endpoint set is unchanged: 97 operations, same paths, same permissions.
 
-#### 28 August 2026
-
-Machine-readable formats, error bodies, search, roles and superseded paths
+#### 28 August 2026 · Machine-readable formats, error bodies, search, roles and superseded paths
 
 - **This documentation is now available in machine-readable form.** [`llms.txt`](llms.txt) indexes every chapter as a Markdown file and every area of the reference as a Markdown file with parameters, request and response bodies, the required permission and the roles that carry it. Built in the same run as this page, from the same source. The specification itself is unchanged and remains the contract.
 
@@ -428,9 +412,7 @@ Machine-readable formats, error bodies, search, roles and superseded paths
 
 - **Correction, the recommended starting role has changed.** The getting started guide recommended `Accountant`, which cannot read articles, so the first call of the guide answered `403`. The guide now recommends a role that covers every call it makes.
 
-#### 24 August 2026
-
-Rate limit, error responses, pagination and API keys
+#### 24 August 2026 · Rate limit, error responses, pagination and API keys
 
 - The rate limit is **at least 10,000 requests per minute**, counted per calling IP address, the same on every endpoint. The informational rate limit headers are suppressed at the gateway, so do not expect them. See [Limits](https://developer.klara.ch/#limits).
 
@@ -446,9 +428,7 @@ Rate limit, error responses, pagination and API keys
 
 - **Correction to an earlier statement:** `External user` holds the same Public API permissions as `Administrator`. Choosing it instead of Administrator does not narrow what a key can reach.
 
-#### 17 August 2026
-
-Initial publication
+#### 17 August 2026 · Initial publication
 
 - 97 endpoints across accounting, finance, articles, customers, payroll and delivery. Accounting, finance and payroll are served under `/core/v1`, articles, customers and authentication under `/core/latest`.
 
