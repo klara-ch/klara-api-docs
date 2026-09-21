@@ -11,7 +11,7 @@ source.
 - Canonical documentation: https://developer.klara.ch/
 - OpenAPI specification: https://developer.klara.ch/klara-openapi.json
 - Index of all files: https://developer.klara.ch/llms.txt
-- Built at: 10 September 2026
+- Built at: 18 September 2026
 
 ## What is in here
 
@@ -19,7 +19,7 @@ source.
 - `md/*.md` — one file per chapter of the documentation
 - `md/reference-*.md` — the endpoints of one area each, with parameters, request
   and response bodies, the required permission and the roles that carry it
-- `klara-openapi.json` — the contract itself, 97 operations
+- `klara-openapi.json` — the contract itself, 98 operations
 
 Where a Markdown file and the specification disagree, the specification is the
 contract.

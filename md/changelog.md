@@ -8,6 +8,192 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
+#### 18 September 2026
+
+1 new · 97 changed
+
+#### New
+
+- GET `/core/v1/invoices` — Search and page the invoices of the authenticated company.
+
+#### Changed
+
+- GET `/core/latest/article-categories` — new parameter `query:offset`; new parameter `query:search-key`; response body now documented for 401 (ErrorMessage), 429 (ErrorMessage)
+
+- GET `/core/latest/article-filters` — new parameter `query:offset`; new parameter `query:search-key`; response body now documented for 401 (ErrorMessage), 429 (ErrorMessage)
+
+- **33 endpoints** — response body now documented for 401 (ErrorMessage), 429 (ErrorMessage)Show the endpointsGET `/core/latest/articles`
+
+- GET `/core/latest/articles/article-and-variants`
+
+- GET `/core/latest/articles/{article-id}`
+
+- GET `/core/latest/articles/{article-id}/article-set-items`
+
+- GET `/core/latest/articles/{article-id}/variants`
+
+- GET `/core/latest/articles/{article-id}/variants/{variant-id}`
+
+- GET `/core/latest/company-configuration/including-vat`
+
+- GET `/core/v1/accounting/accounts`
+
+- GET `/core/v1/accounting/accounts/account-displaying`
+
+- GET `/core/v1/accounting/accounts/by-code/{accountCode}`
+
+- GET `/core/v1/accounting/booking-types`
+
+- GET `/core/v1/accounting/business-cases`
+
+- GET `/core/v1/accounting/business-cases/v2`
+
+- GET `/core/v1/accounting/business-cases/{businessCaseId}`
+
+- GET `/core/v1/accounting/companies/current`
+
+- GET `/core/v1/accounting/companies/current/business-case-templates`
+
+- GET `/core/v1/accounting/companies/current/financial-years`
+
+- GET `/core/v1/accounting/currencies/exchange-rate`
+
+- GET `/core/v1/accounting/master-vats`
+
+- GET `/core/v1/accounting/master-vats/current`
+
+- GET `/core/v1/accounting/master-vats/{masterVatId}`
+
+- GET `/core/v1/accounting/vat-types`
+
+- GET `/core/v1/accounting/vat-types/{vatTypeId}`
+
+- GET `/core/v1/order-documents/{order-type}/next-document-number`
+
+- GET `/core/v1/order-numbering-configurations`
+
+- GET `/core/v1/orders/next-order-number`
+
+- POST `/core/latest/article-categories`
+
+- POST `/core/latest/article-filters`
+
+- POST `/core/latest/articles`
+
+- POST `/core/latest/articles/bulk`
+
+- POST `/core/v1/bookings`
+
+- PUT `/core/latest/articles/{article-id}`
+
+- PUT `/core/v1/bookings/{id}/documents`
+
+**25 endpoints** — response body now documented for 401 (ErrorMessage), 404 (ErrorMessage), 429 (ErrorMessage)Show the endpoints
+
+- DELETE `/core/latest/article-categories/{category-id}`
+
+- DELETE `/core/latest/article-filters/{filter-id}`
+
+- DELETE `/core/latest/customers/{customer-id}/additional-addresses/{address-id}`
+
+- DELETE `/core/latest/customers/{customer-id}/contacts/{contact-id}`
+
+- GET `/core/latest/article-categories/{category-id}`
+
+- GET `/core/latest/article-filters/{filter-id}`
+
+- GET `/core/latest/cities/{city-id}`
+
+- GET `/core/latest/customers`
+
+- GET `/core/latest/customers/{customer-id}`
+
+- GET `/core/latest/customers/{customer-id}/additional-addresses`
+
+- GET `/core/latest/customers/{customer-id}/contacts`
+
+- GET `/core/v1/accounting/business-case-templates/{businessCaseTemplateId}`
+
+- GET `/core/v1/customers`
+
+- GET `/core/v1/invoices/{id}`
+
+- POST `/core/latest/article-categories/{category-id}/assign-to-articles`
+
+- POST `/core/latest/article-filters/{filter-id}/assign-to-articles`
+
+- POST `/core/latest/customers`
+
+- POST `/core/latest/customers/{customer-id}/additional-addresses`
+
+- POST `/core/latest/customers/{customer-id}/contacts`
+
+- POST `/core/v1/invoices/{id}/send`
+
+- PUT `/core/latest/article-categories/{category-id}`
+
+- PUT `/core/latest/article-filters/{filter-id}`
+
+- PUT `/core/latest/customers/{customer-id}`
+
+- PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}`
+
+- PUT `/core/latest/customers/{customer-id}/contacts/{contact-id}`
+
+**6 endpoints** — response body now documented for 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage)Show the endpoints
+
+- DELETE `/core/latest/articles/{article-id}`
+
+- DELETE `/core/latest/articles/{article-id}/images/{image-id}`
+
+- GET `/core/latest/articles/article-numbers`
+
+- GET `/core/latest/articles/{article-id}/images/{image-id}`
+
+- GET `/core/v1/order-documents/filter/type-and-order-number`
+
+- POST `/core/latest/payroll-interface-file`
+
+POST `/core/latest/articles/{article-id}/images` — response body now documented for 401 (ErrorMessage), 415 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage) PUT `/core/latest/articles/{article-id}/images/{image-id}` — response body now documented for 401 (ErrorMessage), 415 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage) GET `/core/latest/articles/search` — new parameter `query:search-key`; response body now documented for 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage) POST `/core/latest/companies/{company-id}/documents` — response body now documented for 401 (ErrorMessage), 415 (ErrorMessage), 429 (ErrorMessage); response schema renamed, 400: `ErrorMessage1` to `ErrorMessage`; 403: `ErrorMessage1` to `ErrorMessage`; 413: `ErrorMessage1` to `ErrorMessage`; 500: `ErrorMessage1` to `ErrorMessage`. Generated client type names change with it **5 endpoints** — response body now documented for 401 (ErrorMessage)Show the endpoints
+
+- GET `/core/latest/company-vats`
+
+- GET `/core/latest/vat-cases`
+
+- GET `/core/latest/vat-cases/{vat-case-id}`
+
+- GET `/core/v2/tenants/individuals/profile`
+
+- POST `/core/v2/tenants/individuals/profile`
+
+DELETE `/core/latest/customers/{customer-id}` — response body now documented for 401 (ErrorMessage), 404 (ErrorMessage), 429 (ErrorMessage); response schema renamed, 400: `ErrorResponse` to `ErrorMessage`. Generated client type names change with it POST `/core/latest/generic-token` — response body now documented for 400 (ErrorMessage), 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage) POST `/core/latest/token` — response body now documented for 400 (ErrorMessage), 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage) POST `/core/latest/token/by-microsoft` — response body now documented for 400 (ErrorMessage), 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage) **5 endpoints** — response body now documented for 429 (ErrorMessage)Show the endpoints
+
+- GET `/core/v2/tenants/companies`
+
+- POST `/core/latest/subscriptions`
+
+- POST `/core/latest/tenants`
+
+- POST `/core/v2/tenants/companies`
+
+- PUT `/core/v2/tenants/companies`
+
+GET `/core/v1/accounting/business-case-templates` — new parameter `query:sort-field`; response body now documented for 401 (ErrorMessage), 429 (ErrorMessage) GET `/core/v1/bank-reconciliation/open-positions` — new parameter `query:search-key`; response body now documented for 401 (ErrorMessage), 429 (ErrorMessage) GET `/core/v1/accounting/vat-profile` — new status codes: 429; response body now documented for 401 (ErrorMessage) GET `/core/v1/accounting/vat-suggestions` — new status codes: 429; response body now documented for 401 (ErrorMessage) **6 endpoints** — response body now documented for 401 (ErrorMessage), 404 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage)Show the endpoints
+
+- GET `/core/v1/company-bank-accounts`
+
+- GET `/core/v1/invoices/next-invoice-number`
+
+- POST `/core/v1/invoices`
+
+- POST `/core/v1/invoices/{id}/printed-document`
+
+- POST `/core/v1/vat-clearing-reports/{year}/{quarter}`
+
+- PUT `/core/v1/invoices`
+
+GET `/core/v1/employees/short-info` — new parameter `query:status`; response body now documented for 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage); response schema renamed, 400: `ErrorMessage1` to `ErrorMessage`; 403: `ErrorMessage1` to `ErrorMessage`; 404: `ErrorMessage1` to `ErrorMessage`. Generated client type names change with it POST `/core/v1/payroll/contracts/{contractId}/payslips/{payslipId}/salary-items` — response body now documented for 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage); response schema renamed, 400: `ErrorMessage1` to `ErrorMessage`; 403: `ErrorMessage1` to `ErrorMessage`; 404: `ErrorMessage1` to `ErrorMessage`. Generated client type names change with it GET `/core/v1/payroll/employees/{employeeId}/addable-salary-items` — response body now documented for 401 (ErrorMessage), 429 (ErrorMessage), 500 (ErrorMessage); response schema renamed, 400: `ErrorMessage1` to `ErrorMessage`; 403: `ErrorMessage1` to `ErrorMessage`; 404: `ErrorMessage1` to `ErrorMessage`. Generated client type names change with it
+
 #### 7 September 2026
 
 7 changed
@@ -181,6 +367,24 @@ PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` —
 - POST `/core/latest/generic-token` — moved from area Klara authentication generic to KLARA authentication generic
 
 ### Documentation changes
+
+#### 18 September 2026
+
+Invoice list, one search pattern, sunset dates and error bodies
+
+- **New: `GET /core/v1/invoices`** returns a page of invoices with free-text search, paging and sorting, so you no longer have to keep every invoice id in your own system. It needs the `FINANCE` permission. **Read the note on `status` before you build on it:** that parameter is the filter from the KLARA invoice overview, not an equality check on the field. `status=OPEN` returns rows that read `INVOICED` or `PAID`. Use `booking-status` to filter on the payment state exactly.
+
+- **The superseded `/core/latest` accounting operations now carry a sunset date: 14 August 2027.** From the day after, they answer `410 Gone` instead of data. Each one names its `/core/v1` successor in the contract. Replacing the prefix remains the whole migration. See [Path prefixes and what is current](https://developer.klara.ch/#api-basics).
+
+- **One search and sort pattern across the API.** `search-key`, `offset`, `limit`, `sort-field`, `sort-direction` and `status` are now the names everywhere. Nothing was renamed: the old names `keyword`, `general-search`, `orderColumns` and `filter-by-status` keep working and are marked deprecated. Send both and the new name wins.
+
+- **Every error response now carries a documented body.** Until now 444 of them declared none. At the same time the duplicate schema `ErrorMessage1` is gone, and four operations that used it now answer with `ErrorMessage`. **If you generate a client, this is the one change that forces a regeneration:** the type name changes, the fields do not.
+
+- The contract now names its own error codes in `x-error-codes`. There are three today, and the list is not exhaustive on purpose. See [What an error body contains](https://developer.klara.ch/#api-basics).
+
+- **Pagination on article categories and article filters is fixed.** Both accept `offset` now and return the total in the `X-Total-Count` header. Until now they took `limit` without `offset`, so nothing beyond the first page was reachable.
+
+- The specification names the real host `https://api.klara.ch` instead of `/`, and states in its own description that this is the only environment customers can reach.
 
 #### 7 September 2026
 

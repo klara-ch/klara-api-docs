@@ -21,9 +21,9 @@ Three prefixes are in use. `/core/v1` holds accounting, finance and payroll, `/c
 
 Three prefixes are in use. `/core/v1` and `/core/v2` are the current ones. `/core/latest` is older and mixed: some endpoints live only there and are perfectly current, others are superseded.
 
-> **Note: The superseded `/core/latest` operations are not in this specification**
+> **Warning: The superseded `/core/latest` operations stop answering on 14 August 2027**
 >
-> 24 operations carry `deprecated` in the source contract: 20 in `accounting`, 2 in `bookings`, 1 in `bank-reconciliation`, 1 in `vat-clearing-reports`. They are excluded from the specification published here, so searching that file for them finds nothing. They still respond at the API, so an existing integration does not break, but they are not part of this contract and new work must use the current path.
+> 24 operations carry `deprecated` in the source contract: 20 in `accounting`, 2 in `bookings`, 1 in `bank-reconciliation`, 1 in `vat-clearing-reports`. They are not in the specification published here, and they carry a sunset date in the source contract: on 14 August 2027, they answer `410 Gone` instead of returning data. Until then they still respond, so an existing integration does not break today, but the migration has a deadline. New work must use the current path.
 >
 > | Superseded | Use instead |
 > |---|---|
@@ -58,12 +58,12 @@ Replacing `/core/latest/` with `/core/v1/` in the path is the whole migration. R
 
 | Verb | Used for | Endpoints |
 |---|---|---|
-| GET | Retrieving resources | 55 |
+| GET | Retrieving resources | 56 |
 | PUT | Replacing a resource completely | 10 |
 | POST | Creating resources, and some actions such as `/send` | 25 |
 | DELETE | Removing a resource | 7 |
 
-97 endpoints in total, which is the same number as in the reference below and in the downloadable specification.
+98 endpoints in total, which is the same number as in the reference below and in the downloadable specification.
 
 The KLARA API does not use `PATCH`. To change part of a resource, send a complete `PUT`. Read the current state first if you do not hold it.
 
@@ -95,23 +95,20 @@ Ask for what the endpoint returns. `Accept: application/json` is correct almost 
 
 | Media type | Endpoints | Which ones |
 |---|---|---|
-| `application/json` | 97 | every endpoint that has one |
+| `application/json` | 98 | every endpoint that has one |
 | `application/octet-stream` | 2 | `GET /core/latest/articles/{article-id}/images/{image-id}` `POST /core/latest/payroll-interface-file` |
 | `application/pdf` | 1 | `POST /core/v1/invoices/{id}/printed-document` |
 
 ### What an error body contains
 
-The specification declares 440 error responses on 97 operations. 241 of them declare no body at all, which is why the shape matters less than the status code.
+The specification declares 447 error responses on 98 operations. Every one of them declares a body, so you can generate a type for the error case and read the `code` and the `uuid` from it.
 
 | Schema | Fields | Error responses | Operations |
 |---|---|---|---|
-| `ErrorMessage`, `ErrorMessage1` | `code`, `createdTime`, `detail`, `message`, `uuid` | 179 | 88 |
-| `ErrorResponse` | `error`, `error_description` | 20 | 6 |
-| no body declared | — | 241 | 97 |
+| `ErrorMessage` | `code`, `createdTime`, `detail`, `message`, `uuid` | 428 | 98 |
+| `ErrorResponse` | `error`, `error_description` | 19 | 5 |
 
-The OAuth-style pair `error` and `error_description` is declared on 6 operations:
-
-- `DELETE /core/latest/customers/{customer-id}`
+The OAuth-style pair `error` and `error_description` is declared on 5 operations:
 
 - `GET /core/v2/tenants/companies`
 
@@ -127,9 +124,15 @@ It is not the shape of the authentication endpoints as a group. What the authent
 
 Two of the entries above are not the application speaking. A `429` body comes from the gateway, not from the API, so it is outside this contract and may look like none of these shapes. And where a status declares no body, a gateway may still add one; that too is outside the contract.
 
-> **Warning: Do not branch on error codes**
->
-> There is no governed catalogue of `code` values. Branch on the HTTP status, log the message, and treat the code as information for a human reading a support ticket.
+The contract names 3 error codes of its own, in the `code` field of the error body:
+
+| Code | Status | Meaning | Where |
+|---|---|---|---|
+| `auth.credentials_missing` | `401` | Neither an Authorization: Bearer header nor an API key header was present on the request. | 3 operations |
+| `booking.status_not_allowed` | `400` | bookingStatus was neither BOOKED nor PLANNED. | 1 operation |
+| `invoice.id_must_be_zero` | `400` | The request body carried a non-zero id. This operation only creates invoices; use PUT /core/v1/invoices to modify an existing one. | 1 operation |
+
+That list is not exhaustive and is not meant to be: a failure detected by a downstream service carries that service's own code. Branch on the HTTP status, treat an unknown code as a generic error of that status, and log the code and the `uuid` for a support request.
 
 ### Errors
 

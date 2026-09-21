@@ -1,6 +1,6 @@
 # Finance
 
-11 operations of the KLARA API, generated from `klara-openapi.json`. Canonical page: https://developer.klara.ch/#reference
+12 operations of the KLARA API, generated from `klara-openapi.json`. Canonical page: https://developer.klara.ch/#reference
 
 ### GET /core/v1/company-bank-accounts
 
@@ -24,17 +24,50 @@ Returns the bank accounts of the company resolved from the bearer JWT, optionall
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Bank accounts of the authenticated company. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | Resource not found |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Resource not found Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+
+### GET /core/v1/invoices
+
+Search and page the invoices of the authenticated company.
+
+Returns a page of the company's invoices, newest first, with optional free-text search (`search-key`) and status filter (`status`). Each row is an `InvoiceSummary` — a flat projection carrying the identity, amounts, dates, customer and both status fields. Retrieve the full document, including order items and attachments, with `GET /core/v1/invoices/{id}`. Paging. Walk the collection with `offset` and `limit`: iterate `offset=0, limit, 2×limit, …` until a response returns fewer than `limit` rows. Ordering defaults to `sort-field=ID`, `sort-direction=DESC`, which is unique per row and therefore stable across pages — if you sort by a non-unique field instead (for example `LAST_MODIFIED`), rows sharing a value may shift between pages. The two status fields mean different things. `status` on a row is the invoice document status; `bookingStatus` is the accounting payment state of its open position, supplied by `an internal service`. A fully paid invoice reads `status: INVOICED` with `bookingStatus: PAID`. The `status` query parameter is the KLARA invoice-overview filter, not an equality filter on the row's `status` field. It matches on both the document status and the payment state, exactly as the KLARA invoice list does:`DRAFT`, `CANCELLED` — document status only.`INVOICED`, `SENT` — invoiced and still open.`OPEN` — invoiced or paid, with `bookingStatus=OPEN`. Rows come back reading `status: INVOICED` or `PAID`, so do not expect the filter value to be echoed in the row.`PAID` — `bookingStatus` of `PAID` or `PARTLY_PAID`.`CLEARED` — `bookingStatus` of `CLEARED` or `PARTLY_CLEARED` (credit notes).Use `booking-status` to filter on the payment state precisely. It matches the row's `bookingStatus` field and nothing else, accepts the full set — including `PARTLY_PAID` and `PARTLY_CLEARED`, which `status` cannot express — and combines with `status`: `?status=INVOICED&booking-status=OPEN` is the exact way to ask for "invoiced and not yet paid". Invoices that carry no booking at all (`DRAFT`, cancelled) have no payment state and are excluded whenever `booking-status` is given. Two further behaviours worth knowing. Invoices whose order has been archived are excluded. And `status=OPEN` — only that one value — applies its payment-state check after the page is cut, so such a page can contain fewer than `limit` rows while the offsets stay stable; keep paging rather than treating a short page as the end. `booking-status=OPEN` does not behave that way: it is part of the query, so a short page really is the last page. Prefer it. Read-only and idempotent. Authentication is API key + bearer JWT; the caller must hold the `FINANCE` permission on the company resolved from the JWT, otherwise the endpoint returns `403`.
+
+- operationId: `listInvoices`
+- Required permission: `FINANCE`
+- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+
+**Parameters**
+
+| Name | In | Required | Type | Description |
+|---|---|---|---|---|
+| `booking-status` | query | no | string | Payment-state filter, matched against the row's `bookingStatus` field. Allowed values: `OPEN`, `PARTLY_PAID`, `PAID`, `PARTLY_CLEARED`, `CLEARED`. Independent of `status` and combinable with it. Invoices without a booking are excluded. When omitted, invoices in every payment state are returned. |
+| `limit` | query | no | integer | Page size. Defaults to `50`; hard cap `100`. Requests above the cap are rejected with `400`. |
+| `offset` | query | no | integer | 0-based pagination offset — the number of rows to skip before the returned page. Defaults to `0`. Combine with `limit` to walk the full collection. |
+| `search-key` | query | no | string | Free-text search. The fields searched are documented per endpoint. Matches are case-insensitive substring matches. Maximum length 256 characters. |
+| `sort-direction` | query | no | string | Sort direction. Allowed values: `ASC`, `DESC`. Defaults to `DESC`. |
+| `sort-field` | query | no | string | Field to order the result by. The accepted values are listed per endpoint; an unknown value is rejected with `400`. Each endpoint documents the default it applies, chosen so that paging with `offset` / `limit` is stable. |
+| `status` | query | no | string | Invoice-overview status filter. Allowed values: `DRAFT`, `INVOICED`, `SENT`, `PAID`, `OPEN`, `CLEARED`, `CANCELLED`. When omitted, invoices in every status are returned. See the operation description — this is not a plain equality filter on the row's `status` field. |
+
+**Responses**
+
+| Status | Body | Meaning |
+|---|---|---|
+| `200` | application/json | A page of invoices. Empty array when nothing matches. |
+| `400` | ErrorMessage | Invalid filter or paging parameter — an unknown `status`, an unknown `sort-field`, a `sort-direction` other than `ASC`/`DESC`, a negative `offset`, or a `limit` outside 1–100. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/v1/invoices
 
 Create a new KLARA invoice for the authenticated company.
 
-Creates a new invoice for an existing customer under the company resolved from the bearer JWT. The request body's `id` must be `0` or omitted — this endpoint does not support updating existing invoices. Typical flow:Call `GET /core/v1/invoices/next-invoice-number` to obtain the next invoice number.Look up the customer via `GET /core/v1/customers` (with search filters and pagination).Look up company bank accounts via `GET /core/v1/company-bank-accounts`.Search articles via `GET /core/latest/articles/search` or `GET /core/latest/articles/article-numbers` to populate order items.(Optional) Look up open positions via `GET /core/v1/bank-reconciliation/open-positions` to reconcile prepayments / credit notes.(Optional) Call `POST /core/v1/orders/next-order-number` to obtain the next `order.orderNumber`.(Optional) Call `GET /core/latest/company-configuration/including-vat` to determine the company default for `usingVAT`.Build the invoice payload with order items.Call this endpoint with `status=INVOICED` to save and book, or `status=DRAFT` to save without booking.On status `INVOICED` or `SENT` the invoice is also booked into KLARA accounting, inventory transactions are created and the HubSpot indicator is synchronised. This endpoint does not send/deliver the invoice (no email/ePost/eBill/print&send), regardless of `postMethod` or a `SENT` status; retrieve the PDF via `POST /core/v1/invoices/{id}/printed-document` and deliver it yourself. The caller must hold the `FINANCE` permission on the target company. Status is caller-controlled. The KLARA GUI keeps an invoice in `DRAFT` until the user posts it in the final step; via the API you choose — send `status=DRAFT` to save without booking, or `status=INVOICED` (or `SENT`) to book immediately. A DRAFT can be finalized later with `PUT /core/v1/invoices` (`status=INVOICED`). Important — booking is created without a printed invoice. When you book via this endpoint (`status=INVOICED`/`SENT`), the accounting booking is created but no PDF is rendered or stored — the invoice and its booking have no printed document (unlike the GUI, which renders, stores and books in one step). To attach the printed invoice, run two follow-up calls: (1) `POST /core/v1/invoices/{id}/printed-document` to render the PDF and store its `printedFileId` on the invoice, then (2) `PUT /core/v1/bookings/{id}/documents` to link that `printedFileId` (in `documentIds`) to the booking returned in `bookingNumbers`.
+Creates a new invoice for an existing customer under the company resolved from the bearer JWT. The request body's `id` must be `0` or omitted — this endpoint does not support updating existing invoices. Typical flow:Call `GET /core/v1/invoices/next-invoice-number` to obtain the next invoice number.(Optional) List existing invoices with `GET /core/v1/invoices` — filter by `status` and page with `offset`/`limit` — to check what is already booked before creating another.Look up the customer via `GET /core/v1/customers` (with search filters and pagination).Look up company bank accounts via `GET /core/v1/company-bank-accounts`.Search articles via `GET /core/latest/articles/search` or `GET /core/latest/articles/article-numbers` to populate order items.(Optional) Look up open positions via `GET /core/v1/bank-reconciliation/open-positions` to reconcile prepayments / credit notes.(Optional) Call `POST /core/v1/orders/next-order-number` to obtain the next `order.orderNumber`.(Optional) Call `GET /core/latest/company-configuration/including-vat` to determine the company default for `usingVAT`.Build the invoice payload with order items.Call this endpoint with `status=INVOICED` to save and book, or `status=DRAFT` to save without booking.On status `INVOICED` or `SENT` the invoice is also booked into KLARA accounting, inventory transactions are created and the HubSpot indicator is synchronised. This endpoint does not send/deliver the invoice (no email/ePost/eBill/print&send), regardless of `postMethod` or a `SENT` status; retrieve the PDF via `POST /core/v1/invoices/{id}/printed-document` and deliver it yourself. The caller must hold the `FINANCE` permission on the target company. Status is caller-controlled. The KLARA GUI keeps an invoice in `DRAFT` until the user posts it in the final step; via the API you choose — send `status=DRAFT` to save without booking, or `status=INVOICED` (or `SENT`) to book immediately. A DRAFT can be finalized later with `PUT /core/v1/invoices` (`status=INVOICED`). Important — booking is created without a printed invoice. When you book via this endpoint (`status=INVOICED`/`SENT`), the accounting booking is created but no PDF is rendered or stored — the invoice and its booking have no printed document (unlike the GUI, which renders, stores and books in one step). To attach the printed invoice, run two follow-up calls: (1) `POST /core/v1/invoices/{id}/printed-document` to render the PDF and store its `printedFileId` on the invoice, then (2) `PUT /core/v1/bookings/{id}/documents` to link that `printedFileId` (in `documentIds`) to the booking returned in `bookingNumbers`.
 
 - operationId: `createInvoice`
 - Required permission: `FINANCE`
@@ -97,12 +130,12 @@ Creates a new invoice for an existing customer under the company resolved from t
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | Invoice | Invoice persisted successfully. |
-| `400` | ErrorMessage | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | Resource not found |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Error codes for this response (the `code` field of the response body):`invoice.id_must_be_zero` — The request body carried a non-zero id. This operation only creates invoices; use PUT /core/v1/invoices to modify an existing one.Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Error codes for this response (the `code` field of the response body):`auth.credentials_missing` — Neither an Authorization: Bearer header nor an API key header was present on the request.Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Resource not found Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### PUT /core/v1/invoices
 
@@ -170,12 +203,12 @@ Updates a DRAFT invoice identified by `invoice.id` in the request body. Only inv
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | Invoice | Invoice updated successfully. |
-| `400` | ErrorMessage | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | Resource not found |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Resource not found Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/invoices/next-invoice-number
 
@@ -192,11 +225,11 @@ Returns the next available invoice number for the company resolved from the bear
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | NextInvoiceNumberResponse | Next available invoice number returned. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | Resource not found |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Resource not found Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/invoices/{id}
 
@@ -219,11 +252,11 @@ Returns the fully-enriched invoice document for the given `id` under the company
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | Invoice | Invoice found and returned. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | No invoice with the given id exists for the authenticated company. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No invoice with the given id exists for the authenticated company. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/v1/invoices/{id}/printed-document
 
@@ -246,11 +279,11 @@ Returns the invoice document as a binary `application/pdf` stream via the intern
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/pdf | Invoice PDF returned as a binary `application/pdf` stream with a `Content-Disposition: attachment` header — either freshly rendered (first print) or the previously stored PDF (already printed). |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | Invoice not found. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Invoice not found. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/v1/invoices/{id}/send
 
@@ -274,12 +307,12 @@ Sends an already-booked invoice to its recipient, synchronously, under the compa
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | SendInvoiceResult | Invoice delivered. Returns the channel actually used, whether it was smart-routed, the OneAPI delivery id and the archived PDF's printedFileId. |
-| `400` | ErrorMessage | Invoice is DRAFT/cancelled, the channel is unsupported (`PRINT_AND_MANUAL_SEND`), the recipient is not eligible for the forced channel, or smart delivery found no channel. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | No invoice with the given id exists for the authenticated company. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Invoice is DRAFT/cancelled, the channel is unsupported (`PRINT_AND_MANUAL_SEND`), the recipient is not eligible for the forced channel, or smart delivery found no channel. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No invoice with the given id exists for the authenticated company. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/order-documents/filter/type-and-order-number
 
@@ -303,11 +336,11 @@ Returns every order-management document of the company resolved from the bearer 
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Matching order-management documents. |
-| `400` | ErrorMessage | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/order-documents/{order-type}/next-document-number
 
@@ -330,11 +363,11 @@ Returns the next available sequence number and its formatted document code for t
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | OrderNumberingResult | Next document number and formatted code for the requested order type. |
-| `400` | ErrorMessage | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/order-numbering-configurations
 
@@ -357,11 +390,11 @@ Returns the numbering strategy configured for the given `order-type` of the comp
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | OrderNumberingConfiguration | Numbering configuration for the requested document type. |
-| `400` | ErrorMessage | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/orders/next-order-number
 
@@ -378,7 +411,7 @@ Returns the next available business order number for the company resolved from t
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | OrderNextNumberResult | Next available order number for the authenticated company. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |

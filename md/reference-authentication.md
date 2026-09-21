@@ -24,11 +24,11 @@ A KLARA user might have multiple tenants. Use this endpoint to get the list of t
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Found tenants |
-| `400` | ErrorResponse | Missing parameters |
-| `401` | ErrorResponse | Invalid credentials |
-| `403` | ErrorResponse | The user has been disabled |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorResponse | Something went wrong when getting list of tenants |
+| `400` | ErrorResponse | Missing parameters Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorResponse | Invalid credentials Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorResponse | The user has been disabled Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorResponse | Something went wrong when getting list of tenants Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/latest/token
 
@@ -57,10 +57,10 @@ After obtaining tenant id and company id for the desired tenant, use this endpoi
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicAPIToken | Token created |
-| `400` | none declared | Could not get token |
-| `401` | none declared | Invalid credentials |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Internal server error |
+| `400` | ErrorMessage | Could not get token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | Invalid credentials Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Internal server error Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/latest/token/by-microsoft
 
@@ -83,7 +83,7 @@ Provide a Microsoft access token and tenant id to exchange for a system token.
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | AccessTokenResponse | Token created |
-| `400` | none declared | Could not get token |
-| `401` | none declared | Invalid credentials |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Internal server error |
+| `400` | ErrorMessage | Could not get token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | Invalid credentials Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Internal server error Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |

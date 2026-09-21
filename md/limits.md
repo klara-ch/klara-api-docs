@@ -54,18 +54,19 @@ Whether `Retry-After` is sent is being confirmed. Do not depend on it yet.
 
 ### Pagination
 
-8 endpoints accept pagination parameters:
+9 endpoints accept pagination parameters:
 
 | Endpoint | Parameters |
 |---|---|
-| GET `/core/latest/article-categories` | `limit` no offset, only the first page is reachable |
-| GET `/core/latest/article-filters` | `limit` no offset, only the first page is reachable |
+| GET `/core/latest/article-categories` | `limit`, `offset` |
+| GET `/core/latest/article-filters` | `limit`, `offset` |
 | GET `/core/latest/articles` | `limit`, `offset` |
 | GET `/core/latest/articles/article-and-variants` | `limit`, `offset` |
 | GET `/core/latest/articles/search` | `limit`, `offset` |
 | GET `/core/v1/accounting/business-case-templates` | `limit`, `offset` |
 | GET `/core/v1/accounting/master-vats` | `limit`, `offset` |
 | GET `/core/v1/customers` | `limit`, `offset` |
+| GET `/core/v1/invoices` | `limit`, `offset` |
 
 Three properties of pagination that decide whether a run is reliable.
 
@@ -73,7 +74,7 @@ Three properties of pagination that decide whether a run is reliable.
 |---|---|
 | Is there a total count? | No. A page smaller than the limit is the only signal that you have reached the end |
 | Is the order stable between requests? | No guarantee, with one exception: `GET /core/v1/accounting/business-case-templates` takes an optional `orderColumns` list |
-| Can every page be reached? | Not everywhere. `GET /core/latest/article-categories` and `GET /core/latest/article-filters` accept `limit` but no `offset`, so nothing beyond the first page is reachable. Under review |
+| Can every page be reached? | Yes. `GET /core/latest/article-categories` and `GET /core/latest/article-filters` accepted `limit` without `offset` until 18 September 2026 and were stuck on the first page. Both take `offset` now and return `X-Total-Count` |
 
 > **Warning: No stable order means pagination can miss or repeat records**
 >
@@ -83,20 +84,21 @@ Three properties of pagination that decide whether a run is reliable.
 
 #### Free-text search
 
-6 endpoints take a search term and match it against several fields at once. This is the only way to find a record without knowing an id.
+7 endpoints take a search term and match it against several fields at once. This is the only way to find a record without knowing an id.
 
 | Endpoint | Parameter |
 |---|---|
-| GET `/core/latest/article-categories` | `keyword` |
-| GET `/core/latest/article-filters` | `keyword` |
-| GET `/core/latest/articles/search` | `keyword` |
-| GET `/core/v1/bank-reconciliation/open-positions` | `general-search` |
+| GET `/core/latest/article-categories` | `keyword`, `search-key` |
+| GET `/core/latest/article-filters` | `keyword`, `search-key` |
+| GET `/core/latest/articles/search` | `keyword`, `search-key` |
+| GET `/core/v1/bank-reconciliation/open-positions` | `general-search`, `search-key` |
 | GET `/core/v1/customers` | `search-key` |
 | GET `/core/v1/employees/short-info` | `search-key` |
+| GET `/core/v1/invoices` | `search-key` |
 
 #### Filtering by field
 
-32 endpoints narrow the result by a field value, 73 parameters in total. Filtering is not searching: you have to know the value you are filtering on.
+33 endpoints narrow the result by a field value, 76 parameters in total. Filtering is not searching: you have to know the value you are filtering on.
 
 | Endpoint | Parameters |
 |---|---|
@@ -123,7 +125,8 @@ Three properties of pagination that decide whether a run is reliable.
 | PUT `/core/v1/bookings/{id}/documents` | `ignore-unsubscripted-dates` |
 | GET `/core/v1/company-bank-accounts` | `iban-number`, `type` |
 | GET `/core/v1/customers` | `status` |
-| GET `/core/v1/employees/short-info` | `filter-by-status`, `workplace-ids` |
+| GET `/core/v1/employees/short-info` | `filter-by-status`, `status`, `workplace-ids` |
+| GET `/core/v1/invoices` | `booking-status`, `status` |
 | PUT `/core/v1/invoices` | `confirmDontMindClosingFiscalYear` |
 | POST `/core/v1/invoices` | `confirmDontMindClosingFiscalYear` |
 | POST `/core/v1/invoices/{id}/send` | `channel` |
@@ -135,6 +138,6 @@ Three properties of pagination that decide whether a run is reliable.
 
 #### Sorting
 
-2 endpoints accept a sort order: `/core/v1/accounting/business-case-templates`, `/core/v1/employees/short-info`. Everywhere else the order is not guaranteed, which matters when you page through a large collection.
+3 endpoints accept a sort order: `/core/v1/accounting/business-case-templates`, `/core/v1/employees/short-info`, `/core/v1/invoices`. Everywhere else the order is not guaranteed, which matters when you page through a large collection.
 
 Invoices are the most important gap: there is no list endpoint at all, so they cannot be listed or filtered. You have to keep the ids you created. See [Known limitations](https://developer.klara.ch/#roadmap).

@@ -72,17 +72,6 @@ curl -X POST "https://api.klara.ch/core/latest/token" \
   --data-urlencode "refresh_token=$REFRESH_TOKEN"
 ```
 
-> **Warning: Error bodies on the authentication endpoints, per endpoint**
->
-> | Endpoint | Statuses with no declared body | Declared schema |
-> |---|---|---|
-> | `POST /core/latest/generic-token` | `400`, `401`, `429`, `500` | — |
-> | `POST /core/latest/tenants` | `429` | `ErrorResponse` |
-> | `POST /core/latest/token` | `400`, `401`, `429`, `500` | — |
-> | `POST /core/latest/token/by-microsoft` | `400`, `401`, `429`, `500` | — |
->
-> 3 of these endpoints declare nothing at all for any error status. Where no body is declared, plan for the status code alone and log the request you sent. Whatever a gateway adds on top is not part of this contract, so do not parse it.
-
 #### Endpoints that need no authentication
 
 4 endpoints require no authentication, because they are how you obtain a token in the first place. Everything else in this reference accepts either an API key or a bearer token, and no endpoint accepts only one of the two.

@@ -6,7 +6,7 @@
 
 List the company's employees as short-info entries, filtered and sorted.
 
-Returns a lightweight directory of the authenticated company's employees (id, name, email, employee number, workplace, status), resolved from the compensation and person records. Each entry's `id` is the `employeeId` consumed by other employee-scoped endpoints (e.g. `GET /payroll/employees/{employeeId}/addable-salary-items`) — call this endpoint first to resolve an employee's id. Results can be narrowed with a free-text `search-key` (matched against name, employee number and email), restricted to specific workplaces via `workplace-ids`, and filtered by contract `filter-by-status`; ordering is controlled by `sort-field` and `sort-direction`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION_TIME_TRACKING` permission on that company.
+Returns a lightweight directory of the authenticated company's employees (id, name, email, employee number, workplace, status), resolved from the compensation and person records. Each entry's `id` is the `employeeId` consumed by other employee-scoped endpoints (e.g. `GET /payroll/employees/{employeeId}/addable-salary-items`) — call this endpoint first to resolve an employee's id. Results can be narrowed with a free-text `search-key` (matched against name, employee number and email), restricted to specific workplaces via `workplace-ids`, and filtered by contract `status`; ordering is controlled by `sort-field` and `sort-direction`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION_TIME_TRACKING` permission on that company.
 
 - operationId: `listEmployeesShortInfo`
 - Required permission: `COMPENSATION_TIME_TRACKING`
@@ -16,10 +16,11 @@ Returns a lightweight directory of the authenticated company's employees (id, na
 
 | Name | In | Required | Type | Description |
 |---|---|---|---|---|
-| `filter-by-status` | query | no | string | Contract-status filter. Allowed values: ALL, ACTIVE, INACTIVE, DRAFT. Defaults to ALL. |
+| `filter-by-status` | query | no | string | Renamed to `status`. This name is accepted until 2027-09-01; when both are sent, `status` wins. After that date, a request sending `filter-by-status` without `status` is rejected with 400. Deprecated — use `status` instead. Contract-status filter. Allowed values: ALL, ACTIVE, INACTIVE, DRAFT. Defaults to ALL. |
 | `search-key` | query | no | string | Case-insensitive substring matched against the employee's full name, employee number and email. When omitted, no text filter is applied. |
 | `sort-direction` | query | no | SortDirection | Sort direction. Allowed values: ASC, DESC. |
 | `sort-field` | query | no | string | Field to sort by. Allowed values: NAME, EMAIL, EMPLOYEE_NUMBER. Defaults to NAME. |
+| `status` | query | no | string | Contract-status filter. Allowed values: ALL, ACTIVE, INACTIVE, DRAFT. Defaults to ALL. |
 | `workplace-ids` | query | no | array | Restrict results to employees whose current contract workplace is in this set. Repeat the parameter for multiple ids (e.g. workplace-ids=12&workplace-ids=13). When omitted, employees of all workplaces are returned. |
 
 **Responses**
@@ -27,12 +28,12 @@ Returns a lightweight directory of the authenticated company's employees (id, na
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Successful operation |
-| `400` | ErrorMessage1 | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage1 | The current user is not allowed to access this company data |
-| `404` | ErrorMessage1 | Resource not found |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Resource not found Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/v1/payroll/contracts/{contractId}/payslips/{payslipId}/salary-items
 
@@ -65,12 +66,12 @@ Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PayslipSalaryItem | Successful operation |
-| `400` | ErrorMessage1 | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage1 | The current user is not allowed to access this company data |
-| `404` | ErrorMessage1 | Resource not found |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Error codes for this response (the `code` field of the response body):`auth.credentials_missing` — Neither an Authorization: Bearer header nor an API key header was present on the request.Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Resource not found Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/payroll/employees/{employeeId}/addable-salary-items
 
@@ -95,9 +96,9 @@ Resolves the employee's main (latest) contract and its editable payslip, then re
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | AddablePayslipSalaryItems | Successful operation |
-| `400` | ErrorMessage1 | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage1 | The current user is not allowed to access this company data |
-| `404` | ErrorMessage1 | Resource not found |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Resource not found Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |

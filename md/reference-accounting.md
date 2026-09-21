@@ -23,10 +23,10 @@ Returns the canonical debit/credit accounts maintained by KLARA as the seed of a
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Master accounts, sorted by `code` ascending. Empty array when the chart of accounts has not been seeded yet. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `404` | ErrorMessage | The supplied `legal-form` value does not match any known legal form. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | The supplied `legal-form` value does not match any known legal form. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/accounts/account-displaying
 
@@ -50,11 +50,11 @@ Returns a flat list of `AccountDisplaying` rows for every account in the caller'
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Flat list of account-displaying rows, sorted by account code ascending. Each row contains `combinedCode`, `combinedName`, `parentAccount`, and the link fields populated for sub-account rows or `null` for bare rows. Returns an empty array when no accounts match the supplied `legal-form`. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | ErrorMessage | The company associated with the caller's session could not be resolved by the downstream accounting service, or the supplied `legal-form` value does not match any known legal form. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | The company associated with the caller's session could not be resolved by the downstream accounting service, or the supplied `legal-form` value does not match any known legal form. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/accounts/by-code/{accountCode}
 
@@ -78,10 +78,10 @@ Loads a single master account row from KLARA's global chart of accounts, identif
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiAccount | The master account matching `accountCode`. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `404` | ErrorMessage | No master account exists for the supplied `accountCode`, or the supplied `legal-form` value does not match any known legal form. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No master account exists for the supplied `accountCode`, or the supplied `legal-form` value does not match any known legal form. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/booking-types
 
@@ -103,15 +103,15 @@ Returns the canonical catalog of accounting booking types maintained by KLARA �
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Master booking types, ordered by `code` ascending. Empty array when the catalog has not been seeded yet. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/business-case-templates
 
 List KLARA master accounting business-case templates.
 
-Returns the global catalog of business-case templates — the manual-journal categories that drive the booking form (operating expenses, salary payments, asset purchases, …). The catalog is global KLARA reference data: the same list is returned for every tenant, so there are no tenant or company path parameters. The `Accept-Language` header selects which translation of the human-readable `display` label is returned; if absent or unsupported the German translation is used as a fallback and the full per-language `i18n` / `keywordI18ns` maps are returned for client-side rendering. Optional `orderColumns` / `offset` / `limit` query parameters are forwarded verbatim to the downstream catalog for ordering and pagination. The endpoint is a pure read — idempotent, no side effects. Requires a bearer token whose principal carries the `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE` permission.
+Returns the global catalog of business-case templates — the manual-journal categories that drive the booking form (operating expenses, salary payments, asset purchases, …). The catalog is global KLARA reference data: the same list is returned for every tenant, so there are no tenant or company path parameters. The `Accept-Language` header selects which translation of the human-readable `display` label is returned; if absent or unsupported the German translation is used as a fallback and the full per-language `i18n` / `keywordI18ns` maps are returned for client-side rendering. Optional `sort-field` (comma-separated column names) / `offset` / `limit` query parameters are forwarded to the downstream catalog for ordering and pagination. The endpoint is a pure read — idempotent, no side effects. Requires a bearer token whose principal carries the `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE` permission.
 
 - operationId: `listBusinessCaseTemplatesV1`
 - Required permission: `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE`
@@ -123,7 +123,8 @@ Returns the global catalog of business-case templates — the manual-journal cat
 |---|---|---|---|---|
 | `limit` | query | no | integer | Maximum number of templates to return. When omitted, the downstream service returns the full catalog. |
 | `offset` | query | no | integer | Zero-based index of the first template to return. When omitted, the response starts at the first row. |
-| `orderColumns` | query | no | array | Names of columns to order the result by, ascending. Repeat the query parameter for multi-column ordering (e.g. `?orderColumns=group&orderColumns=code`). |
+| `orderColumns` | query | no | array | Renamed to `sort-field`. This name is accepted until 2027-09-01; when both are sent, `sort-field` wins. After that date, a request sending `orderColumns` without `sort-field` is rejected with 400. Deprecated — use `sort-field` instead, which takes the columns as one comma-separated value rather than as a repeated parameter. Names of columns to order the result by, ascending. Repeat this query parameter for multi-column ordering. |
+| `sort-field` | query | no | string | Comma-separated list of columns to order the result by, ascending (e.g. `?sort-field=group,code`). This catalog orders ascending only, so it publishes no `sort-direction`. |
 | `Accept-Language` | header | no | string | IETF language tag used to resolve the localized `display` label of each template. Examples: `de-CH`, `fr-CH`, `it-CH`, `en`. Falls back to the German translation when no translation exists for the requested language. |
 
 **Responses**
@@ -131,10 +132,10 @@ Returns the global catalog of business-case templates — the manual-journal cat
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Business-case templates matching the supplied ordering and pagination. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/business-case-templates/{businessCaseTemplateId}
 
@@ -158,11 +159,11 @@ Returns one business-case template from the global KLARA catalog — a manual-jo
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiBusinessCaseTemplate | Business-case template matching the supplied id. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | No business-case template carries the requested id. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No business-case template carries the requested id. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/business-cases
 
@@ -188,12 +189,12 @@ Loads the fully hydrated business-case aggregate the booking form needs: the tem
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiBusinessCase | Hydrated business-case aggregate for the requested template. |
-| `400` | ErrorMessage | One of `dateForFilteringFiscalYear` / `dateForFilteringCompanyVat` is not a valid ISO date (`yyyy-MM-dd`), or the supplied `businessCaseTemplateId` is not valid for the company's legal form or VAT regime. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | ErrorMessage | No business-case template matches the supplied `businessCaseTemplateId` in the caller's company scope. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | One of `dateForFilteringFiscalYear` / `dateForFilteringCompanyVat` is not a valid ISO date (`yyyy-MM-dd`), or the supplied `businessCaseTemplateId` is not valid for the company's legal form or VAT regime. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No business-case template matches the supplied `businessCaseTemplateId` in the caller's company scope. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/business-cases/v2
 
@@ -222,12 +223,12 @@ Snippet-scoped variant of `GET /core/v1/accounting/business-cases`: hydrates onl
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiBusinessCase | Hydrated business-case aggregate for the requested template and snippet. |
-| `400` | ErrorMessage | One of `dateForFilteringFiscalYear` / `dateForFilteringCompanyVat` is not a valid ISO date (`yyyy-MM-dd`), or the supplied `businessCaseTemplateId` is not valid for the company's legal form or VAT regime. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | ErrorMessage | No business-case template matches the supplied `businessCaseTemplateId` in the caller's company scope. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | One of `dateForFilteringFiscalYear` / `dateForFilteringCompanyVat` is not a valid ISO date (`yyyy-MM-dd`), or the supplied `businessCaseTemplateId` is not valid for the company's legal form or VAT regime. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No business-case template matches the supplied `businessCaseTemplateId` in the caller's company scope. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/business-cases/{businessCaseId}
 
@@ -251,12 +252,12 @@ Loads the fully hydrated business-case aggregate that was previously persisted f
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiBusinessCase | Hydrated business-case aggregate for the requested id. |
-| `400` | ErrorMessage | The supplied `businessCaseId` is not a valid numeric id. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | ErrorMessage | No business case matches the supplied `businessCaseId` in the caller's company scope. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | The supplied `businessCaseId` is not a valid numeric id. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No business case matches the supplied `businessCaseId` in the caller's company scope. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/companies/current
 
@@ -273,11 +274,11 @@ Returns the dunning waiting periods configured for the authenticated caller's co
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiAccountingCompany | Accounting configuration of the caller's company. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | ErrorMessage | The company associated with the caller's session could not be resolved by the downstream accounting service. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | The company associated with the caller's session could not be resolved by the downstream accounting service. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/companies/current/business-case-templates
 
@@ -300,11 +301,11 @@ Returns the manual-journal categories ("business-case templates") the caller's c
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Business-case templates grouped by financial-year period. May be an empty array when the company has no open fiscal year yet. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | ErrorMessage | The company associated with the caller's session could not be resolved by the downstream accounting service. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | The company associated with the caller's session could not be resolved by the downstream accounting service. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/companies/current/financial-years
 
@@ -327,11 +328,11 @@ Returns the company's currently active fiscal-year periods (status `OPEN` or `CL
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Active financial-year periods of the caller's company. May be an empty array when the company has no open fiscal year yet. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | ErrorMessage | The company associated with the caller's session could not be resolved by the downstream accounting service. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | The company associated with the caller's session could not be resolved by the downstream accounting service. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/currencies/exchange-rate
 
@@ -355,10 +356,10 @@ Returns the Swiss National Bank reference rate that converts one unit of `from-c
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Exchange rate as a JSON number; the value `1` when `from-currency-code` is CHF. |
-| `400` | ErrorMessage | `exchange-date` is not a valid ISO-8601 calendar date, or no rate could be resolved for the supplied `from-currency-code`. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | `exchange-date` is not a valid ISO-8601 calendar date, or no rate could be resolved for the supplied `from-currency-code`. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/master-vats
 
@@ -386,9 +387,9 @@ Returns the global master VAT catalog — the table of supported VAT rates with 
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Array of master VAT rows matching the filters. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/master-vats/current
 
@@ -405,9 +406,9 @@ Returns the subset of the master VAT catalog whose validity range (`validFrom` /
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Array of master VAT rows valid for the current day. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/master-vats/{masterVatId}
 
@@ -430,10 +431,10 @@ Loads a single master VAT row from KLARA's global master VAT catalog, identified
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiMasterVat | The master VAT row matching `masterVatId`, including its rate, VAT code and validity range. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `404` | ErrorMessage | No master VAT row exists for the supplied `masterVatId`. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No master VAT row exists for the supplied `masterVatId`. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/vat-profile
 
@@ -456,9 +457,10 @@ Returns the company's VAT regime (effective vs net-tax-rate), billing method and
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiVatProfile | VAT profile. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/vat-suggestions
 
@@ -487,10 +489,11 @@ Turns a plain-language context — a purchase vs a sale — into ranked, copy-pa
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Ranked VAT suggestions. |
-| `400` | ErrorMessage | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/vat-types
 
@@ -512,9 +515,9 @@ Returns every VAT-type row maintained by KLARA — the canonical VAT codes that 
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | Master VAT-type rows. Empty array when the catalogue has not been seeded yet. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/accounting/vat-types/{vatTypeId}
 
@@ -537,10 +540,10 @@ Loads a single VAT-type row from KLARA's global master VAT-type catalogue, ident
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiVatType | The master VAT-type row matching `vatTypeId`, including its localized description, short name and posting formulas. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `404` | ErrorMessage | No master VAT-type row exists for the supplied `vatTypeId`. |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | No master VAT-type row exists for the supplied `vatTypeId`. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### GET /core/v1/bank-reconciliation/open-positions
 
@@ -560,13 +563,14 @@ Returns the list of open booking-detail positions (AR / AP invoices, payments, p
 | `booking-type-codes` | query | no | string | Comma-separated list of booking-type codes to restrict to. Allowed values: `GENERAL_LEDGER`, `AP_INVOICE`, `AP_PAYMENT`, `AR_INVOICE`, `AR_PAYMENT`, `AP_PREPAYMENT`, `AP_PREPAYUSE`, `AR_PREPAYMENT`, `AR_PREPAYUSE`, `AR_CREDITNOTE`, `AR_CREDITUSE`, `AP_CREDITNOTE`, `AP_CREDITUSE`, `AMORTIZATION`, `SELLOFF_AMORTIZATION`, `DELIMIT`. |
 | `crdr-type` | query | no | PublicApiCrDrType | Restrict to credit (`CR`) or debit (`DR`) postings. |
 | `credit-card-not-reconciled` | query | no | boolean | When `true`, restricts to credit-card transactions still pending reconciliation. |
-| `general-search` | query | no | string | Free-text search across description, partner name, document id and reference fields. Combined with the other filters using the mode selected by `action`. |
+| `general-search` | query | no | string | Renamed to `search-key`. This name is accepted until 2027-09-01; when both are sent, `search-key` wins. After that date, a request sending `general-search` without `search-key` is rejected with 400. Deprecated — use `search-key` instead. Free-text search across description, partner name, document id and reference fields. |
 | `invoice-date` | query | no | string (date) | Exact-match invoice (document) date filter (ISO date `yyyy-MM-dd`). |
 | `partner` | query | no | string | KLARA partner URI to filter by. Format: `/api/…/{tenantId}/companies/{companyId}/partners/{partnerId}`. Construct from the partner id returned by the public partner endpoints. |
 | `payment-date` | query | no | string (date) | Exact-match payment date filter (ISO date `yyyy-MM-dd`). |
 | `payment-date-from` | query | no | string (date) | Inclusive lower bound of the payment-date range filter (ISO date `yyyy-MM-dd`). |
 | `payment-date-to` | query | no | string (date) | Inclusive upper bound of the payment-date range filter (ISO date `yyyy-MM-dd`). |
 | `position-status` | query | no | string | Comma-separated list of open-position lifecycle statuses to restrict to. Allowed values: `OPEN`, `PARTLY_PAID`, `PAID`, `PARTLY_CLEARED`, `CLEARED`. |
+| `search-key` | query | no | string | Free-text search across description, partner name, document id and reference fields. Combined with the other filters using the mode selected by `action`. |
 | `tags` | query | no | string | Comma-separated list of tag names to filter by (free-form). |
 
 **Responses**
@@ -574,11 +578,11 @@ Returns the list of open booking-detail positions (AR / AP invoices, payments, p
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | application/json | List of open positions matching the filters. Empty array when nothing matches. |
-| `400` | ErrorMessage | One of the date filters is not a valid ISO date (`yyyy-MM-dd`), or one of the enum filters (`position-status`, `booking-type-codes`, `crdr-type`) carries a value that is not in the documented value set, or a free-text filter exceeds 256 characters. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | One of the date filters is not a valid ISO date (`yyyy-MM-dd`), or one of the enum filters (`position-status`, `booking-type-codes`, `crdr-type`) carries a value that is not in the documented value set, or a free-text filter exceeds 256 characters. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/v1/bookings
 
@@ -627,11 +631,11 @@ Records a manual journal entry against the authenticated caller's company and re
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | PublicApiBookingHeader | Booking created. |
-| `400` | ErrorMessage | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Error codes for this response (the `code` field of the response body):`booking.status_not_allowed` — bookingStatus was neither BOOKED nor PLANNED.Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Error codes for this response (the `code` field of the response body):`auth.credentials_missing` — Neither an Authorization: Bearer header nor an API key header was present on the request.Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### PUT /core/v1/bookings/{id}/documents
 
@@ -662,11 +666,11 @@ Replaces the set of supporting-document identifiers and the document date stored
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | none declared | Document attachments and date applied to the booking (or accepted as a no-op when the booking does not exist on the downstream side). |
-| `400` | ErrorMessage | Data invalid |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `400` | ErrorMessage | Data invalid Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/v1/vat-clearing-reports/{year}/{quarter}
 
@@ -692,8 +696,8 @@ Returns the VAT clearing report of the caller's company for the requested calend
 | Status | Body | Meaning |
 |---|---|---|
 | `200` | VatClearingReport | The VAT clearing report. |
-| `401` | none declared | No Authorization header found or invalid token |
-| `403` | ErrorMessage | The current user is not allowed to access this company data |
-| `404` | none declared | Resource not found |
-| `429` | none declared | API rate limit exceeded |
-| `500` | none declared | Something went wrong on our side while processing the request. Please kindly contact our support. |
+| `401` | ErrorMessage | No Authorization header found or invalid token Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorMessage | The current user is not allowed to access this company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `404` | ErrorMessage | Resource not found Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorMessage | Something went wrong on our side while processing the request. Please kindly contact our support. Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |

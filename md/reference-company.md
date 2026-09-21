@@ -17,10 +17,10 @@ Retrieve the business company of a tenant. Use your KLARA token from your userna
 | Status | Body | Meaning |
 |---|---|---|
 | `201` | BusinessCompany | Company found |
-| `401` | ErrorResponse | Invalid credentials |
-| `403` | ErrorResponse | The user has been disabled |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorResponse | Something went wrong when find company |
+| `401` | ErrorResponse | Invalid credentials Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorResponse | The user has been disabled Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorResponse | Something went wrong when find company Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### POST /core/v2/tenants/companies
 
@@ -50,11 +50,11 @@ A KLARA user might have multiple company tenants. Use this endpoint to create a 
 | Status | Body | Meaning |
 |---|---|---|
 | `201` | application/json | Tenant and company created |
-| `400` | ErrorResponse | Invalid company data |
-| `401` | ErrorResponse | Invalid credentials |
-| `403` | ErrorResponse | The user has been disabled |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorResponse | Something went wrong when creating tenant and business company |
+| `400` | ErrorResponse | Invalid company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorResponse | Invalid credentials Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorResponse | The user has been disabled Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorResponse | Something went wrong when creating tenant and business company Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
 
 ### PUT /core/v2/tenants/companies
 
@@ -84,8 +84,8 @@ A KLARA user might have multiple tenants. Use this endpoint to update a KLARA bu
 | Status | Body | Meaning |
 |---|---|---|
 | `201` | BusinessCompany | Company updated |
-| `400` | ErrorResponse | Invalid company data |
-| `401` | ErrorResponse | Invalid credentials |
-| `403` | ErrorResponse | The user has been disabled |
-| `429` | none declared | API rate limit exceeded |
-| `500` | ErrorResponse | Something went wrong when updating tenant |
+| `400` | ErrorResponse | Invalid company data Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `401` | ErrorResponse | Invalid credentials Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `403` | ErrorResponse | The user has been disabled Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `429` | ErrorMessage | API rate limit exceeded Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |
+| `500` | ErrorResponse | Something went wrong when updating tenant Failures detected by a downstream service carry that service's own `code`, which this reference does not enumerate, so the `code` field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list. |

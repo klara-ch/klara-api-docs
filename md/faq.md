@@ -12,7 +12,7 @@ Yes. [Download it here](https://developer.klara.ch/#openapi-spec). Use it to gen
 
 #### Can I list all invoices, or filter them by status?
 
-Not yet. `GET /core/v1/invoices/{id}` returns a single invoice including `status`, `bookingStatus`, `paymentDate` and `bookingDueDate`, but there is no collection endpoint, so you need to keep the ids in your own system. See [Known limitations](https://developer.klara.ch/#roadmap).
+Yes, since 18 September 2026. `GET /core/v1/invoices` returns a page of invoices with free-text search, paging and sorting. One thing to know before you build on it: the `status` parameter is the filter from the KLARA invoice overview, not an equality check on the `status` field of a row. `status=OPEN` returns rows that read `INVOICED` or `PAID`, because it also looks at the payment state. Use `booking-status` when you want to filter on the payment state exactly, and `?status=INVOICED&booking-status=OPEN` for «invoiced and not yet paid».
 
 #### Can I write variable payroll data?
 
