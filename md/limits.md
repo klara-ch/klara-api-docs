@@ -98,7 +98,7 @@ Three properties of pagination that decide whether a run is reliable.
 
 #### Filtering by field
 
-33 endpoints narrow the result by a field value, 76 parameters in total. Filtering is not searching: you have to know the value you are filtering on.
+32 endpoints narrow the result by a field value, 75 parameters in total. Filtering is not searching: you have to know the value you are filtering on.
 
 | Endpoint | Parameters |
 |---|---|
@@ -132,7 +132,6 @@ Three properties of pagination that decide whether a run is reliable.
 | POST `/core/v1/invoices/{id}/send` | `channel` |
 | GET `/core/v1/order-documents/filter/type-and-order-number` | `order-number`, `type` |
 | GET `/core/v1/order-numbering-configurations` | `order-type` |
-| POST `/core/v1/payroll/contracts/{contractId}/payslips/{payslipId}/salary-items` | `recalculate` |
 | GET `/core/v1/payroll/employees/{employeeId}/addable-salary-items` | `month` |
 | POST `/core/v1/vat-clearing-reports/{year}/{quarter}` | `recalculate` |
 

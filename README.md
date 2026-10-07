@@ -11,7 +11,7 @@ source.
 - Canonical documentation: https://developer.klara.ch/
 - OpenAPI specification: https://developer.klara.ch/klara-openapi.json
 - Index of all files: https://developer.klara.ch/llms.txt
-- Built at: 21 September 2026
+- Built at: 7 October 2026
 
 ## What is in here
 

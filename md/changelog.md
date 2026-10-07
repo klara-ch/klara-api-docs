@@ -8,6 +8,20 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
+#### 7 October 2026 · 3 changed · breaking
+
+> **Warning: Breaking changes**
+>
+> Existing integrations may be affected. This concerns `POST /core/v1/payroll/contracts/{contractId}/payslips/{payslipId}/salary-items`.
+
+#### Changed
+
+- PUT `/core/v1/invoices` — documentation correction: `order` and `orderItems` have always been required, the specification now lists them. Existing integrations are not affected
+
+- POST `/core/v1/invoices` — documentation correction: `order` and `orderItems` have always been required, the specification now lists them. Existing integrations are not affected
+
+- POST `/core/v1/payroll/contracts/{contractId}/payslips/{payslipId}/salary-items` — parameter `query:recalculate` removed
+
 #### 18 September 2026 · 1 new · 97 changed
 
 #### New

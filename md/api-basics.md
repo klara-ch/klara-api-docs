@@ -124,13 +124,15 @@ It is not the shape of the authentication endpoints as a group. What the authent
 
 Two of the entries above are not the application speaking. A `429` body comes from the gateway, not from the API, so it is outside this contract and may look like none of these shapes. And where a status declares no body, a gateway may still add one; that too is outside the contract.
 
-The contract names 3 error codes of its own, in the `code` field of the error body:
+The contract names 5 error codes of its own, in the `code` field of the error body:
 
 | Code | Status | Meaning | Where |
 |---|---|---|---|
 | `auth.credentials_missing` | `401` | Neither an Authorization: Bearer header nor an API key header was present on the request. | 3 operations |
 | `booking.status_not_allowed` | `400` | bookingStatus was neither BOOKED nor PLANNED. | 1 operation |
 | `invoice.id_must_be_zero` | `400` | The request body carried a non-zero id. This operation only creates invoices; use PUT /core/v1/invoices to modify an existing one. | 1 operation |
+| `invoice.vat_code_missing` | `400` | At least one orderItems[] entry set VAT on vatType, vatCase or the top-level vatCode while leaving vat.vatCode empty. Only vat.vatCode is stored, so that line would have been booked at 0%. Move the code to vat.vatCode, or send "0" ("No VAT") for a position that genuinely carries none. | 2 operations |
+| `invoice.vat_rate_mismatch` | `400` | At least one orderItems[] entry sent a vat.rate that is not the rate of its vat.vatCode. The booking always uses the code's rate, so the invoice document would state a different percentage than the accounting record. Send the matching rate, or omit vat.rate and let the server fill it in. | 2 operations |
 
 That list is not exhaustive and is not meant to be: a failure detected by a downstream service carries that service's own code. Branch on the HTTP status, treat an unknown code as a generic error of that status, and log the code and the `uuid` for a support request.
 

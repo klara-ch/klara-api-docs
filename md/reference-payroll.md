@@ -6,7 +6,7 @@
 
 List the company's employees as short-info entries, filtered and sorted.
 
-Returns a lightweight directory of the authenticated company's employees (id, name, email, employee number, workplace, status), resolved from the compensation and person records. Each entry's `id` is the `employeeId` consumed by other employee-scoped endpoints (e.g. `GET /payroll/employees/{employeeId}/addable-salary-items`) — call this endpoint first to resolve an employee's id. Results can be narrowed with a free-text `search-key` (matched against name, employee number and email), restricted to specific workplaces via `workplace-ids`, and filtered by contract `status`; ordering is controlled by `sort-field` and `sort-direction`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION_TIME_TRACKING` permission on that company.
+Returns a lightweight directory of the authenticated company's employees (id, name, email, employee number, workplace, status), resolved from the compensation and person records. Each entry's `id` is the `employeeId` consumed by other employee-scoped endpoints (e.g. `GET /payroll/employees/{employeeId}/addable-salary-items`) — call this endpoint first to resolve an employee's id. Results can be narrowed with a free-text `search-key` (matched against name, employee number and email), restricted to specific workplaces via `workplace-ids`, and filtered by contract `status`; ordering is controlled by `sort-field` and `sort-direction`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION_GET_EMPLOYEE` permission on that company.
 
 - operationId: `listEmployeesShortInfo`
 - Required permission: `COMPENSATION_TIME_TRACKING`
@@ -39,7 +39,7 @@ Returns a lightweight directory of the authenticated company's employees (id, na
 
 Add a salary item to an employee's payslip.
 
-Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the employee's editable (non-sealed) payslip identified by `payslipId`, then recalculates that month unless `recalculate=false`. Returns the added salary item with its server-assigned `id`. This operation is not idempotent: repeated calls append duplicate items or throw an error when the item is not duplicatable (subject to the item's duplicatable flag). Prerequisite: call `GET /payroll/employees/{employeeId}/addable-salary-items` first — its response provides the `contractId` and `payslipId` to target and the addable `code`s; resolve `employeeId` beforehand via `GET /employees/short-info`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION` permission on that company.
+Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the employee's editable (non-sealed) payslip identified by `payslipId`, then always recalculates that month. Returns the added salary item with its server-assigned `id`. This operation is not idempotent: repeated calls append duplicate items or throw an error when the item is not duplicatable (subject to the item's duplicatable flag). Salary items can only be added for active employees: if the contract is inactive (the employee has left the company), the request is rejected with `400` and nothing is added. Prerequisite: call `GET /payroll/employees/{employeeId}/addable-salary-items` first — its response provides the `contractId` and `payslipId` to target and the addable `code`s; resolve `employeeId` beforehand via `GET /employees/short-info`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION` permission on that company.
 
 - operationId: `addSalaryItem`
 - Required permission: `COMPENSATION`
@@ -51,7 +51,6 @@ Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the
 |---|---|---|---|---|
 | `contractId` | path | yes | integer | Id of the employee's contract to add the salary item to. Obtained from the `contractId` field of the `GET /payroll/employees/{employeeId}/addable-salary-items` response — call that endpoint first to select the employee and obtain this id. |
 | `payslipId` | path | yes | integer | Id of the target (editable, non-sealed) payslip. Obtained from the `payslipId` field of the `GET /payroll/employees/{employeeId}/addable-salary-items` response — call that endpoint first to select the employee and obtain this id. |
-| `recalculate` | query | no | boolean | Whether to recalculate the payslip after adding the item. Defaults to true. |
 
 **Request body** (`application/json`, required)
 
@@ -77,7 +76,7 @@ Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the
 
 Get the salary items that can be added to an employee's payslip.
 
-Resolves the employee's main (latest) contract and its editable payslip, then returns the salary-item types that can be added to that payslip as blank templates (numeric value fields cleared, distinct by `code`), together with the resolved `contractId` and `payslipId` so the response can be chained into the add-salary-item call. Prerequisite: call `GET /employees/short-info` first to resolve the `employeeId` path parameter from the returned entries' `id` field. When `month` is provided the specified month's payslip is used (read-only); when it is omitted the employee's current editable payslip is used, which may be computed on first access. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION` permission on that company.
+Resolves the employee's main (latest) contract and its editable payslip, then returns the salary-item types that can be added to that payslip as blank templates (numeric value fields cleared, distinct by `code`), together with the resolved `contractId` and `payslipId` so the response can be chained into the add-salary-item call. Prerequisite: call `GET /employees/short-info` first to resolve the `employeeId` path parameter from the returned entries' `id` field. When `month` is provided that month's payslip is used; when it is omitted the employee's current payslip is used. An employee who has left (inactive) is rejected with `400`. This call does not recalculate or create payslips, with one exception: the current payslip may be created on first access. A month whose payslip is already sealed (paid) is rejected with `400`, and a month for which no payslip exists (e.g. a future month) returns `404`. The tenant and company are derived from the authenticated token; the caller must hold the `COMPENSATION` permission on that company.
 
 - operationId: `listAddableSalaryItems`
 - Required permission: `COMPENSATION`
@@ -88,7 +87,7 @@ Resolves the employee's main (latest) contract and its editable payslip, then re
 | Name | In | Required | Type | Description |
 |---|---|---|---|---|
 | `employeeId` | path | yes | integer | Id of the employee whose addable salary items are resolved. Obtained from the `id` field of an entry returned by `GET /employees/short-info`. |
-| `month` | query | no | string | Payslip month in the format MM.yyyy (e.g. 06.2025). If omitted, the employee's current editable payslip is used. |
+| `month` | query | no | string | Payslip month in the format MM.yyyy (e.g. 06.2025). If omitted, the employee's current payslip is used. The month's payslip must exist and must not be sealed (see the operation description). |
 | `Accept-Language` | header | no | string | Preferred language for localised salary-item descriptions, as an IETF language tag. Examples: de-CH, fr-CH, it-CH, en. Defaults to the tenant's language when omitted. |
 
 **Responses**

@@ -8415,7 +8415,7 @@
           "Payroll"
         ],
         "summary": "List the company's employees as short-info entries, filtered and sorted.",
-        "description": "Returns a lightweight directory of the authenticated company's employees (id, name, email, employee number, workplace, status), resolved from the compensation and person records. Each entry's <code>id</code> is the <code>employeeId</code> consumed by other employee-scoped endpoints (e.g. <code>GET /payroll/employees/{employeeId}/addable-salary-items</code>) — call this endpoint first to resolve an employee's id. Results can be narrowed with a free-text <code>search-key</code> (matched against name, employee number and email), restricted to specific workplaces via <code>workplace-ids</code>, and filtered by contract <code>status</code>; ordering is controlled by <code>sort-field</code> and <code>sort-direction</code>. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION_TIME_TRACKING</code> permission on that company.",
+        "description": "Returns a lightweight directory of the authenticated company's employees (id, name, email, employee number, workplace, status), resolved from the compensation and person records. Each entry's <code>id</code> is the <code>employeeId</code> consumed by other employee-scoped endpoints (e.g. <code>GET /payroll/employees/{employeeId}/addable-salary-items</code>) — call this endpoint first to resolve an employee's id. Results can be narrowed with a free-text <code>search-key</code> (matched against name, employee number and email), restricted to specific workplaces via <code>workplace-ids</code>, and filtered by contract <code>status</code>; ordering is controlled by <code>sort-field</code> and <code>sort-direction</code>. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION_GET_EMPLOYEE</code> permission on that company.",
         "operationId": "listEmployeesShortInfo",
         "parameters": [
           {
@@ -8793,7 +8793,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Invoice"
+                "$ref": "#/components/schemas/InvoiceCreateRequest"
               },
               "examples": {
                 "Update DRAFT to INVOICED": {
@@ -8893,14 +8893,24 @@
             }
           },
           "400": {
-            "description": "Data invalid<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "description": "Data invalid<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>invoice.vat_code_missing</code> — At least one orderItems[] entry set VAT on vatType, vatCase or the top-level vatCode while leaving vat.vatCode empty. Only vat.vatCode is stored, so that line would have been booked at 0%. Move the code to vat.vatCode, or send \"0\" (\"No VAT\") for a position that genuinely carries none.</li><li><code>invoice.vat_rate_mismatch</code> — At least one orderItems[] entry sent a vat.rate that is not the rate of its vat.vatCode. The booking always uses the code's rate, so the invoice document would state a different percentage than the accounting record. Send the matching rate, or omit vat.rate and let the server fill it in.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorMessage"
                 }
               }
-            }
+            },
+            "x-error-codes": [
+              {
+                "code": "invoice.vat_code_missing",
+                "meaning": "At least one orderItems[] entry set VAT on vatType, vatCase or the top-level vatCode while leaving vat.vatCode empty. Only vat.vatCode is stored, so that line would have been booked at 0%. Move the code to vat.vatCode, or send \"0\" (\"No VAT\") for a position that genuinely carries none."
+              },
+              {
+                "code": "invoice.vat_rate_mismatch",
+                "meaning": "At least one orderItems[] entry sent a vat.rate that is not the rate of its vat.vatCode. The booking always uses the code's rate, so the invoice document would state a different percentage than the accounting record. Send the matching rate, or omit vat.rate and let the server fill it in."
+              }
+            ]
           },
           "401": {
             "description": "No Authorization header found or invalid token<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
@@ -8993,11 +9003,11 @@
           }
         ],
         "requestBody": {
-          "description": "<strong>Creates a new invoice for an existing customer.</strong> The <code>id</code> field must be <code>0</code> or omitted. This endpoint does not support updating existing invoices.<br/><br/><strong>Prerequisite APIs (call these first):</strong><ul><li><code>GET /core/v1/invoices/next-invoice-number</code> → provides <code>invoiceCode</code> and <code>invoiceNumber</code> (the next available invoice number for the company).</li><li><code>GET /core/v1/customers?search-key=...&amp;limit=...</code> → provides <code>order.customer.id</code>, <code>order.customer.company</code> (with addresses, emails), and <code>order.customer.customerType</code>.</li><li><code>GET /core/v1/company-bank-accounts</code> → provides <code>ibanNumberCHF</code> / <code>ibanNumberCHW</code> for payment accounts.</li><li><code>GET /core/latest/articles/search?keyword=...</code> → search articles by keyword for the autocomplete; provides <code>orderItems[].itemNumer</code>, <code>description</code>, <code>price</code>, <code>vat</code>, <code>unit</code>.</li><li><code>GET /core/latest/articles/article-numbers?article-numbers=...</code> → fetch full article data by article number(s) to fill <code>orderItems[]</code>.</li><li><code>GET /core/latest/articles/{article-id}/article-set-items</code> → expands article set/bundle into component line items for <code>orderItems[]</code>.</li><li><code>GET /core/v1/bank-reconciliation/open-positions</code> → lists customer's open prepayments / credit notes that can be reconciled; provides <code>openPositionsLinkedToInvoice[].bookingTypeCode</code>, <code>bookingDetailUri</code>, <code>partialPaymentAmount</code>.</li><li>(Optional) <code>POST /core/v1/orders/next-order-number</code> → provides <code>order.orderNumber</code>; each call advances the in-memory counter — call immediately before creating the invoice, not speculatively.</li><li>(Optional) <code>GET /core/latest/company-configuration/including-vat</code> → provides the company-level default for <code>usingVAT</code>; returns <code>false</code> when no configuration record exists.</li><li><code>printedFileId</code> (String, server-assigned) — populated automatically by <code>POST /core/v1/invoices/{id}/printed-document</code> after PDF generation; omit on creation.</li></ul><br/><strong>Top-level fields:</strong><ul><li><code>id</code> (long, required) — must be <code>0</code> for creation.</li><li><code>invoiceCode</code> (String, required) — unique invoice code; obtain from <code>GET /core/v1/invoices/next-invoice-number</code>.</li><li><code>orderType</code> (String, required) — must be <code>INVOICE</code>.</li><li><code>status</code> (String, required) — determines booking behavior (not delivery). Allowed: <code>DRAFT</code> (saves without booking), <code>INVOICED</code> (saves and books into accounting), <code>SENT</code> (saves and books; does <strong>not</strong> send/deliver the invoice).</li><li><code>postMethod</code> (String, optional) — distribution channel <strong>recorded on the invoice only</strong>; this endpoint does not deliver the invoice. Allowed: <code>A_POST</code>, <code>B_POST</code>, <code>SEND_EMAIL</code>, <code>PRINT_AND_MANUAL_SEND</code>, <code>EPOST</code>, <code>EBILL</code>.</li><li><code>documentDate</code> (date, required) — invoice issue date, format <code>yyyy-MM-dd</code>.</li><li><code>paymentDate</code> (date, required) — payment due date, must be on or after <code>documentDate</code>.</li><li><code>ibanNumberCHF</code> (String, conditional) — CHF IBAN for payment; required when booking is triggered.</li><li><code>ibanNumberCHW</code> (String, optional) — WIR IBAN for combined payments.</li><li><code>wirAcceptanceRate</code> (int, optional) — WIR acceptance percentage (0–100).</li><li><code>invoiceType</code> (String, required) — <code>MANUAL</code> or <code>RECURRING</code>.</li><li><code>amount</code> (BigDecimal, required) — total invoice amount over all items. Caller-supplied; not recomputed by the server. With <code>usingVAT=false</code> this is net + VAT; with <code>usingVAT=true</code> it is the sum of the gross item amounts.</li><li><code>usingVAT</code> (boolean) — GUI checkbox <em>\"VAT included in amount of each item\"</em>. Controls whether item <code>price</code>/<code>amount</code> are VAT-inclusive (<code>true</code>, gross) or VAT-exclusive (<code>false</code>, net). It does <strong>not</strong> switch VAT on/off (that is the company's VAT registration). Use <code>GET /core/latest/company-configuration/including-vat</code> for the company default. See <em>VAT handling</em> below.</li><li><code>usingExportVat</code> (boolean, optional) — GUI checkbox <em>\"Export\"</em>. When <code>true</code>, the invoice is an export: set every <code>orderItems[].vat.rate</code> to <code>0</code> so no VAT is charged. Defaults to <code>false</code>.</li><li><code>subject</code> (String, optional) — invoice subject/title.</li><li><code>ourReference</code> / <code>yourReference</code> (String, optional) — reference texts.</li><li><code>companyCityAndDate</code> (String, optional) — city and date line printed on invoice.</li><li><code>closeAndSignature</code> (String, optional) — closing text and signature block.</li><li><code>printedFileId</code> (String, optional) — document ID of uploaded PDF from partner system.</li></ul><br/><strong>Nested fields — <code>order</code> (required):</strong><ul><li><code>order.id</code> (long) — must be <code>0</code> for new orders.</li><li><code>order.orderNumber</code> (int, required) — unique order number; must be &gt; 0 (validated). Obtain from <code>POST /core/v1/orders/next-order-number</code> (not idempotent — each call advances the counter).</li><li><code>order.orderName</code> (String, optional) — order description.</li><li><code>order.companyId</code> (long, required) — company ID from bearer token scope.</li><li><code>order.customer</code> (object, required) — existing customer; obtain from <code>GET /core/v1/customers</code>. Must include <code>customer.id</code>, <code>customer.company</code> (with addresses), and <code>customer.customerType</code> (<code>COMPANY</code> or <code>PERSON</code>).</li></ul><br/><strong>Nested fields — <code>orderItems[]</code> (required, at least 1):</strong><ul><li><code>orderItems[].position</code> (int) — line item position (1-based).</li><li><code>orderItems[].itemNumer</code> (String) — article number.</li><li><code>orderItems[].description</code> (String) — item description.</li><li><code>orderItems[].quantity</code> (double) — quantity.</li><li><code>orderItems[].unit</code> (String) — unit of measure (e.g. <code>Unit</code>, <code>Hour</code>).</li><li><code>orderItems[].price</code> (double) — unit price (negative for credit notes). VAT-inclusive (gross) when <code>usingVAT=true</code>, VAT-exclusive (net) when <code>usingVAT=false</code>. Both variants are available from the article lookup APIs.</li><li><code>orderItems[].discount</code> (double) — discount percentage.</li><li><code>orderItems[].amount</code> (double) — line total = <code>quantity × price × (1 − discount/100)</code>, rounded to the nearest 0.05. Gross or net following <code>usingVAT</code> (same basis as <code>price</code>).</li><li><code>orderItems[].tag</code> (String, <strong>required for booking</strong>) — tags field; must not be empty when status is <code>INVOICED</code>/<code>SENT</code>.</li><li><code>orderItems[].vatCase</code> (String) — <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>.</li><li><code>orderItems[].articleType</code> (String) — <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>.</li><li><code>orderItems[].vat</code> (object) — VAT details: <code>vatCode</code>, <code>rate</code>, <code>description</code>, <code>masterId</code>. For an export invoice (<code>usingExportVat=true</code>) set <code>rate=0</code> and the export/zero <code>vatCode</code>.</li><li><code>orderItems[].id</code> (long) — must be <code>0</code> for new items.</li></ul><br/><strong>VAT handling — the server does not recalculate amounts.</strong> Unlike the KLARA GUI (which recomputes line amounts, VAT and totals whenever you toggle the <em>\"VAT included in amount of each item\"</em> or <em>\"Export\"</em> checkbox), this endpoint stores the amounts you send <em>verbatim</em> and performs no VAT recalculation or consistency check. Send <code>orderItems[].price</code>, <code>orderItems[].amount</code>, <code>orderItems[].vat</code> and the document <code>amount</code> already consistent with the two flags:<ul><li><code>usingVAT=false</code> (VAT-exclusive) — <code>price</code>/<code>amount</code> are net; document <code>amount</code> = net + VAT.</li><li><code>usingVAT=true</code> (VAT-inclusive) — <code>price</code>/<code>amount</code> are gross (VAT already inside); document <code>amount</code> = sum of gross item amounts.</li><li><code>usingExportVat=true</code> (export) — set every <code>orderItems[].vat.rate</code> to <code>0</code>; VAT = 0 and document <code>amount</code> = sum of net item amounts.</li></ul>To reproduce the GUI figures exactly: per line <code>amount = round0.05(quantity × price × (1 − discount/100))</code>; VAT per rate group = <code>amount × rate/100</code> when VAT-exclusive, or <code>amount × (rate/100) / (1 + rate/100)</code> when VAT-inclusive — each rounded to the nearest 0.05 (Swiss commercial rounding). Article unit prices for the inclusive, exclusive and export cases come from the article lookup APIs above (each article exposes both a VAT-inclusive and a VAT-exclusive price); pick the one matching <code>usingVAT</code>/<code>usingExportVat</code>.<br/><br/><strong>Nested fields — <code>attachments[]</code> (optional):</strong><ul><li><code>attachments[].fileId</code> (String) — document file ID uploaded via partner system.</li><li><code>attachments[].orderDetailId</code> (long) — set to <code>0</code> for new invoices.</li><li><code>attachments[].id</code> (long) — set to <code>0</code> for new attachments.</li></ul><br/><strong>Nested fields — <code>openPositionsLinkedToInvoice[]</code> (optional, for reconciliation):</strong><ul><li><code>openPositionsLinkedToInvoice[].bookingTypeCode</code> (String) — <code>AR_PREPAYMENT</code> or <code>AR_CREDITNOTE</code>.</li><li><code>openPositionsLinkedToInvoice[].bookingDetailUri</code> (String) — internal URI of the booking detail to reconcile (format: <code>/…/{tenant-id}/companies/{companyId}/bookings/{bookingId}/booking-details/{detailId}</code>).</li><li><code>openPositionsLinkedToInvoice[].partialPaymentAmount</code> (BigDecimal) — amount to offset from this open position.</li></ul><br/><strong>Validation rules:</strong><ul><li><code>paymentDate</code> must be on or after <code>documentDate</code> (when amount &gt; 0).</li><li><code>order.orderNumber</code> must be &gt; 0.</li><li><code>invoiceCode</code> must be unique within the company.</li><li><code>status</code> must not be null.</li><li>IBAN format is validated when provided.</li><li>When status is <code>SENT</code>, credit notes (negative total) are not allowed.</li><li>Each <code>orderItems[].tag</code> must be present when status triggers booking (<code>INVOICED</code>/<code>SENT</code>).</li></ul><br/><strong>Server-managed fields (ignored on input, populated on output):</strong> <code>vatDate</code>, <code>lastModified</code>, <code>createDate</code>, <code>bookingDueDate</code>, <code>bookingNumbers</code>, <code>businessCaseId</code>, <code>bookingStatus</code>, <code>bookingMessage</code>, <code>bookingSealed</code>, <code>fiscalYearHasCreatedAuto</code>, <code>createBy</code>, <code>issuedDate</code>.",
+          "description": "<strong>Creates a new invoice for an existing customer.</strong> The <code>id</code> field must be <code>0</code> or omitted. This endpoint does not support updating existing invoices.<br/><br/><strong>Prerequisite APIs (call these first):</strong><ul><li><code>GET /core/v1/invoices/next-invoice-number</code> → provides <code>invoiceCode</code> and <code>invoiceNumber</code> (the next available invoice number for the company).</li><li><code>GET /core/v1/customers?search-key=...&amp;limit=...</code> → provides <code>order.customer.id</code>, <code>order.customer.company</code> (with addresses, emails), and <code>order.customer.customerType</code>.</li><li><code>GET /core/v1/company-bank-accounts</code> → provides <code>ibanNumberCHF</code> / <code>ibanNumberCHW</code> for payment accounts.</li><li><code>GET /core/latest/articles/search?keyword=...</code> → search articles by keyword for the autocomplete; provides <code>orderItems[].itemNumer</code>, <code>description</code>, <code>price</code>, <code>vat</code>, <code>unit</code>.</li><li><code>GET /core/latest/articles/article-numbers?article-numbers=...</code> → fetch full article data by article number(s) to fill <code>orderItems[]</code>.</li><li><code>GET /core/latest/articles/{article-id}/article-set-items</code> → expands article set/bundle into component line items for <code>orderItems[]</code>.</li><li><code>GET /core/v1/bank-reconciliation/open-positions</code> → lists customer's open prepayments / credit notes that can be reconciled; provides <code>openPositionsLinkedToInvoice[].bookingTypeCode</code>, <code>bookingDetailUri</code>, <code>partialPaymentAmount</code>.</li><li>(Optional) <code>POST /core/v1/orders/next-order-number</code> → provides <code>order.orderNumber</code>; each call advances the in-memory counter — call immediately before creating the invoice, not speculatively.</li><li>(Optional) <code>GET /core/latest/company-configuration/including-vat</code> → provides the company-level default for <code>usingVAT</code>; returns <code>false</code> when no configuration record exists.</li><li><code>printedFileId</code> (String, server-assigned) — populated automatically by <code>POST /core/v1/invoices/{id}/printed-document</code> after PDF generation; omit on creation.</li></ul><br/><strong>Field names that look like typos but are not.</strong> The following names are the literal wire field names accepted by the backend. The corrected-looking spellings are <strong>not</strong> accepted:<ul><li><code>orderItems[].itemNumer</code> — article number (<em>not</em> <code>itemNumber</code>). The article lookup endpoints expose the same value under the name <code>articleNumber</code>.</li><li><code>...address.homeNumber</code> — house number (<em>not</em> <code>houseNumber</code>).</li><li><code>...city.cityName18</code> / <code>cityName27</code> — the 18- and 27-character city name variants of the Swiss Post address directory. Neither is a leftover.</li></ul><br/><strong>Top-level fields:</strong><ul><li><code>id</code> (long, required) — must be <code>0</code> for creation.</li><li><code>invoiceCode</code> (String, required) — unique invoice code; obtain from <code>GET /core/v1/invoices/next-invoice-number</code>.</li><li><code>orderType</code> (String, required) — must be <code>INVOICE</code>.</li><li><code>status</code> (String, required) — determines booking behavior (not delivery). Allowed: <code>DRAFT</code> (saves without booking), <code>INVOICED</code> (saves and books into accounting), <code>SENT</code> (saves and books; does <strong>not</strong> send/deliver the invoice).</li><li><code>postMethod</code> (String, optional) — distribution channel <strong>recorded on the invoice only</strong>; this endpoint does not deliver the invoice. Allowed: <code>A_POST</code>, <code>B_POST</code>, <code>SEND_EMAIL</code>, <code>PRINT_AND_MANUAL_SEND</code>, <code>EPOST</code>, <code>EBILL</code>.</li><li><code>documentDate</code> (date, required) — invoice issue date, format <code>yyyy-MM-dd</code>.</li><li><code>paymentDate</code> (date, required) — payment due date, must be on or after <code>documentDate</code>.</li><li><code>ibanNumberCHF</code> (String, conditional) — CHF IBAN for payment; required when booking is triggered.</li><li><code>ibanNumberCHW</code> (String, optional) — WIR IBAN for combined payments.</li><li><code>wirAcceptanceRate</code> (int, optional) — WIR acceptance percentage (0–100).</li><li><code>invoiceType</code> (String, required) — <code>MANUAL</code> or <code>RECURRING</code>.</li><li><code>amount</code> (BigDecimal, required) — total invoice amount over all items. Caller-supplied; not recomputed by the server. With <code>usingVAT=false</code> this is net + VAT; with <code>usingVAT=true</code> it is the sum of the gross item amounts.</li><li><code>usingVAT</code> (boolean) — GUI checkbox <em>\"VAT included in amount of each item\"</em>. Controls whether item <code>price</code>/<code>amount</code> are VAT-inclusive (<code>true</code>, gross) or VAT-exclusive (<code>false</code>, net). It does <strong>not</strong> switch VAT on/off (that is the company's VAT registration). Use <code>GET /core/latest/company-configuration/including-vat</code> for the company default. See <em>VAT handling</em> below.</li><li><code>usingExportVat</code> (boolean, optional) — GUI checkbox <em>\"Export\"</em>. When <code>true</code>, the invoice is an export: set every <code>orderItems[].vat.rate</code> to <code>0</code> so no VAT is charged. Defaults to <code>false</code>.</li><li><code>subject</code> (String, optional) — invoice subject/title.</li><li><code>ourReference</code> / <code>yourReference</code> (String, optional) — reference texts.</li><li><code>companyCityAndDate</code> (String, optional) — city and date line printed on invoice.</li><li><code>closeAndSignature</code> (String, optional) — closing text and signature block.</li><li><code>printedFileId</code> (String, optional) — document ID of uploaded PDF from partner system.</li></ul><br/><strong>Nested fields — <code>order</code> (required):</strong><ul><li><code>order.id</code> (long) — must be <code>0</code> for new orders.</li><li><code>order.orderNumber</code> (int, required) — unique order number; must be &gt; 0 (validated). Obtain from <code>POST /core/v1/orders/next-order-number</code> (not idempotent — each call advances the counter).</li><li><code>order.orderName</code> (String, optional) — order description.</li><li><code>order.companyId</code> (long, required) — company ID from bearer token scope.</li><li><code>order.customer</code> (object, required) — existing customer; obtain from <code>GET /core/v1/customers</code>. Must include <code>customer.id</code>, <code>customer.company</code> (with addresses), and <code>customer.customerType</code> (<code>COMPANY</code> or <code>PERSON</code>).</li></ul><br/><strong>Nested fields — <code>orderItems[]</code> (required, at least 1):</strong><ul><li><code>orderItems[].position</code> (int) — line item position (1-based).</li><li><code>orderItems[].itemNumer</code> (String) — article number. <strong>The field name is <code>itemNumer</code>, not <code>itemNumber</code></strong> — this spelling is the literal wire field name of the KLARA order-management model and is what the backend accepts. It is not a typo in this documentation. The article lookup endpoints expose the same value under the name <code>articleNumber</code>.</li><li><code>orderItems[].description</code> (String) — item description.</li><li><code>orderItems[].quantity</code> (double) — quantity.</li><li><code>orderItems[].unit</code> (String) — unit of measure (e.g. <code>Unit</code>, <code>Hour</code>).</li><li><code>orderItems[].price</code> (double) — unit price (negative for credit notes). VAT-inclusive (gross) when <code>usingVAT=true</code>, VAT-exclusive (net) when <code>usingVAT=false</code>. Both variants are available from the article lookup APIs.</li><li><code>orderItems[].discount</code> (double) — discount percentage.</li><li><code>orderItems[].amount</code> (double) — line total = <code>quantity × price × (1 − discount/100)</code>, rounded to the nearest 0.05. Gross or net following <code>usingVAT</code> (same basis as <code>price</code>).</li><li><code>orderItems[].tag</code> (String, <strong>required for booking</strong>) — tags field; must not be empty when status is <code>INVOICED</code>/<code>SENT</code>.</li><li><code>orderItems[].vatCase</code> (String) — <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>.</li><li><code>orderItems[].articleType</code> (String) — <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>.</li><li><code>orderItems[].vat</code> (object) — VAT details: <code>vatCode</code>, <code>rate</code>, <code>description</code>, <code>masterId</code>. For an export invoice (<code>usingExportVat=true</code>) set <code>rate=0</code> and the export/zero <code>vatCode</code>.</li><li><code>orderItems[].id</code> (long) — must be <code>0</code> for new items.</li></ul><br/><strong>VAT handling — the server does not recalculate amounts.</strong> Unlike the KLARA GUI (which recomputes line amounts, VAT and totals whenever you toggle the <em>\"VAT included in amount of each item\"</em> or <em>\"Export\"</em> checkbox), this endpoint stores the amounts you send <em>verbatim</em> and performs no VAT recalculation or consistency check. Send <code>orderItems[].price</code>, <code>orderItems[].amount</code>, <code>orderItems[].vat</code> and the document <code>amount</code> already consistent with the two flags:<ul><li><code>usingVAT=false</code> (VAT-exclusive) — <code>price</code>/<code>amount</code> are net; document <code>amount</code> = net + VAT.</li><li><code>usingVAT=true</code> (VAT-inclusive) — <code>price</code>/<code>amount</code> are gross (VAT already inside); document <code>amount</code> = sum of gross item amounts.</li><li><code>usingExportVat=true</code> (export) — set every <code>orderItems[].vat.rate</code> to <code>0</code>; VAT = 0 and document <code>amount</code> = sum of net item amounts.</li></ul>To reproduce the GUI figures exactly: per line <code>amount = round0.05(quantity × price × (1 − discount/100))</code>; VAT per rate group = <code>amount × rate/100</code> when VAT-exclusive, or <code>amount × (rate/100) / (1 + rate/100)</code> when VAT-inclusive — each rounded to the nearest 0.05 (Swiss commercial rounding). Article unit prices for the inclusive, exclusive and export cases come from the article lookup APIs above (each article exposes both a VAT-inclusive and a VAT-exclusive price); pick the one matching <code>usingVAT</code>/<code>usingExportVat</code>.<br/><br/><strong>Nested fields — <code>attachments[]</code> (optional):</strong><ul><li><code>attachments[].fileId</code> (String) — document file ID uploaded via partner system.</li><li><code>attachments[].orderDetailId</code> (long) — set to <code>0</code> for new invoices.</li><li><code>attachments[].id</code> (long) — set to <code>0</code> for new attachments.</li></ul><br/><strong>Nested fields — <code>openPositionsLinkedToInvoice[]</code> (optional, for reconciliation):</strong><ul><li><code>openPositionsLinkedToInvoice[].bookingTypeCode</code> (String) — <code>AR_PREPAYMENT</code> or <code>AR_CREDITNOTE</code>.</li><li><code>openPositionsLinkedToInvoice[].bookingDetailUri</code> (String) — internal URI of the booking detail to reconcile (format: <code>/…/{tenant-id}/companies/{companyId}/bookings/{bookingId}/booking-details/{detailId}</code>).</li><li><code>openPositionsLinkedToInvoice[].partialPaymentAmount</code> (BigDecimal) — amount to offset from this open position.</li></ul><br/><strong>Validation rules:</strong><ul><li><code>paymentDate</code> must be on or after <code>documentDate</code> (when amount &gt; 0).</li><li><code>order.orderNumber</code> must be &gt; 0.</li><li><code>invoiceCode</code> must be unique within the company.</li><li><code>status</code> must not be null.</li><li>IBAN format is validated when provided.</li><li>When status is <code>SENT</code>, credit notes (negative total) are not allowed.</li><li>Each <code>orderItems[].tag</code> must be present when status triggers booking (<code>INVOICED</code>/<code>SENT</code>).</li></ul><br/><strong>Server-managed fields (ignored on input, populated on output):</strong> <code>vatDate</code>, <code>lastModified</code>, <code>createDate</code>, <code>bookingDueDate</code>, <code>bookingNumbers</code>, <code>businessCaseId</code>, <code>bookingStatus</code>, <code>bookingMessage</code>, <code>bookingSealed</code>, <code>fiscalYearHasCreatedAuto</code>, <code>createBy</code>, <code>issuedDate</code>.",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Invoice"
+                "$ref": "#/components/schemas/InvoiceCreateRequest"
               },
               "examples": {
                 "With articles only": {
@@ -9411,7 +9421,7 @@
             }
           },
           "400": {
-            "description": "Data invalid<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>invoice.id_must_be_zero</code> — The request body carried a non-zero id. This operation only creates invoices; use PUT /core/v1/invoices to modify an existing one.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "description": "Data invalid<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>invoice.id_must_be_zero</code> — The request body carried a non-zero id. This operation only creates invoices; use PUT /core/v1/invoices to modify an existing one.</li><li><code>invoice.vat_code_missing</code> — At least one orderItems[] entry set VAT on vatType, vatCase or the top-level vatCode while leaving vat.vatCode empty. Only vat.vatCode is stored, so that line would have been booked at 0%. Move the code to vat.vatCode, or send \"0\" (\"No VAT\") for a position that genuinely carries none.</li><li><code>invoice.vat_rate_mismatch</code> — At least one orderItems[] entry sent a vat.rate that is not the rate of its vat.vatCode. The booking always uses the code's rate, so the invoice document would state a different percentage than the accounting record. Send the matching rate, or omit vat.rate and let the server fill it in.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9423,6 +9433,14 @@
               {
                 "code": "invoice.id_must_be_zero",
                 "meaning": "The request body carried a non-zero id. This operation only creates invoices; use PUT /core/v1/invoices to modify an existing one."
+              },
+              {
+                "code": "invoice.vat_code_missing",
+                "meaning": "At least one orderItems[] entry set VAT on vatType, vatCase or the top-level vatCode while leaving vat.vatCode empty. Only vat.vatCode is stored, so that line would have been booked at 0%. Move the code to vat.vatCode, or send \"0\" (\"No VAT\") for a position that genuinely carries none."
+              },
+              {
+                "code": "invoice.vat_rate_mismatch",
+                "meaning": "At least one orderItems[] entry sent a vat.rate that is not the rate of its vat.vatCode. The booking always uses the code's rate, so the invoice document would state a different percentage than the accounting record. Send the matching rate, or omit vat.rate and let the server fill it in."
               }
             ]
           },
@@ -10286,7 +10304,7 @@
           "Payroll"
         ],
         "summary": "Add a salary item to an employee's payslip.",
-        "description": "Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the employee's editable (non-sealed) payslip identified by <code>payslipId</code>, then recalculates that month unless <code>recalculate=false</code>. Returns the added salary item with its server-assigned <code>id</code>. This operation is <strong>not idempotent</strong>: repeated calls append duplicate items or throw an error when the item is not duplicatable (subject to the item's duplicatable flag). <strong>Prerequisite:</strong> call <code>GET /payroll/employees/{employeeId}/addable-salary-items</code> first — its response provides the <code>contractId</code> and <code>payslipId</code> to target and the addable <code>code</code>s; resolve <code>employeeId</code> beforehand via <code>GET /employees/short-info</code>. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION</code> permission on that company.",
+        "description": "Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the employee's editable (non-sealed) payslip identified by <code>payslipId</code>, then always recalculates that month. Returns the added salary item with its server-assigned <code>id</code>. This operation is <strong>not idempotent</strong>: repeated calls append duplicate items or throw an error when the item is not duplicatable (subject to the item's duplicatable flag). Salary items can only be added for <strong>active</strong> employees: if the contract is inactive (the employee has left the company), the request is rejected with <code>400</code> and nothing is added. <strong>Prerequisite:</strong> call <code>GET /payroll/employees/{employeeId}/addable-salary-items</code> first — its response provides the <code>contractId</code> and <code>payslipId</code> to target and the addable <code>code</code>s; resolve <code>employeeId</code> beforehand via <code>GET /employees/short-info</code>. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION</code> permission on that company.",
         "operationId": "addSalaryItem",
         "parameters": [
           {
@@ -10310,22 +10328,10 @@
               "example": 26
             },
             "example": 26
-          },
-          {
-            "name": "recalculate",
-            "in": "query",
-            "description": "Whether to recalculate the payslip after adding the item. Defaults to true.",
-            "required": false,
-            "schema": {
-              "default": "true",
-              "type": "boolean",
-              "example": true
-            },
-            "example": true
           }
         ],
         "requestBody": {
-          "description": "<strong>Purpose:</strong> add one salary item to the target payslip. The <code>code</code> must be one of the addable salary items for this payslip, and only the value fields the item allows may be sent.<br/><strong>Prerequisite APIs / value sources:</strong><ul><li><code>GET /employees/short-info</code> &rarr; provides <code>employeeId</code></li><li><code>GET /payroll/employees/{employeeId}/addable-salary-items</code> &rarr; provides the <code>contractId</code> and <code>payslipId</code> path parameters, plus <code>salaryItems[].code</code> (&rarr; <code>code</code>) and each item's <code>editableFields</code> (which of <code>baseValue</code>/<code>rate</code>/<code>quantity</code>/<code>value</code> may be sent)</li></ul><strong>Top-level fields:</strong><ul><li><code>code</code> (string, required) — salary-type code from the addable-salary-items response.</li><li><code>salaryItemValues</code> (object, optional) — the numeric values; see below.</li><li><code>remark</code> (string, optional, max 1024) — free-text comment (GUI \"Comments\").</li></ul><strong>Nested <code>salaryItemValues</code>:</strong><ul><li><code>baseValue</code> — GUI \"Base\".</li><li><code>rate</code> — GUI \"Percent (%)\", but expressed as a decimal <strong>multiplier</strong>, not a percentage number: <code>1</code> = 100%, <code>0.5</code> = 50%, <code>2</code> = 200%. If your application wants to keep a normal percentage input for the user (e.g. typing 50 for 50%), it must divide that value by 100 before sending it here (50 / 100 = 0.5).</li><li><code>quantity</code> — GUI \"Quantity\".</li><li><code>value</code> — GUI \"Amount\".</li></ul><strong>Rules:</strong> the payslip must be editable (non-sealed); the <code>code</code> must be addable to this payslip (returned by the addable-salary-items endpoint); only fields listed in the item's <code>editableFields</code> should be provided and the your application should also only show input boxes for those fields; with salary items that are not duplicatable (<code>duplicatable=false</code>), the your application should have a mechanism to recall the <code>GET /payroll/employees/{employeeId}/addable-salary-items</code> endpoint after each add to refresh the list of addable items and prevent adding duplicates, or automatically remove the added item from the list of addable items in the GUI; <code>salaryItemValues.rate</code> is a decimal multiplier (1 = 100%, 0.5 = 50%, 2 = 200%), not a percentage number — do not send a raw percentage like 50 for 50%, send 0.5.",
+          "description": "<strong>Purpose:</strong> add one salary item to the target payslip. The <code>code</code> must be one of the addable salary items for this payslip, and only the value fields the item allows may be sent.<br/><strong>Prerequisite APIs / value sources:</strong><ul><li><code>GET /employees/short-info</code> &rarr; provides <code>employeeId</code></li><li><code>GET /payroll/employees/{employeeId}/addable-salary-items</code> &rarr; provides the <code>contractId</code> and <code>payslipId</code> path parameters, plus <code>salaryItems[].code</code> (&rarr; <code>code</code>) and each item's <code>editableFields</code> (which of <code>baseValue</code>/<code>rate</code>/<code>quantity</code>/<code>value</code> may be sent)</li></ul><strong>Top-level fields:</strong><ul><li><code>code</code> (string, required) — salary-type code from the addable-salary-items response.</li><li><code>salaryItemValues</code> (object, optional) — the numeric values; see below.</li><li><code>remark</code> (string, optional, max 1024) — free-text comment (GUI \"Comments\").</li></ul><strong>Nested <code>salaryItemValues</code>:</strong><ul><li><code>baseValue</code> — GUI \"Base\".</li><li><code>rate</code> — GUI \"Percent (%)\", but expressed as a decimal <strong>multiplier</strong>, not a percentage number: <code>1</code> = 100%, <code>0.5</code> = 50%, <code>2</code> = 200%. If your application wants to keep a normal percentage input for the user (e.g. typing 50 for 50%), it must divide that value by 100 before sending it here (50 / 100 = 0.5).</li><li><code>quantity</code> — GUI \"Quantity\".</li><li><code>value</code> — GUI \"Amount\".</li></ul><strong>Rules:</strong> the payslip must be editable (non-sealed); the employee must be active (a contract of an employee who has left is rejected with <code>400</code>); the <code>code</code> must be addable to this payslip (returned by the addable-salary-items endpoint); only fields listed in the item's <code>editableFields</code> should be provided and the your application should also only show input boxes for those fields; with salary items that are not duplicatable (<code>duplicatable=false</code>), the your application should have a mechanism to recall the <code>GET /payroll/employees/{employeeId}/addable-salary-items</code> endpoint after each add to refresh the list of addable items and prevent adding duplicates, or automatically remove the added item from the list of addable items in the GUI; <code>salaryItemValues.rate</code> is a decimal multiplier (1 = 100%, 0.5 = 50%, 2 = 200%), not a percentage number — do not send a raw percentage like 50 for 50%, send 0.5.",
           "content": {
             "application/json": {
               "schema": {
@@ -10429,7 +10435,7 @@
           "Payroll"
         ],
         "summary": "Get the salary items that can be added to an employee's payslip.",
-        "description": "Resolves the employee's main (latest) contract and its editable payslip, then returns the salary-item types that can be added to that payslip as blank templates (numeric value fields cleared, distinct by <code>code</code>), together with the resolved <code>contractId</code> and <code>payslipId</code> so the response can be chained into the add-salary-item call. <strong>Prerequisite:</strong> call <code>GET /employees/short-info</code> first to resolve the <code>employeeId</code> path parameter from the returned entries' <code>id</code> field. When <code>month</code> is provided the specified month's payslip is used (read-only); when it is omitted the employee's current editable payslip is used, which may be computed on first access. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION</code> permission on that company.",
+        "description": "Resolves the employee's main (latest) contract and its editable payslip, then returns the salary-item types that can be added to that payslip as blank templates (numeric value fields cleared, distinct by <code>code</code>), together with the resolved <code>contractId</code> and <code>payslipId</code> so the response can be chained into the add-salary-item call. <strong>Prerequisite:</strong> call <code>GET /employees/short-info</code> first to resolve the <code>employeeId</code> path parameter from the returned entries' <code>id</code> field. When <code>month</code> is provided that month's payslip is used; when it is omitted the employee's current payslip is used. An employee who has left (inactive) is rejected with <code>400</code>. This call does not recalculate or create payslips, with one exception: the current payslip may be created on first access. A month whose payslip is already sealed (paid) is rejected with <code>400</code>, and a month for which no payslip exists (e.g. a future month) returns <code>404</code>. The tenant and company are derived from the authenticated token; the caller must hold the <code>COMPENSATION</code> permission on that company.",
         "operationId": "listAddableSalaryItems",
         "parameters": [
           {
@@ -10446,7 +10452,7 @@
           {
             "name": "month",
             "in": "query",
-            "description": "Payslip month in the format MM.yyyy (e.g. 06.2025). If omitted, the employee's current editable payslip is used.",
+            "description": "Payslip month in the format MM.yyyy (e.g. 06.2025). If omitted, the employee's current payslip is used. The month's payslip must exist and must not be sealed (see the operation description).",
             "required": false,
             "schema": {
               "type": "string",
@@ -13139,6 +13145,11 @@
             "type": "boolean",
             "example": false
           },
+          "hasCompanyVat": {
+            "description": "Whether the company is liable for VAT. <strong>Leave this out.</strong> The server derives it from the company's VAT registration for the invoice's effective VAT date (<code>deliveryDate</code> when set, otherwise <code>documentDate</code>) and a derived value always wins over a value sent here. It is documented only because it is accepted, and because sending <code>false</code> on a VAT-registered company used to book every position at 0% while returning 200 — this field is the master switch for VAT at booking time, ahead of any per-line VAT code. It is only consulted when the company has no VAT configuration for that date, where it cannot be derived at all.",
+            "type": "boolean",
+            "example": true
+          },
           "subject": {
             "description": "Free-text invoice subject.",
             "maxLength": 1024,
@@ -13277,6 +13288,1212 @@
           }
         }
       },
+      "InvoiceAddress": {
+        "description": "Postal address of an invoice customer. Obtain a complete address block from <code>GET /core/v1/customers</code> and send it back unchanged.",
+        "required": [
+          "type",
+          "addressType",
+          "city"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Address id. Use the id returned by the customer lookup; <code>0</code> or omitted for a new address.",
+            "type": "integer",
+            "example": 0
+          },
+          "type": {
+            "description": "Partner type this address belongs to. <strong>Required.</strong> Allowed values: <code>COMPANY</code>, <code>PERSON</code>.",
+            "type": "string",
+            "example": "COMPANY"
+          },
+          "addressType": {
+            "description": "Address type label. <strong>Required.</strong> Typically <code>MAIN</code> or <code>BILLING</code>.",
+            "type": "string",
+            "example": "MAIN"
+          },
+          "salutation": {
+            "description": "Salutation of the addressee. Allowed values: <code>MALE</code>, <code>FEMALE</code>, <code>MALE_FEMALE</code>, <code>FAMILY</code>.",
+            "type": "string",
+            "example": "MALE"
+          },
+          "firstName": {
+            "description": "First name of the addressee (person addresses).",
+            "type": "string",
+            "example": "Hans"
+          },
+          "lastName": {
+            "description": "Last name of the addressee (person addresses).",
+            "type": "string",
+            "example": "Muster"
+          },
+          "companyName": {
+            "description": "Company name of the addressee (company addresses).",
+            "type": "string",
+            "example": "Muster AG"
+          },
+          "street": {
+            "description": "Street name, without the house number.",
+            "type": "string",
+            "example": "Bahnhofstrasse"
+          },
+          "homeNumber": {
+            "description": "House number. <code>homeNumber</code> is the literal field name used throughout the KLARA address model — <code>houseNumber</code> is not accepted.",
+            "type": "string",
+            "example": "12a"
+          },
+          "additionalAddress": {
+            "description": "Additional address line (c/o, department, ...).",
+            "type": "string",
+            "example": "c/o Finance Department"
+          },
+          "addressLines": {
+            "description": "Combined street and house number. <strong>Deprecated</strong> — use <code>street</code> and <code>homeNumber</code> instead.",
+            "type": "string",
+            "example": "Bahnhofstrasse 12a",
+            "deprecated": true
+          },
+          "city": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceCity"
+              },
+              {
+                "description": "City block. <strong>Required.</strong>"
+              }
+            ]
+          },
+          "validFrom": {
+            "format": "date",
+            "description": "Address valid-from date (ISO 8601).",
+            "type": "string",
+            "example": "2026-01-01"
+          },
+          "validTo": {
+            "format": "date",
+            "description": "Address valid-to date (ISO 8601). Must be after <code>validFrom</code>.",
+            "type": "string",
+            "example": "2026-12-31"
+          }
+        }
+      },
+      "InvoiceAttachment": {
+        "description": "A document attached to the invoice. Upload the file first and reference the returned document id in <code>fileId</code>.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Attachment id. Must be <code>0</code> or omitted for a new attachment.",
+            "type": "integer",
+            "example": 0
+          },
+          "orderDetailId": {
+            "format": "int64",
+            "description": "Id of the invoice this attachment belongs to. Must be <code>0</code> for a new invoice.",
+            "type": "integer",
+            "example": 0
+          },
+          "fileId": {
+            "description": "Document id of the uploaded file.",
+            "type": "string",
+            "example": "5f8d0d55-b1a4-4d6e-9a1f-2c3b4d5e6f70"
+          }
+        }
+      },
+      "InvoiceCity": {
+        "description": "City of an invoice address. Obtain a complete city block from the customer lookup (<code>GET /core/v1/customers</code>) and send it back unchanged.",
+        "required": [
+          "cityName18",
+          "cityName27"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "City id from the Swiss Post address directory.",
+            "type": "integer",
+            "example": 4247
+          },
+          "addressPostcode": {
+            "description": "Postcode (PLZ / NPA).",
+            "type": "string",
+            "example": "8005"
+          },
+          "cityName18": {
+            "description": "City name, 18-character Swiss Post variant. <strong>Required.</strong> <code>cityName18</code> is the literal field name of the Swiss Post address directory (18-character abbreviation) — it is not a typo or a leftover.",
+            "type": "string",
+            "example": "Zuerich"
+          },
+          "cityName27": {
+            "description": "City name, 27-character Swiss Post variant. <strong>Required.</strong>",
+            "type": "string",
+            "example": "Zuerich"
+          },
+          "onrp": {
+            "format": "int32",
+            "description": "Swiss Post ONRP identifier of the locality.",
+            "type": "integer",
+            "example": 4247
+          },
+          "postcodeType": {
+            "format": "int32",
+            "description": "Swiss Post postcode type.",
+            "type": "integer",
+            "example": 20
+          },
+          "additionalPostcode": {
+            "description": "Additional postcode suffix (max 2 characters).",
+            "type": "string",
+            "example": "00"
+          },
+          "basicPostcode": {
+            "format": "int32",
+            "description": "Basic postcode.",
+            "type": "integer",
+            "example": 8005
+          },
+          "languageCode": {
+            "format": "int32",
+            "description": "Swiss Post language code of the locality.",
+            "type": "integer",
+            "example": 1
+          },
+          "state": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceState"
+              },
+              {
+                "description": "Canton / state of the locality."
+              }
+            ]
+          },
+          "country": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceCountry"
+              },
+              {
+                "description": "Country of the locality."
+              }
+            ]
+          }
+        }
+      },
+      "InvoiceCompany": {
+        "description": "Company partner of an invoice customer. Present when <code>customerType</code> is <code>COMPANY</code>. Obtain it from <code>GET /core/v1/customers</code> and send it back unchanged.",
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Company partner id as returned by the customer lookup.",
+            "type": "integer",
+            "example": 50123
+          },
+          "name": {
+            "description": "Company name. <strong>Required.</strong>",
+            "type": "string",
+            "example": "Muster AG"
+          },
+          "addresses": {
+            "description": "Postal addresses of the company. At least the billing address must be present for the invoice to be printable.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceAddress"
+            }
+          },
+          "emails": {
+            "description": "E-mail addresses of the company.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceEmail"
+            }
+          },
+          "phones": {
+            "description": "Phone numbers of the company.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoicePhone"
+            }
+          },
+          "companyBillingAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceAddress"
+              },
+              {
+                "description": "Dedicated billing address, used when <code>companyBillingAddressEnabled</code> is <code>true</code>."
+              }
+            ]
+          },
+          "companyBillingAddressEnabled": {
+            "description": "Whether <code>companyBillingAddress</code> is used instead of the main address.",
+            "type": "boolean",
+            "example": false
+          },
+          "corporateIdentificationNumber": {
+            "description": "Swiss company identification number (UID).",
+            "type": "string",
+            "example": "CHE-123.456.789"
+          },
+          "vatNumber": {
+            "description": "VAT registration number.",
+            "type": "string",
+            "example": "CHE-123.456.789 MWST"
+          },
+          "hrNumber": {
+            "description": "Commercial register number.",
+            "type": "string",
+            "example": "CH-020.3.926.481-3"
+          },
+          "nogaCode": {
+            "description": "NOGA economic activity code.",
+            "type": "string",
+            "example": "620100"
+          },
+          "companyNumber": {
+            "description": "Company number in KLARA.",
+            "type": "string",
+            "example": "C-0001"
+          },
+          "companyOriginReference": {
+            "description": "External reference of the company in the partner system.",
+            "type": "string",
+            "example": "ERP-4711"
+          },
+          "website": {
+            "description": "Company website.",
+            "type": "string",
+            "example": "https://www.muster.ch"
+          },
+          "language": {
+            "description": "Preferred correspondence language as a BCP-47 tag.",
+            "type": "string",
+            "example": "de"
+          }
+        }
+      },
+      "InvoiceCountry": {
+        "description": "Country of an invoice address.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Country id.",
+            "type": "integer",
+            "example": 1
+          },
+          "countryName": {
+            "description": "Country name.",
+            "type": "string",
+            "example": "Switzerland"
+          },
+          "iso2Code": {
+            "description": "ISO 3166-1 alpha-2 code.",
+            "type": "string",
+            "example": "CH"
+          },
+          "iso3Code": {
+            "description": "ISO 3166-1 alpha-3 code.",
+            "type": "string",
+            "example": "CHE"
+          },
+          "phoneCode": {
+            "description": "International dialling code.",
+            "type": "string",
+            "example": "41"
+          },
+          "numericCode": {
+            "description": "ISO 3166-1 numeric code.",
+            "type": "string",
+            "example": "756"
+          }
+        }
+      },
+      "InvoiceCreateRequest": {
+        "description": "Request body of <code>POST</code> and <code>PUT /core/v1/invoices</code>. Carries every field of the <code>Invoice</code> model plus the nested order, line item, attachment and reconciliation blocks.<br/><br/><strong>Field names that look like typos but are not:</strong> <code>orderItems[].itemNumer</code> (article number), <code>...city.cityName18</code> / <code>cityName27</code> (Swiss Post 18- and 27-character city names) and <code>...address.homeNumber</code> (house number) are the literal wire field names accepted by the backend. <code>itemNumber</code>, <code>houseNumber</code> and similar corrected spellings are <strong>not</strong> accepted.<br/><br/><strong>VAT:</strong> set the code on <code>orderItems[].vat.vatCode</code> and nowhere else — it is the only VAT field this endpoint stores. A line that puts a code on the sibling <code>orderItems[].vatCode</code> and leaves <code>vat.vatCode</code> empty is rejected with <code>400 invoice.vat_code_missing</code> rather than booked at 0%. Omitting the code entirely is allowed: the server takes it from <code>vat.rate</code> when you sent one, from the article otherwise, and a company that is not liable for VAT needs none. To state a zero rate explicitly — on an export invoice, for instance — send the <code>\"0\"</code> (\"No VAT\") code.<br/><br/><strong><code>orderItems[].vat.rate</code> identifies the code; it does not set the percentage.</strong> A company's VAT configuration normally holds one code per rate, so a rate alone is enough — including one from an earlier release, such as 7.7. Only if two of the company's codes share the rate are you asked for <code>vat.vatCode</code>. What is finally stored and booked is always the rate the code resolves to on the date the booking uses (<code>servicePeriodFrom</code>, else <code>deliveryDate</code>, else <code>documentDate</code>), which is the only way the invoice document and the accounting record are guaranteed to state the same percentage. If you send both a code and a rate, the rate must be one the code has carried in some release — 2.5 or 2.6 for <code>\"1\"</code>, not 8.1 — or the request is rejected with <code>400 invoice.vat_rate_mismatch</code>. The sibling <code>orderItems[].vatCode</code>, <code>vatCase</code>, <code>articleType</code> and <code>tag</code> are accepted but not persisted, and <code>vatType</code> does not exist at all. Leave <code>hasCompanyVat</code> out: the server derives the company's VAT liability itself.",
+        "required": [
+          "invoiceCode",
+          "order",
+          "orderItems"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Invoice id. Must be <code>0</code> or omitted when creating a new invoice. This endpoint only supports creation; updating an existing invoice is not supported.",
+            "type": "integer",
+            "example": 0
+          },
+          "orderType": {
+            "description": "Polymorphic discriminator. Must be <code>INVOICE</code>. Allowed values: <code>INVOICE</code>.",
+            "default": "INVOICE",
+            "type": "string",
+            "example": "INVOICE"
+          },
+          "status": {
+            "description": "Invoice status. Allowed values: <code>DRAFT</code>, <code>INVOICED</code>, <code>SENT</code>, <code>PAID</code>, <code>CANCELLED</code>. Required. Status <code>INVOICED</code> or <code>SENT</code> triggers accounting booking.",
+            "type": "string",
+            "example": "INVOICED"
+          },
+          "invoiceCode": {
+            "description": "Human-readable invoice code. Required and unique per company.",
+            "maxLength": 64,
+            "pattern": "\\S",
+            "type": "string",
+            "example": "INV-2026-001",
+            "nullable": false
+          },
+          "invoiceNumber": {
+            "format": "int64",
+            "description": "Sequential invoice number, typically obtained from <code>GET /invoices/next-invoice-number</code>.",
+            "type": "integer",
+            "example": 2026001
+          },
+          "documentDate": {
+            "format": "date",
+            "description": "Invoice document date (ISO 8601). Required when <code>amount</code> is greater than 0. Must fall inside the company's active Order Management subscription period.",
+            "type": "string",
+            "example": "2026-05-28"
+          },
+          "paymentDate": {
+            "format": "date",
+            "description": "Payment due date (ISO 8601). Required when <code>amount</code> is greater than 0. Must be on or after <code>documentDate</code>.",
+            "type": "string",
+            "example": "2026-06-27"
+          },
+          "deliveryDate": {
+            "format": "date",
+            "description": "Service delivery date (ISO 8601).",
+            "type": "string",
+            "example": "2026-05-25"
+          },
+          "issuedDate": {
+            "format": "date",
+            "description": "Date the invoice was issued (ISO 8601).",
+            "type": "string",
+            "example": "2026-05-28"
+          },
+          "servicePeriodFrom": {
+            "format": "date",
+            "description": "Service period start date (ISO 8601).",
+            "type": "string",
+            "example": "2026-05-01"
+          },
+          "servicePeriodTo": {
+            "format": "date",
+            "description": "Service period end date (ISO 8601).",
+            "type": "string",
+            "example": "2026-05-31"
+          },
+          "servicePeriodPattern": {
+            "description": "Service period pattern label (e.g. <code>MONTHLY</code>, <code>YEARLY</code>).",
+            "maxLength": 32,
+            "type": "string",
+            "example": "MONTHLY"
+          },
+          "vatDate": {
+            "format": "date",
+            "description": "VAT date. Server-managed (read-only).",
+            "type": "string"
+          },
+          "bookingDueDate": {
+            "format": "date",
+            "description": "Booking due date returned by accounting. Server-managed (read-only).",
+            "type": "string"
+          },
+          "lastModified": {
+            "format": "date-time",
+            "description": "Last modification timestamp. Server-managed (read-only).",
+            "type": "string"
+          },
+          "createDate": {
+            "format": "date-time",
+            "description": "Creation timestamp. Server-managed (read-only).",
+            "type": "string"
+          },
+          "amount": {
+            "description": "Invoice total. When <code>usingVAT=false</code> (VAT-exclusive items) this is the gross total = net + VAT; when <code>usingVAT=true</code> (VAT-inclusive items) it is the sum of the gross item amounts (VAT already inside). <strong>Caller-supplied — the server does not recompute it.</strong>",
+            "type": "number",
+            "example": 1080
+          },
+          "usingVAT": {
+            "description": "Controls whether each item <code>price</code>/<code>amount</code> is <strong>VAT-inclusive (gross)</strong> or <strong>VAT-exclusive (net)</strong>. This is the GUI checkbox <em>\"VAT included in amount of each item\"</em>. <code>true</code> = amounts already include VAT (INCLUDE_VAT); <code>false</code> = VAT is added on top of the net amounts (EXCLUDE_VAT). It does <strong>not</strong> turn VAT on or off — whether VAT applies at all is governed by the company's VAT registration. Use <code>GET /core/latest/company-configuration/including-vat</code> for the company default. <strong>The server stores the amounts you send verbatim and does not recompute them from this flag</strong> — send <code>price</code>/<code>amount</code> consistent with the chosen mode (see the create operation's VAT-handling notes).",
+            "default": "false",
+            "type": "boolean",
+            "example": true
+          },
+          "usingExportVat": {
+            "description": "Export invoice flag — the GUI <em>\"Export\"</em> checkbox. When <code>true</code>, the invoice is treated as an export: every <code>orderItems[].vat.rate</code> must be <code>0</code> (export/zero VAT code), so no VAT is charged. When <code>false</code> (default) the items' normal VAT rates apply. The server does not recompute item VAT from this flag — set the per-item VAT accordingly.",
+            "default": "false",
+            "type": "boolean",
+            "example": false
+          },
+          "hasCompanyVat": {
+            "description": "Whether the company is liable for VAT. <strong>Leave this out.</strong> The server derives it from the company's VAT registration for the invoice's effective VAT date (<code>deliveryDate</code> when set, otherwise <code>documentDate</code>) and a derived value always wins over a value sent here. It is documented only because it is accepted, and because sending <code>false</code> on a VAT-registered company used to book every position at 0% while returning 200 — this field is the master switch for VAT at booking time, ahead of any per-line VAT code. It is only consulted when the company has no VAT configuration for that date, where it cannot be derived at all.",
+            "type": "boolean",
+            "example": true
+          },
+          "subject": {
+            "description": "Free-text invoice subject.",
+            "maxLength": 1024,
+            "type": "string",
+            "example": "Invoice 2026-001"
+          },
+          "closeAndSignature": {
+            "description": "Free-text closing remarks / signature block.",
+            "maxLength": 4096,
+            "type": "string",
+            "example": "Thank you for your business."
+          },
+          "ourReference": {
+            "description": "Internal sender reference.",
+            "maxLength": 128,
+            "type": "string",
+            "example": "ACC-2026"
+          },
+          "yourReference": {
+            "description": "Customer-side reference (e.g. PO number).",
+            "maxLength": 128,
+            "type": "string",
+            "example": "PO-9981"
+          },
+          "companyCityAndDate": {
+            "description": "Header line such as 'Zurich, 28.05.2026'.",
+            "maxLength": 256,
+            "type": "string",
+            "example": "Zurich, 28.05.2026"
+          },
+          "postMethod": {
+            "description": "Distribution channel recorded on the invoice. <strong>Stored only — creating an invoice does not deliver it</strong> (no email/ePost/eBill/print&amp;send). Allowed values: <code>A_POST</code>, <code>B_POST</code>, <code>SEND_EMAIL</code>, <code>PRINT_AND_MANUAL_SEND</code>, <code>EPOST</code>, <code>EBILL</code>.",
+            "type": "string",
+            "example": "SEND_EMAIL"
+          },
+          "delivery": {
+            "description": "Delivery method label (free text).",
+            "maxLength": 64,
+            "type": "string",
+            "example": "DHL"
+          },
+          "ibanNumberCHF": {
+            "description": "CHF IBAN for payment. Validated by downstream service.",
+            "type": "string",
+            "example": "CH9300762011623852957"
+          },
+          "ibanNumberCHW": {
+            "description": "WIR-franc IBAN for payment.",
+            "type": "string",
+            "example": "CH9300762011623852957"
+          },
+          "wirAcceptanceRate": {
+            "description": "WIR acceptance percentage.",
+            "type": "number",
+            "example": 0
+          },
+          "referenceNumber": {
+            "description": "QR / ISR reference number.",
+            "maxLength": 64,
+            "type": "string",
+            "example": "21 00000 00003 13947 14300 09017"
+          },
+          "qrInvoice": {
+            "description": "When <code>true</code>, the invoice is rendered/booked as a Swiss QR-invoice. Defaults to false.",
+            "default": "false",
+            "type": "boolean",
+            "example": true
+          },
+          "fromAutoInvoicing": {
+            "description": "Indicates the invoice was generated by auto-invoicing. Defaults to false.",
+            "default": "false",
+            "type": "boolean",
+            "example": false
+          },
+          "fromInvoiceRun": {
+            "description": "Indicates the invoice was produced by a recurring invoice run. When <code>true</code>, accounting booking and inventory transactions are skipped. Defaults to false.",
+            "default": "false",
+            "type": "boolean",
+            "example": false
+          },
+          "invoiceType": {
+            "description": "Invoice type. Allowed values: <code>MANUAL</code>, <code>CREDIT_DEBIT</code>.",
+            "type": "string",
+            "example": "MANUAL"
+          },
+          "originDistributionMethod": {
+            "description": "Origin distribution method. Allowed values: <code>A_POST</code>, <code>B_POST</code>, <code>SEND_EMAIL</code>, <code>PRINT_AND_MANUAL_SEND</code>, <code>EPOST</code>, <code>EBILL</code>.",
+            "type": "string",
+            "example": "SEND_EMAIL"
+          },
+          "templateId": {
+            "format": "int64",
+            "description": "Template id used to create this invoice.",
+            "type": "integer",
+            "example": 0
+          },
+          "runHistoryId": {
+            "format": "int64",
+            "description": "Recurring invoice run history id.",
+            "type": "integer",
+            "example": 0
+          },
+          "settledAmount": {
+            "description": "KLARA-Pay settled amount (online shop only).",
+            "type": "number",
+            "example": 0
+          },
+          "bookingNumbers": {
+            "description": "Accounting booking-number string. Server-managed (read-only).",
+            "type": "string"
+          },
+          "businessCaseId": {
+            "format": "int64",
+            "description": "Accounting business case id. Server-managed (read-only).",
+            "type": "integer"
+          },
+          "bookingStatus": {
+            "description": "Booking status (e.g. <code>OPEN</code>, <code>PARTIAL</code>, <code>PAID</code>). Server-managed (read-only).",
+            "type": "string"
+          },
+          "bookingMessage": {
+            "description": "Optional booking error/info code (e.g. <code>INVALID_SUBSCRIPTION_FOR_ACCOUNTING</code>). Server-managed (read-only).",
+            "type": "string"
+          },
+          "bookingSealed": {
+            "description": "Whether the booking has been finalized. Server-managed (read-only).",
+            "type": "boolean"
+          },
+          "fiscalYearHasCreatedAuto": {
+            "description": "Whether a fiscal year was auto-created during booking. Server-managed (read-only).",
+            "type": "boolean"
+          },
+          "createBy": {
+            "description": "Server-assigned audit user (token subject). Server-managed (read-only).",
+            "type": "string"
+          },
+          "order": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceOrder"
+              },
+              {
+                "description": "The order header this invoice belongs to. <strong>Required.</strong>"
+              }
+            ]
+          },
+          "orderItems": {
+            "description": "Invoice line items. <strong>Required — at least one entry.</strong>",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceOrderItem"
+            }
+          },
+          "attachments": {
+            "description": "Documents attached to the invoice.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceAttachment"
+            }
+          },
+          "openPositionsLinkedToInvoice": {
+            "description": "Open positions (prepayments, credit notes) offset against this invoice.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceOpenPositionLink"
+            }
+          },
+          "documentAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDocumentAddress"
+              },
+              {
+                "description": "Address block printed on the invoice document. Derived from the customer when omitted."
+              }
+            ]
+          },
+          "mailingAddress": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceDocumentAddress"
+              },
+              {
+                "description": "Address used for postal delivery. Derived from the customer when omitted."
+              }
+            ]
+          },
+          "mailingContact": {
+            "format": "int64",
+            "description": "Contact person id used for postal delivery.",
+            "type": "integer",
+            "example": 0
+          },
+          "emailDistribution": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceEmailDistribution"
+              },
+              {
+                "description": "E-mail distribution settings recorded on the invoice. <strong>Stored only — this endpoint never sends the invoice.</strong>"
+              }
+            ]
+          },
+          "partnerContactId": {
+            "format": "int64",
+            "description": "Contact person of the customer this invoice is addressed to.",
+            "type": "integer",
+            "example": 0
+          },
+          "printedFileId": {
+            "description": "Document id of the printed invoice PDF. Normally server-assigned by <code>POST /core/v1/invoices/{id}/printed-document</code> — omit it on creation. Set it only to attach a PDF your own system rendered.",
+            "type": "string",
+            "example": "5f8d0d55-b1a4-4d6e-9a1f-2c3b4d5e6f70"
+          }
+        }
+      },
+      "InvoiceCustomer": {
+        "description": "The invoice recipient. Must be an <strong>existing</strong> customer — look it up with <code>GET /core/v1/customers</code> and send the returned block back unchanged. Populate <code>company</code> when <code>customerType</code> is <code>COMPANY</code>, or <code>person</code> when it is <code>PERSON</code>.",
+        "required": [
+          "id",
+          "customerType"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Customer id of an existing customer. <strong>Required.</strong>",
+            "type": "integer",
+            "example": 50123
+          },
+          "customerType": {
+            "description": "Discriminator selecting <code>company</code> or <code>person</code>. <strong>Required.</strong> Allowed values: <code>COMPANY</code>, <code>PERSON</code>.",
+            "type": "string",
+            "example": "COMPANY"
+          },
+          "companyId": {
+            "format": "int64",
+            "description": "Owning KLARA company id — must match the company resolved from the bearer token.",
+            "type": "integer",
+            "example": 12345
+          },
+          "company": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceCompany"
+              },
+              {
+                "description": "Company partner data. Required when <code>customerType</code> is <code>COMPANY</code>."
+              }
+            ]
+          },
+          "person": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoicePerson"
+              },
+              {
+                "description": "Person partner data. Required when <code>customerType</code> is <code>PERSON</code>."
+              }
+            ]
+          },
+          "termsOfPayment": {
+            "format": "int32",
+            "description": "Payment terms in days, used to derive the default <code>paymentDate</code>.",
+            "type": "integer",
+            "example": 30
+          },
+          "discount": {
+            "description": "Default customer discount in percent.",
+            "type": "number",
+            "example": 0
+          },
+          "priceCategory": {
+            "description": "Price category assigned to the customer.",
+            "type": "string",
+            "example": "STANDARD"
+          },
+          "uuid": {
+            "description": "Stable external identifier of the customer.",
+            "type": "string",
+            "example": "0d9f4d1e-4a2b-4c8d-9f3e-1b2c3d4e5f60"
+          }
+        }
+      },
+      "InvoiceDocumentAddress": {
+        "description": "The address block printed on the invoice document. Omit it to let the backend derive it from the customer's main address.",
+        "type": "object",
+        "properties": {
+          "customerId": {
+            "format": "int64",
+            "description": "Customer the address belongs to.",
+            "type": "integer",
+            "example": 50123
+          },
+          "customerType": {
+            "description": "Partner type. Allowed values: <code>COMPANY</code>, <code>PERSON</code>.",
+            "type": "string",
+            "example": "COMPANY"
+          },
+          "address": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceAddress"
+              },
+              {
+                "description": "The postal address to print."
+              }
+            ]
+          },
+          "salutation": {
+            "description": "Salutation printed above the address. Allowed values: <code>MALE</code>, <code>FEMALE</code>, <code>MALE_FEMALE</code>, <code>FAMILY</code>.",
+            "type": "string",
+            "example": "MALE"
+          },
+          "personFirstName": {
+            "description": "First name printed on the document (person recipients).",
+            "type": "string",
+            "example": "Hans"
+          },
+          "personLastName": {
+            "description": "Last name printed on the document (person recipients).",
+            "type": "string",
+            "example": "Muster"
+          },
+          "companyName": {
+            "description": "Company name printed on the document (company recipients).",
+            "type": "string",
+            "example": "Muster AG"
+          }
+        }
+      },
+      "InvoiceEmail": {
+        "description": "E-mail address of an invoice customer.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "E-mail entry id.",
+            "type": "string",
+            "example": "1001"
+          },
+          "emailAddress": {
+            "description": "The e-mail address.",
+            "type": "string",
+            "example": "billing@muster.ch"
+          },
+          "type": {
+            "description": "E-mail type. Allowed values: <code>PRIVATE</code>, <code>WORK</code>, <code>OFFICE</code>, <code>OTHER</code>.",
+            "type": "string",
+            "example": "WORK"
+          }
+        }
+      },
+      "InvoiceEmailDistribution": {
+        "description": "E-mail distribution settings recorded on the invoice. <strong>Stored only — this endpoint never sends the invoice.</strong> Retrieve the PDF via <code>POST /core/v1/invoices/{id}/printed-document</code> and deliver it yourself.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Distribution entry id. Must be <code>0</code> or omitted for a new invoice.",
+            "type": "integer",
+            "example": 0
+          },
+          "subject": {
+            "description": "Subject line stored for the distribution.",
+            "type": "string",
+            "example": "Invoice INV-2026-001"
+          },
+          "emailAddress": {
+            "description": "Primary recipient address.",
+            "type": "string",
+            "example": "billing@muster.ch"
+          },
+          "ccEmailAddresses": {
+            "description": "Carbon-copy recipient addresses.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "accounting@muster.ch"
+            ]
+          },
+          "replyTo": {
+            "description": "Reply-to address.",
+            "type": "string",
+            "example": "finance@my-company.ch"
+          },
+          "emailText": {
+            "description": "Body text stored for the distribution.",
+            "type": "string",
+            "example": "Please find our invoice attached."
+          }
+        }
+      },
+      "InvoiceInventorySelection": {
+        "description": "Stock selection for a line item whose article is inventory-managed. Serial numbers must be unique across the whole invoice.",
+        "type": "object",
+        "properties": {
+          "storagePlaceId": {
+            "format": "int64",
+            "description": "Storage place the quantity is taken from.",
+            "type": "integer",
+            "example": 77
+          },
+          "quantity": {
+            "description": "Quantity taken from this storage place.",
+            "type": "number",
+            "example": 1
+          },
+          "serialNumbers": {
+            "description": "Serial numbers of the units delivered. Duplicates within the same invoice are rejected.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "SN-0001",
+              "SN-0002"
+            ]
+          }
+        }
+      },
+      "InvoiceOpenPositionLink": {
+        "description": "An open position (prepayment or credit note) offset against this invoice. Look up candidates with <code>GET /core/v1/bank-reconciliation/open-positions</code>.",
+        "required": [
+          "bookingTypeCode",
+          "bookingDetailUri"
+        ],
+        "type": "object",
+        "properties": {
+          "bookingTypeCode": {
+            "description": "Type of the linked booking. <strong>Required.</strong> For invoice reconciliation the relevant values are <code>AR_PREPAYMENT</code> and <code>AR_CREDITNOTE</code>.",
+            "type": "string",
+            "example": "AR_PREPAYMENT"
+          },
+          "bookingDetailUri": {
+            "description": "Internal URI of the booking detail to reconcile. <strong>Required.</strong> Must match the pattern <code>/…/{tenant-id}/companies/{companyId}/bookings/{bookingId}/booking-details/{detailId}</code>.",
+            "type": "string",
+            "example": "/luz_accounting/api/klara_tenant/companies/12345/bookings/778/booking-details/9912"
+          },
+          "partialPaymentAmount": {
+            "description": "Amount to offset from this open position.",
+            "type": "number",
+            "example": 250
+          }
+        }
+      },
+      "InvoiceOrder": {
+        "description": "The order header the invoice belongs to. <strong>Required.</strong> Every invoice is created together with its order — send <code>id=0</code> and a fresh <code>orderNumber</code>.",
+        "required": [
+          "orderNumber",
+          "companyId",
+          "customer"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Order id. Must be <code>0</code> or omitted for a new order.",
+            "type": "integer",
+            "example": 0
+          },
+          "orderNumber": {
+            "format": "int32",
+            "description": "Order number, unique within the company. <strong>Required and must be greater than 0.</strong> Obtain it from <code>POST /core/v1/orders/next-order-number</code> — that endpoint is not idempotent, each call advances the counter.",
+            "type": "integer",
+            "example": 2026001
+          },
+          "orderName": {
+            "description": "Free-text order name.",
+            "type": "string",
+            "example": "Consulting Q2 2026"
+          },
+          "companyId": {
+            "format": "int64",
+            "description": "Owning KLARA company id — must match the company resolved from the bearer token. <strong>Required.</strong>",
+            "type": "integer",
+            "example": 12345
+          },
+          "customer": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceCustomer"
+              },
+              {
+                "description": "The invoice recipient. <strong>Required.</strong>"
+              }
+            ]
+          },
+          "invoiceGroup": {
+            "description": "Invoice group the order is assigned to.",
+            "type": "string",
+            "example": "DEFAULT"
+          },
+          "lumpSum": {
+            "description": "Whether the order is billed as a lump sum.",
+            "type": "boolean",
+            "example": false
+          },
+          "archived": {
+            "description": "Whether the order is archived.",
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "InvoiceOrderItem": {
+        "description": "A single invoice line item. At least one item is required when creating an invoice. <strong>The server stores the amounts you send verbatim and does not recalculate them</strong> — send <code>price</code>, <code>amount</code> and <code>vat</code> consistent with the document flags <code>usingVAT</code> and <code>usingExportVat</code>.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Item id. Must be <code>0</code> or omitted for a new item.",
+            "type": "integer",
+            "example": 0
+          },
+          "position": {
+            "format": "int64",
+            "description": "Line position, 1-based.",
+            "type": "integer",
+            "example": 1
+          },
+          "itemNumer": {
+            "description": "Article number of the item, as returned by <code>GET /core/latest/articles/search</code> or <code>GET /core/latest/articles/article-numbers</code>. <strong>The field name is <code>itemNumer</code>, not <code>itemNumber</code>.</strong> This spelling is the literal wire field name of the KLARA order-management model and is what the backend accepts — it is not a typo in this documentation. Note that the article search endpoints expose the same value under the name <code>articleNumber</code>.",
+            "type": "string",
+            "example": "P0000061123"
+          },
+          "description": {
+            "description": "Item description printed on the invoice line.",
+            "type": "string",
+            "example": "Consulting services"
+          },
+          "articleExtendedDescription": {
+            "description": "Additional descriptive text printed below the line.",
+            "type": "string",
+            "example": "Sprint 12, May 2026"
+          },
+          "quantity": {
+            "description": "Quantity billed.",
+            "type": "number",
+            "example": 10
+          },
+          "unit": {
+            "description": "Unit of measure.",
+            "type": "string",
+            "example": "Hour"
+          },
+          "price": {
+            "description": "Unit price. Negative for credit-note lines. VAT-inclusive (gross) when the document has <code>usingVAT=true</code>, VAT-exclusive (net) when <code>usingVAT=false</code>. Both variants are available from the article lookup endpoints.",
+            "type": "number",
+            "example": 100
+          },
+          "discount": {
+            "description": "Discount on this line, in percent.",
+            "type": "number",
+            "example": 0
+          },
+          "amount": {
+            "description": "Line total = <code>quantity x price x (1 - discount/100)</code>, rounded to the nearest 0.05 (Swiss commercial rounding). Gross or net following <code>usingVAT</code>, on the same basis as <code>price</code>.",
+            "type": "number",
+            "example": 1000
+          },
+          "posAmount": {
+            "description": "Position amount as shown in the KLARA GUI. Optional; derived from <code>amount</code> when omitted.",
+            "type": "number",
+            "example": 1000
+          },
+          "vat": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InvoiceVat"
+              },
+              {
+                "description": "VAT applied to this line. For an export invoice (<code>usingExportVat=true</code>) set <code>rate</code> to <code>0</code> and use the export/zero VAT code."
+              }
+            ]
+          },
+          "vatCode": {
+            "description": "VAT code of the line. Convenience mirror of <code>vat.vatCode</code>.",
+            "type": "string",
+            "example": "1"
+          },
+          "vatCase": {
+            "description": "VAT treatment of the line. Allowed values: <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>.",
+            "type": "string",
+            "example": "TAXABLE_SUPPLY"
+          },
+          "articleType": {
+            "description": "Article category. Allowed values: <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>.",
+            "type": "string",
+            "example": "SERVICE"
+          },
+          "tag": {
+            "description": "Accounting tag of the line. <strong>Required for booking</strong> — must not be empty when <code>status</code> is <code>INVOICED</code> or <code>SENT</code>.",
+            "type": "string",
+            "example": "3400"
+          },
+          "servicePeriodFrom": {
+            "format": "date",
+            "description": "Service period start for this line (ISO 8601).",
+            "type": "string",
+            "example": "2026-05-01"
+          },
+          "servicePeriodTo": {
+            "format": "date",
+            "description": "Service period end for this line (ISO 8601).",
+            "type": "string",
+            "example": "2026-05-31"
+          },
+          "servicePeriodPattern": {
+            "description": "Service period pattern label for this line.",
+            "type": "string",
+            "example": "MONTHLY"
+          },
+          "specialRates": {
+            "description": "Swiss social-security special rate applied to the line. Allowed values: <code>SSS1</code>, <code>SSS2</code>.",
+            "type": "string",
+            "example": "SSS1"
+          },
+          "articleSet": {
+            "description": "Identifier of the article set this line belongs to.",
+            "type": "string",
+            "example": "SET-001"
+          },
+          "inventorySelections": {
+            "description": "Inventory selections (serial numbers, storage places) for stock-managed articles.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceInventorySelection"
+            }
+          }
+        }
+      },
+      "InvoicePerson": {
+        "description": "Natural-person partner of an invoice customer. Present when <code>customerType</code> is <code>PERSON</code>. Obtain it from <code>GET /core/v1/customers</code> and send it back unchanged.",
+        "required": [
+          "firstName",
+          "lastName",
+          "birthday"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Person partner id as returned by the customer lookup.",
+            "type": "integer",
+            "example": 50124
+          },
+          "salutation": {
+            "description": "Salutation. Allowed values: <code>MALE</code>, <code>FEMALE</code>, <code>MALE_FEMALE</code>, <code>FAMILY</code>.",
+            "type": "string",
+            "example": "MALE"
+          },
+          "firstName": {
+            "description": "First name. <strong>Required.</strong>",
+            "type": "string",
+            "example": "Hans"
+          },
+          "lastName": {
+            "description": "Last name. <strong>Required.</strong>",
+            "type": "string",
+            "example": "Muster"
+          },
+          "birthday": {
+            "format": "date",
+            "description": "Date of birth (ISO 8601). <strong>Required</strong> by the downstream person model.",
+            "type": "string",
+            "example": "1980-04-17"
+          },
+          "addressList": {
+            "description": "Postal addresses of the person.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceAddress"
+            }
+          },
+          "emailList": {
+            "description": "E-mail addresses of the person.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceEmail"
+            }
+          },
+          "phoneList": {
+            "description": "Phone numbers of the person.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoicePhone"
+            }
+          },
+          "personNumber": {
+            "description": "Person number in KLARA.",
+            "type": "string",
+            "example": "P-0001"
+          },
+          "personOriginReference": {
+            "description": "External reference of the person in the partner system.",
+            "type": "string",
+            "example": "ERP-8150"
+          },
+          "website": {
+            "description": "Personal website.",
+            "type": "string",
+            "example": "https://www.muster.ch"
+          },
+          "language": {
+            "description": "Preferred correspondence language as a BCP-47 tag.",
+            "type": "string",
+            "example": "de"
+          }
+        }
+      },
+      "InvoicePhone": {
+        "description": "Phone number of an invoice customer.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Phone entry id.",
+            "type": "integer",
+            "example": 2001
+          },
+          "phoneNumber": {
+            "description": "The phone number.",
+            "type": "string",
+            "example": "+41 44 123 45 67"
+          },
+          "type": {
+            "description": "Phone type. Allowed values: <code>PRIVATE</code>, <code>OFFICE</code>, <code>FAX</code>, <code>WORK</code>, <code>MOBILE</code>.",
+            "type": "string",
+            "example": "WORK"
+          }
+        }
+      },
+      "InvoiceState": {
+        "description": "Canton / state of an invoice address.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "State id.",
+            "type": "integer",
+            "example": 26
+          },
+          "code": {
+            "description": "Canton code (max 3 characters).",
+            "type": "string",
+            "example": "ZH"
+          },
+          "description": {
+            "description": "Canton name.",
+            "type": "string",
+            "example": "Zuerich"
+          }
+        }
+      },
       "InvoiceSummary": {
         "description": "A single invoice as returned by the invoice collection endpoint. A flat projection of the invoice document — retrieve the full record, including order items and attachments, with <code>GET /core/v1/invoices/{id}</code>.",
         "type": "object",
@@ -13372,6 +14589,69 @@
             "format": "date-time",
             "description": "Last modification timestamp.",
             "type": "string"
+          }
+        }
+      },
+      "InvoiceVat": {
+        "description": "VAT applied to an invoice line item. The server does not recompute VAT from the document flags — send the rate that matches <code>usingVAT</code> / <code>usingExportVat</code>.",
+        "required": [
+          "vatCode"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "VAT id.",
+            "type": "integer",
+            "example": 1
+          },
+          "vatCode": {
+            "description": "VAT code. <strong>Required.</strong>",
+            "type": "string",
+            "example": "1"
+          },
+          "rate": {
+            "description": "VAT rate in percent. Set to <code>0</code> for export invoices (<code>usingExportVat=true</code>).",
+            "type": "number",
+            "example": 8.1
+          },
+          "description": {
+            "description": "Human-readable VAT description.",
+            "type": "string",
+            "example": "Normal rate 8.1%"
+          },
+          "masterId": {
+            "format": "int64",
+            "description": "Master data id of the VAT record.",
+            "type": "integer",
+            "example": 0
+          },
+          "companySelectedVat": {
+            "description": "Whether this is a company-selected VAT.",
+            "type": "boolean",
+            "example": false
+          },
+          "sss1": {
+            "description": "Whether the first Swiss social-security special rate applies.",
+            "type": "boolean",
+            "example": false
+          },
+          "sss2": {
+            "description": "Whether the second Swiss social-security special rate applies.",
+            "type": "boolean",
+            "example": false
+          },
+          "validFrom": {
+            "format": "date",
+            "description": "VAT valid-from date (ISO 8601).",
+            "type": "string",
+            "example": "2024-01-01"
+          },
+          "validTo": {
+            "format": "date",
+            "description": "VAT valid-to date (ISO 8601).",
+            "type": "string",
+            "example": "2099-12-31"
           }
         }
       },
