@@ -136,23 +136,24 @@ Articles    GET  /core/latest/articles?limit=…&offset=…    → page through 
 
 ### Showing invoice status in your CRM
 
-Read the current state of an invoice you created earlier.
+Read the state of your invoices, as a filtered list or one at a time.
 
 ```
-GET /core/v1/invoices/{id}   → the full invoice including booking status
+GET /core/v1/invoices?status=INVOICED&booking-status=OPEN   → invoiced and not yet paid, one page at a time
+GET /core/v1/invoices/{id}                                → the full invoice including booking status
 ```
 
-**Permissions needed for the whole flow:** `FINANCE`. **Roles that cover all of it:** Administrator, External user, Mitarbeiter und Lohn, Buchhalter, Kundenbeziehungen, Online Terminbuchung.
-
-> **Warning: You need to have kept the invoice id**
->
-> Invoices cannot be listed, searched or filtered. There is no `GET /core/v1/invoices` collection. The only way back to an invoice is the numeric id returned when you created it, so store it in your own system at creation time. If you did not, the API cannot help you find it again. See [Known limitations](https://developer.klara.ch/#roadmap).
+**Permissions needed for the whole flow:** `FINANCE`. **Roles that cover all of it:** Administrator, External user, Mitarbeiter und Lohn, Buchhalter, Kundenbeziehungen, Online Terminbuchung. **Not yet established:** GET /core/v1/invoices. Plan for an Administrator key until this is confirmed.
 
 #### What to watch out for
 
-- **The status values are** `DRAFT`, `INVOICED`, `SENT`, `PAID` and `CANCELLED`.
+- **`status` is the filter from the KLARA invoice overview,** not an equality check on the field. `status=OPEN` returns rows that read `INVOICED` or `PAID`, because it also looks at the payment state. Use `booking-status` to filter on the payment state exactly.
 
-- **The response also carries booking state:** `bookingStatus`, `bookingDueDate` and `bookingSealed`.
+- **A list row and the full invoice report status differently.** For amounts of zero or more, a row reads `INVOICED` where the full invoice reads `SENT`. The full invoice uses `DRAFT`, `INVOICED`, `SENT`, `PAID` and `CANCELLED`.
+
+- **Page with `offset` and `limit`.** Keep the default sort by id so pages stay stable while you walk them. Page size and its maximum are on the endpoint in the reference.
+
+- **The full invoice also carries booking state:** `bookingStatus`, `bookingDueDate` and `bookingSealed`.
 
 - **Polling is the only option today.** There are no webhooks, so poll gently and cache. See [rate limiting](https://developer.klara.ch/#limits).
 

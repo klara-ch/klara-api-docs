@@ -138,5 +138,3 @@ Three properties of pagination that decide whether a run is reliable.
 #### Sorting
 
 3 endpoints accept a sort order: `/core/v1/accounting/business-case-templates`, `/core/v1/employees/short-info`, `/core/v1/invoices`. Everywhere else the order is not guaranteed, which matters when you page through a large collection.
-
-Invoices are the most important gap: there is no list endpoint at all, so they cannot be listed or filtered. You have to keep the ids you created. See [Known limitations](https://developer.klara.ch/#roadmap).

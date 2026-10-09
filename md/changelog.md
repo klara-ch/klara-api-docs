@@ -374,6 +374,10 @@ PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` —
 
 ### Documentation changes
 
+#### 9 October 2026 · Invoice status guide starts from the invoice list
+
+- **Showing invoice status in your CRM now starts from the invoice list.** Filter with `status` and `booking-status` instead of keeping every invoice id in your own system. Two older notes that still said invoices could not be listed are gone.
+
 #### 18 September 2026 · Invoice list, one search pattern, sunset dates and error bodies
 
 - **New: `GET /core/v1/invoices`** returns a page of invoices with free-text search, paging and sorting, so you no longer have to keep every invoice id in your own system. It needs the `FINANCE` permission. **Read the note on `status` before you build on it:** that parameter is the filter from the KLARA invoice overview, not an equality check on the field. `status=OPEN` returns rows that read `INVOICED` or `PAID`. Use `booking-status` to filter on the payment state exactly.
