@@ -22,10 +22,10 @@ A KLARA business account offers nine assignable roles, plus Object manager and m
 |---|---|---|
 | Administrator | `company_administrator` | 95 |
 | External user | `external_user` | 95 |
-| Kundenbeziehungen | `customer_relationship_manager` | 76 |
-| Buchhalter | `accountant` | 62 |
-| Mitarbeiter und Lohn | `payroll_specialist` | 60 |
-| Online Terminbuchung | `booking` | 49 |
+| Kundenbeziehungen | `customer_relationship_manager` | 77 |
+| Buchhalter | `accountant` | 44 |
+| Mitarbeiter und Lohn | `payroll_specialist` | 35 |
+| Online Terminbuchung | `booking` | 24 |
 | Zeit- und Materialrapporte | `reporter` | 21 |
 | Objektmanager | `object_manager` | 13 |
 
@@ -33,25 +33,27 @@ Administrator and External user reach everything, which is exactly why neither b
 
 ### Which role carries which permission
 
-Sixteen permissions are in use across the documented endpoints. The **Endpoints** column counts how many of them check that permission. A tick means the role grants it.
+Eighteen permissions are in use across the documented endpoints. The **Endpoints** column counts how many of them check that permission. A tick means the role grants it.
 
 | Permission | Endpoints | Administrator | External user | Mitarbeiter und Lohn | Buchhalter | Kundenbeziehungen | Zeit- und Materialrapporte | Online Terminbuchung | Objektmanager |
 |---|---|---|---|---|---|---|---|---|---|
-| `FINANCE` | 23 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | – |
 | `ARTICLE` | 21 | ✓ | ✓ | – | – | ✓ | – | – | – |
+| `FINANCE` | 20 | ✓ | ✓ | – | – | ✓ | – | – | – |
 | `ACCOUNTING` | 13 | ✓ | ✓ | – | ✓ | – | – | – | – |
 | `ARTICLE_READ_ONLY` | 7 | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ | – |
 | `COMPENSATION` | 4 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | – |
 | `ACCOUNTING_GET_MASTER_VAT` | 3 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – |
+| `FINANCE_GET_CUSTOMER` | 3 | ✓ | ✓ | – | ✓ | ✓ | – | – | – |
 | `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE` | 2 | ✓ | ✓ | ✓ | ✓ | – | – | – | – |
-| `FINANCE_COMPANY_VAT` | 2 | ✓ | ✓ | ✓ | ✓ | – | – | – | – |
-| `FINANCE_GET_CUSTOMER` | 2 | ✓ | ✓ | ✓ | – | ✓ | – | ✓ | – |
+| `FINANCE_COMPANY_GET_VAT` | 2 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – |
 | `ACCOUNTING_GET_OPEN_POSITION` | 1 | ✓ | ✓ | – | ✓ | ✓ | – | – | – |
 | `ACCOUNTING_INTERFACE` | 1 | ✓ | ✓ | ✓ | – | – | – | – | – |
 | `COMPENSATION_COMPANY_INFO` | 1 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `COMPENSATION_TIME_TRACKING` | 1 | ✓ | ✓ | ✓ | – | – | ✓ | – | – |
 | `FINANCE_BANK_ACCOUNT` | 1 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – |
-| `FINANCE_CREATE_CUSTOMER` | 1 | ✓ | ✓ | ✓ | – | ✓ | – | – | – |
+| `FINANCE_COMPANY_VAT` | 1 | ✓ | ✓ | ✓ | ✓ | – | – | – | – |
+| `FINANCE_CREATE_CUSTOMER` | 1 | ✓ | ✓ | – | – | ✓ | – | – | – |
+| `FINANCE_GET_INVOICE` | 1 | ✓ | ✓ | – | ✓ | ✓ | – | – | – |
 | `STORE_CUSTOMER` | 1 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | – |
 
 Two things stand out. `ARTICLE` sits with Kundenbeziehungen alone, so only that role can write articles. And `COMPENSATION_COMPANY_INFO` is the single permission every role holds.
@@ -78,7 +80,7 @@ Every endpoint in the [reference](https://developer.klara.ch/#reference) states 
 
 - **Only Kundenbeziehungen can write articles.** Every other role reaches at most `ARTICLE_READ_ONLY`. An integration that maintains articles needs that role or an Administrator.
 
-- **Online Terminbuchung can change and delete customers but not create them.** The role holds `FINANCE` and `FINANCE_GET_CUSTOMER`, but not `FINANCE_CREATE_CUSTOMER`, and creating a customer checks that one instead of `FINANCE`.
+- **Buchhalter reads invoices one at a time, but cannot list or write them.** The role holds `FINANCE_GET_INVOICE`, which the single-invoice call checks, but not `FINANCE`, which the invoice list and every invoice write check. An integration that creates or sends invoices needs Administrator, External user or Kundenbeziehungen.
 
 ### Endpoints that need no particular permission
 

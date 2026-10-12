@@ -374,6 +374,14 @@ PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` —
 
 ### Documentation changes
 
+#### 12 October 2026 · Fewer roles can create and send invoices
+
+**Breaking for existing keys.** This changed in the KLARA roles, not in the API contract, so the list of API changes above does not show it.
+
+- **Since September 2026, Buchhalter, Mitarbeiter und Lohn and Online Terminbuchung no longer hold `FINANCE`.** Keys with only these roles can no longer create, update, send or list invoices, and no longer update or delete customers. They receive `403`. This page still listed them until today. For invoicing, use Administrator, External user or Kundenbeziehungen.
+
+- **Four endpoints check a narrower permission than this page said.** `GET /core/v1/invoices/{id}` checks `FINANCE_GET_INVOICE`, so Buchhalter can read a single invoice again. `GET /core/latest/customers/{customer-id}` checks `FINANCE_GET_CUSTOMER`. Both VAT reads, `GET /core/latest/company-configuration/including-vat` and `GET /core/latest/company-vats`, check `FINANCE_COMPANY_GET_VAT`.
+
 #### 9 October 2026 · Invoice status guide starts from the invoice list
 
 - **Showing invoice status in your CRM now starts from the invoice list.** Filter with `status` and `booking-status` instead of keeping every invoice id in your own system. Two older notes that still said invoices could not be listed are gone.

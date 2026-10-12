@@ -20,7 +20,7 @@ Turn an order in your system into a KLARA invoice. Five calls, of which three ar
 5. POST /core/v1/invoices                       → the created invoice with its id
 ```
 
-**Permissions needed for the whole flow:** `ARTICLE_READ_ONLY`, `FINANCE`, `FINANCE_BANK_ACCOUNT`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, External user, Mitarbeiter und Lohn, Kundenbeziehungen.
+**Permissions needed for the whole flow:** `ARTICLE_READ_ONLY`, `FINANCE`, `FINANCE_BANK_ACCOUNT`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, External user, Kundenbeziehungen.
 
 #### What to watch out for
 
@@ -47,7 +47,7 @@ A new buyer in your shop becomes a KLARA customer and an invoice. This is the in
 4. POST /core/v1/invoices/{id}/send       → deliver it
 ```
 
-**Permissions needed for the whole flow:** `ARTICLE_READ_ONLY`, `FINANCE`, `FINANCE_BANK_ACCOUNT`, `FINANCE_CREATE_CUSTOMER`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, External user, Mitarbeiter und Lohn, Kundenbeziehungen.
+**Permissions needed for the whole flow:** `ARTICLE_READ_ONLY`, `FINANCE`, `FINANCE_BANK_ACCOUNT`, `FINANCE_CREATE_CUSTOMER`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, External user, Kundenbeziehungen.
 
 #### What to watch out for
 
@@ -143,7 +143,7 @@ GET /core/v1/invoices?status=INVOICED&booking-status=OPEN   → invoiced and not
 GET /core/v1/invoices/{id}                                → the full invoice including booking status
 ```
 
-**Permissions needed for the whole flow:** `FINANCE`. **Roles that cover all of it:** Administrator, External user, Mitarbeiter und Lohn, Buchhalter, Kundenbeziehungen, Online Terminbuchung.
+**Permissions needed for the whole flow:** `FINANCE`, `FINANCE_GET_INVOICE`. **Roles that cover all of it:** Administrator, External user, Kundenbeziehungen.
 
 #### What to watch out for
 

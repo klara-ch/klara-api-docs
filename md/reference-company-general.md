@@ -9,8 +9,8 @@ Get the VAT inclusion setting for the authenticated company.
 Returns whether invoice amounts for the company resolved from the bearer JWT are displayed and calculated including VAT (`includingVat: true`) or excluding VAT (`includingVat: false`). Use this value before creating or displaying invoices to apply the correct pricing model. When no configuration record exists for the company, the endpoint returns `false` (excluding VAT) as the default. The caller must hold the `FINANCE` permission on the target company.
 
 - operationId: `getCompanyIncludingVatSetting`
-- Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Required permission: `FINANCE_COMPANY_GET_VAT`
+- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
 
 **Responses**
 
@@ -27,8 +27,8 @@ Returns whether invoice amounts for the company resolved from the bearer JWT are
 Returns vat list of a company
 
 - operationId: `listCompanyVatLiabilities`
-- Required permission: `FINANCE_COMPANY_VAT`
-- Roles that carry it: Administrator, Buchhalter, External user, Mitarbeiter und Lohn
+- Required permission: `FINANCE_COMPANY_GET_VAT`
+- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
 
 **Parameters**
 

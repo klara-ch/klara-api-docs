@@ -8,7 +8,7 @@ Returns all customers of a company
 
 - operationId: `listCustomers`
 - Required permission: `FINANCE_GET_CUSTOMER`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen
 
 **Responses**
 
@@ -26,7 +26,7 @@ Create a new customer
 
 - operationId: `createCustomer`
 - Required permission: `FINANCE_CREATE_CUSTOMER`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Request body** (`application/json`, required)
 
@@ -56,7 +56,7 @@ Delete a customer
 
 - operationId: `deleteCustomer`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -80,8 +80,8 @@ Delete a customer
 Returns a customer of a company based on given id
 
 - operationId: `getCustomer`
-- Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Required permission: `FINANCE_GET_CUSTOMER`
+- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -105,7 +105,7 @@ Update an existing customer
 
 - operationId: `updateCustomer`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -141,7 +141,7 @@ Gets all additional addresses of a customer
 
 - operationId: `listCustomerAdditionalAddresses`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -165,7 +165,7 @@ Creates a new customer's additional address
 
 - operationId: `createCustomerAdditionalAddress`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -208,7 +208,7 @@ Delete an additional-address data by customer's id and customer's contact-id
 
 - operationId: `deleteCustomerAdditionalAddress`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -233,7 +233,7 @@ Updates a Address
 
 - operationId: `updateCustomerAdditionalAddress`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -277,7 +277,7 @@ Gets all contacts of a customer
 
 - operationId: `listCustomerContacts`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -301,7 +301,7 @@ Creates a new customer's contact
 
 - operationId: `createCustomerContact`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -346,7 +346,7 @@ Delete a CustomerContact data by customer's id and customer's contact-id
 
 - operationId: `deleteCustomerContact`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -371,7 +371,7 @@ Updates a CustomerContact
 
 - operationId: `updateCustomerContact`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, External user, Kundenbeziehungen
 
 **Parameters**
 
@@ -419,7 +419,7 @@ Returns a page of customers (`Persons` + `Companies`) of the caller's company, w
 
 - operationId: `listCustomersV1`
 - Required permission: `FINANCE_GET_CUSTOMER`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen
 
 **Parameters**
 
