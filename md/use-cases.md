@@ -143,7 +143,7 @@ GET /core/v1/invoices?status=INVOICED&booking-status=OPEN   → invoiced and not
 GET /core/v1/invoices/{id}                                → the full invoice including booking status
 ```
 
-**Permissions needed for the whole flow:** `FINANCE`. **Roles that cover all of it:** Administrator, External user, Mitarbeiter und Lohn, Buchhalter, Kundenbeziehungen, Online Terminbuchung. **Not yet established:** GET /core/v1/invoices. Plan for an Administrator key until this is confirmed.
+**Permissions needed for the whole flow:** `FINANCE`. **Roles that cover all of it:** Administrator, External user, Mitarbeiter und Lohn, Buchhalter, Kundenbeziehungen, Online Terminbuchung.
 
 #### What to watch out for
 

@@ -20,12 +20,12 @@ A KLARA business account offers nine assignable roles, plus Object manager and m
 
 | Role in KLARA | Technical name | Endpoints reachable, of 98 |
 |---|---|---|
-| Administrator | `company_administrator` | 94 |
-| External user | `external_user` | 94 |
-| Kundenbeziehungen | `customer_relationship_manager` | 75 |
-| Buchhalter | `accountant` | 61 |
-| Mitarbeiter und Lohn | `payroll_specialist` | 59 |
-| Online Terminbuchung | `booking` | 48 |
+| Administrator | `company_administrator` | 95 |
+| External user | `external_user` | 95 |
+| Kundenbeziehungen | `customer_relationship_manager` | 76 |
+| Buchhalter | `accountant` | 62 |
+| Mitarbeiter und Lohn | `payroll_specialist` | 60 |
+| Online Terminbuchung | `booking` | 49 |
 | Zeit- und Materialrapporte | `reporter` | 21 |
 | Objektmanager | `object_manager` | 13 |
 
@@ -37,7 +37,7 @@ Sixteen permissions are in use across the documented endpoints. The **Endpoints*
 
 | Permission | Endpoints | Administrator | External user | Mitarbeiter und Lohn | Buchhalter | Kundenbeziehungen | Zeit- und Materialrapporte | Online Terminbuchung | Objektmanager |
 |---|---|---|---|---|---|---|---|---|---|
-| `FINANCE` | 22 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | – |
+| `FINANCE` | 23 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | – |
 | `ARTICLE` | 21 | ✓ | ✓ | – | – | ✓ | – | – | – |
 | `ACCOUNTING` | 13 | ✓ | ✓ | – | ✓ | – | – | – | – |
 | `ARTICLE_READ_ONLY` | 7 | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ | – |
