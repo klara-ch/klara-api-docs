@@ -7957,7 +7957,7 @@
             }
           },
           "400": {
-            "description": "Data invalid<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>booking.status_not_allowed</code> — bookingStatus was neither BOOKED nor PLANNED.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "description": "Data invalid<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>booking.status_not_allowed</code> — bookingStatus was neither BOOKED nor PLANNED.</li><li><code>booking.business_case_id_invalid</code> — businessCaseId was set but is not a numeric business case id. Leave it empty when creating a booking; use businessCase for a label.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
             "content": {
               "application/json": {
                 "schema": {
@@ -7969,6 +7969,10 @@
               {
                 "code": "booking.status_not_allowed",
                 "meaning": "bookingStatus was neither BOOKED nor PLANNED."
+              },
+              {
+                "code": "booking.business_case_id_invalid",
+                "meaning": "businessCaseId was set but is not a numeric business case id. Leave it empty when creating a booking; use businessCase for a label."
               }
             ]
           },
@@ -9003,7 +9007,7 @@
           }
         ],
         "requestBody": {
-          "description": "<strong>Creates a new invoice for an existing customer.</strong> The <code>id</code> field must be <code>0</code> or omitted. This endpoint does not support updating existing invoices.<br/><br/><strong>Prerequisite APIs (call these first):</strong><ul><li><code>GET /core/v1/invoices/next-invoice-number</code> → provides <code>invoiceCode</code> and <code>invoiceNumber</code> (the next available invoice number for the company).</li><li><code>GET /core/v1/customers?search-key=...&amp;limit=...</code> → provides <code>order.customer.id</code>, <code>order.customer.company</code> (with addresses, emails), and <code>order.customer.customerType</code>.</li><li><code>GET /core/v1/company-bank-accounts</code> → provides <code>ibanNumberCHF</code> / <code>ibanNumberCHW</code> for payment accounts.</li><li><code>GET /core/latest/articles/search?keyword=...</code> → search articles by keyword for the autocomplete; provides <code>orderItems[].itemNumer</code>, <code>description</code>, <code>price</code>, <code>vat</code>, <code>unit</code>.</li><li><code>GET /core/latest/articles/article-numbers?article-numbers=...</code> → fetch full article data by article number(s) to fill <code>orderItems[]</code>.</li><li><code>GET /core/latest/articles/{article-id}/article-set-items</code> → expands article set/bundle into component line items for <code>orderItems[]</code>.</li><li><code>GET /core/v1/bank-reconciliation/open-positions</code> → lists customer's open prepayments / credit notes that can be reconciled; provides <code>openPositionsLinkedToInvoice[].bookingTypeCode</code>, <code>bookingDetailUri</code>, <code>partialPaymentAmount</code>.</li><li>(Optional) <code>POST /core/v1/orders/next-order-number</code> → provides <code>order.orderNumber</code>; each call advances the in-memory counter — call immediately before creating the invoice, not speculatively.</li><li>(Optional) <code>GET /core/latest/company-configuration/including-vat</code> → provides the company-level default for <code>usingVAT</code>; returns <code>false</code> when no configuration record exists.</li><li><code>printedFileId</code> (String, server-assigned) — populated automatically by <code>POST /core/v1/invoices/{id}/printed-document</code> after PDF generation; omit on creation.</li></ul><br/><strong>Field names that look like typos but are not.</strong> The following names are the literal wire field names accepted by the backend. The corrected-looking spellings are <strong>not</strong> accepted:<ul><li><code>orderItems[].itemNumer</code> — article number (<em>not</em> <code>itemNumber</code>). The article lookup endpoints expose the same value under the name <code>articleNumber</code>.</li><li><code>...address.homeNumber</code> — house number (<em>not</em> <code>houseNumber</code>).</li><li><code>...city.cityName18</code> / <code>cityName27</code> — the 18- and 27-character city name variants of the Swiss Post address directory. Neither is a leftover.</li></ul><br/><strong>Top-level fields:</strong><ul><li><code>id</code> (long, required) — must be <code>0</code> for creation.</li><li><code>invoiceCode</code> (String, required) — unique invoice code; obtain from <code>GET /core/v1/invoices/next-invoice-number</code>.</li><li><code>orderType</code> (String, required) — must be <code>INVOICE</code>.</li><li><code>status</code> (String, required) — determines booking behavior (not delivery). Allowed: <code>DRAFT</code> (saves without booking), <code>INVOICED</code> (saves and books into accounting), <code>SENT</code> (saves and books; does <strong>not</strong> send/deliver the invoice).</li><li><code>postMethod</code> (String, optional) — distribution channel <strong>recorded on the invoice only</strong>; this endpoint does not deliver the invoice. Allowed: <code>A_POST</code>, <code>B_POST</code>, <code>SEND_EMAIL</code>, <code>PRINT_AND_MANUAL_SEND</code>, <code>EPOST</code>, <code>EBILL</code>.</li><li><code>documentDate</code> (date, required) — invoice issue date, format <code>yyyy-MM-dd</code>.</li><li><code>paymentDate</code> (date, required) — payment due date, must be on or after <code>documentDate</code>.</li><li><code>ibanNumberCHF</code> (String, conditional) — CHF IBAN for payment; required when booking is triggered.</li><li><code>ibanNumberCHW</code> (String, optional) — WIR IBAN for combined payments.</li><li><code>wirAcceptanceRate</code> (int, optional) — WIR acceptance percentage (0–100).</li><li><code>invoiceType</code> (String, required) — <code>MANUAL</code> or <code>RECURRING</code>.</li><li><code>amount</code> (BigDecimal, required) — total invoice amount over all items. Caller-supplied; not recomputed by the server. With <code>usingVAT=false</code> this is net + VAT; with <code>usingVAT=true</code> it is the sum of the gross item amounts.</li><li><code>usingVAT</code> (boolean) — GUI checkbox <em>\"VAT included in amount of each item\"</em>. Controls whether item <code>price</code>/<code>amount</code> are VAT-inclusive (<code>true</code>, gross) or VAT-exclusive (<code>false</code>, net). It does <strong>not</strong> switch VAT on/off (that is the company's VAT registration). Use <code>GET /core/latest/company-configuration/including-vat</code> for the company default. See <em>VAT handling</em> below.</li><li><code>usingExportVat</code> (boolean, optional) — GUI checkbox <em>\"Export\"</em>. When <code>true</code>, the invoice is an export: set every <code>orderItems[].vat.rate</code> to <code>0</code> so no VAT is charged. Defaults to <code>false</code>.</li><li><code>subject</code> (String, optional) — invoice subject/title.</li><li><code>ourReference</code> / <code>yourReference</code> (String, optional) — reference texts.</li><li><code>companyCityAndDate</code> (String, optional) — city and date line printed on invoice.</li><li><code>closeAndSignature</code> (String, optional) — closing text and signature block.</li><li><code>printedFileId</code> (String, optional) — document ID of uploaded PDF from partner system.</li></ul><br/><strong>Nested fields — <code>order</code> (required):</strong><ul><li><code>order.id</code> (long) — must be <code>0</code> for new orders.</li><li><code>order.orderNumber</code> (int, required) — unique order number; must be &gt; 0 (validated). Obtain from <code>POST /core/v1/orders/next-order-number</code> (not idempotent — each call advances the counter).</li><li><code>order.orderName</code> (String, optional) — order description.</li><li><code>order.companyId</code> (long, required) — company ID from bearer token scope.</li><li><code>order.customer</code> (object, required) — existing customer; obtain from <code>GET /core/v1/customers</code>. Must include <code>customer.id</code>, <code>customer.company</code> (with addresses), and <code>customer.customerType</code> (<code>COMPANY</code> or <code>PERSON</code>).</li></ul><br/><strong>Nested fields — <code>orderItems[]</code> (required, at least 1):</strong><ul><li><code>orderItems[].position</code> (int) — line item position (1-based).</li><li><code>orderItems[].itemNumer</code> (String) — article number. <strong>The field name is <code>itemNumer</code>, not <code>itemNumber</code></strong> — this spelling is the literal wire field name of the KLARA order-management model and is what the backend accepts. It is not a typo in this documentation. The article lookup endpoints expose the same value under the name <code>articleNumber</code>.</li><li><code>orderItems[].description</code> (String) — item description.</li><li><code>orderItems[].quantity</code> (double) — quantity.</li><li><code>orderItems[].unit</code> (String) — unit of measure (e.g. <code>Unit</code>, <code>Hour</code>).</li><li><code>orderItems[].price</code> (double) — unit price (negative for credit notes). VAT-inclusive (gross) when <code>usingVAT=true</code>, VAT-exclusive (net) when <code>usingVAT=false</code>. Both variants are available from the article lookup APIs.</li><li><code>orderItems[].discount</code> (double) — discount percentage.</li><li><code>orderItems[].amount</code> (double) — line total = <code>quantity × price × (1 − discount/100)</code>, rounded to the nearest 0.05. Gross or net following <code>usingVAT</code> (same basis as <code>price</code>).</li><li><code>orderItems[].tag</code> (String, <strong>required for booking</strong>) — tags field; must not be empty when status is <code>INVOICED</code>/<code>SENT</code>.</li><li><code>orderItems[].vatCase</code> (String) — <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>.</li><li><code>orderItems[].articleType</code> (String) — <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>.</li><li><code>orderItems[].vat</code> (object) — VAT details: <code>vatCode</code>, <code>rate</code>, <code>description</code>, <code>masterId</code>. For an export invoice (<code>usingExportVat=true</code>) set <code>rate=0</code> and the export/zero <code>vatCode</code>.</li><li><code>orderItems[].id</code> (long) — must be <code>0</code> for new items.</li></ul><br/><strong>VAT handling — the server does not recalculate amounts.</strong> Unlike the KLARA GUI (which recomputes line amounts, VAT and totals whenever you toggle the <em>\"VAT included in amount of each item\"</em> or <em>\"Export\"</em> checkbox), this endpoint stores the amounts you send <em>verbatim</em> and performs no VAT recalculation or consistency check. Send <code>orderItems[].price</code>, <code>orderItems[].amount</code>, <code>orderItems[].vat</code> and the document <code>amount</code> already consistent with the two flags:<ul><li><code>usingVAT=false</code> (VAT-exclusive) — <code>price</code>/<code>amount</code> are net; document <code>amount</code> = net + VAT.</li><li><code>usingVAT=true</code> (VAT-inclusive) — <code>price</code>/<code>amount</code> are gross (VAT already inside); document <code>amount</code> = sum of gross item amounts.</li><li><code>usingExportVat=true</code> (export) — set every <code>orderItems[].vat.rate</code> to <code>0</code>; VAT = 0 and document <code>amount</code> = sum of net item amounts.</li></ul>To reproduce the GUI figures exactly: per line <code>amount = round0.05(quantity × price × (1 − discount/100))</code>; VAT per rate group = <code>amount × rate/100</code> when VAT-exclusive, or <code>amount × (rate/100) / (1 + rate/100)</code> when VAT-inclusive — each rounded to the nearest 0.05 (Swiss commercial rounding). Article unit prices for the inclusive, exclusive and export cases come from the article lookup APIs above (each article exposes both a VAT-inclusive and a VAT-exclusive price); pick the one matching <code>usingVAT</code>/<code>usingExportVat</code>.<br/><br/><strong>Nested fields — <code>attachments[]</code> (optional):</strong><ul><li><code>attachments[].fileId</code> (String) — document file ID uploaded via partner system.</li><li><code>attachments[].orderDetailId</code> (long) — set to <code>0</code> for new invoices.</li><li><code>attachments[].id</code> (long) — set to <code>0</code> for new attachments.</li></ul><br/><strong>Nested fields — <code>openPositionsLinkedToInvoice[]</code> (optional, for reconciliation):</strong><ul><li><code>openPositionsLinkedToInvoice[].bookingTypeCode</code> (String) — <code>AR_PREPAYMENT</code> or <code>AR_CREDITNOTE</code>.</li><li><code>openPositionsLinkedToInvoice[].bookingDetailUri</code> (String) — internal URI of the booking detail to reconcile (format: <code>/…/{tenant-id}/companies/{companyId}/bookings/{bookingId}/booking-details/{detailId}</code>).</li><li><code>openPositionsLinkedToInvoice[].partialPaymentAmount</code> (BigDecimal) — amount to offset from this open position.</li></ul><br/><strong>Validation rules:</strong><ul><li><code>paymentDate</code> must be on or after <code>documentDate</code> (when amount &gt; 0).</li><li><code>order.orderNumber</code> must be &gt; 0.</li><li><code>invoiceCode</code> must be unique within the company.</li><li><code>status</code> must not be null.</li><li>IBAN format is validated when provided.</li><li>When status is <code>SENT</code>, credit notes (negative total) are not allowed.</li><li>Each <code>orderItems[].tag</code> must be present when status triggers booking (<code>INVOICED</code>/<code>SENT</code>).</li></ul><br/><strong>Server-managed fields (ignored on input, populated on output):</strong> <code>vatDate</code>, <code>lastModified</code>, <code>createDate</code>, <code>bookingDueDate</code>, <code>bookingNumbers</code>, <code>businessCaseId</code>, <code>bookingStatus</code>, <code>bookingMessage</code>, <code>bookingSealed</code>, <code>fiscalYearHasCreatedAuto</code>, <code>createBy</code>, <code>issuedDate</code>.",
+          "description": "<strong>Creates a new invoice for an existing customer.</strong> The <code>id</code> field must be <code>0</code> or omitted. This endpoint does not support updating existing invoices.<br/><br/><strong>Prerequisite APIs (call these first):</strong><ul><li><code>GET /core/v1/invoices/next-invoice-number</code> → provides <code>invoiceCode</code> and <code>invoiceNumber</code> (the next available invoice number for the company).</li><li><code>GET /core/v1/customers?search-key=...&amp;limit=...</code> → provides <code>order.customer.id</code>, <code>order.customer.company</code> (with addresses, emails), and <code>order.customer.customerType</code>.</li><li><code>GET /core/v1/company-bank-accounts</code> → provides <code>ibanNumberCHF</code> / <code>ibanNumberCHW</code> for payment accounts.</li><li><code>GET /core/latest/articles/search?keyword=...</code> → search articles by keyword for the autocomplete; provides <code>orderItems[].itemNumer</code>, <code>description</code>, <code>price</code>, <code>vat</code>, <code>unit</code>.</li><li><code>GET /core/latest/articles/article-numbers?article-numbers=...</code> → fetch full article data by article number(s) to fill <code>orderItems[]</code>.</li><li><code>GET /core/latest/articles/{article-id}/article-set-items</code> → expands article set/bundle into component line items for <code>orderItems[]</code>.</li><li><code>GET /core/v1/bank-reconciliation/open-positions</code> → lists customer's open prepayments / credit notes that can be reconciled; provides <code>openPositionsLinkedToInvoice[].bookingTypeCode</code>, <code>bookingDetailUri</code>, <code>partialPaymentAmount</code>.</li><li>(Optional) <code>POST /core/v1/orders/next-order-number</code> → provides <code>order.orderNumber</code>; each call advances the in-memory counter — call immediately before creating the invoice, not speculatively.</li><li>(Optional) <code>GET /core/latest/company-configuration/including-vat</code> → provides the company-level default for <code>usingVAT</code>; returns <code>false</code> when no configuration record exists.</li><li><code>printedFileId</code> (String, server-assigned) — populated automatically by <code>POST /core/v1/invoices/{id}/printed-document</code> after PDF generation; omit on creation.</li></ul><br/><strong>Field names that look like typos but are not.</strong> The following names are the literal wire field names accepted by the backend. The corrected-looking spellings are <strong>not</strong> accepted:<ul><li><code>orderItems[].itemNumer</code> — article number (<em>not</em> <code>itemNumber</code>). The article lookup endpoints expose the same value under the name <code>articleNumber</code>. Aligning the two names is tracked separately (LUZ-160625); until then <code>itemNumer</code> is the only accepted spelling.</li><li><code>...address.homeNumber</code> — house number (<em>not</em> <code>houseNumber</code>).</li><li><code>...city.cityName18</code> / <code>cityName27</code> — the 18- and 27-character city name variants of the Swiss Post address directory. Neither is a leftover.</li></ul><br/><strong>Top-level fields:</strong><ul><li><code>id</code> (long, required) — must be <code>0</code> for creation.</li><li><code>invoiceCode</code> (String, required) — unique invoice code; obtain from <code>GET /core/v1/invoices/next-invoice-number</code>.</li><li><code>orderType</code> (String, required) — must be <code>INVOICE</code>.</li><li><code>status</code> (String, required) — determines booking behavior (not delivery). Allowed: <code>DRAFT</code> (saves without booking), <code>INVOICED</code> (saves and books into accounting), <code>SENT</code> (saves and books; does <strong>not</strong> send/deliver the invoice).</li><li><code>postMethod</code> (String, optional) — distribution channel <strong>recorded on the invoice only</strong>; this endpoint does not deliver the invoice. Allowed: <code>A_POST</code>, <code>B_POST</code>, <code>SEND_EMAIL</code>, <code>PRINT_AND_MANUAL_SEND</code>, <code>EPOST</code>, <code>EBILL</code>.</li><li><code>documentDate</code> (date, required) — invoice issue date, format <code>yyyy-MM-dd</code>.</li><li><code>paymentDate</code> (date, required) — payment due date, must be on or after <code>documentDate</code>.</li><li><code>ibanNumberCHF</code> (String, conditional) — CHF IBAN for payment; required when booking is triggered.</li><li><code>ibanNumberCHW</code> (String, optional) — WIR IBAN for combined payments.</li><li><code>wirAcceptanceRate</code> (int, optional) — WIR acceptance percentage (0–100).</li><li><code>invoiceType</code> (String, required) — <code>MANUAL</code> or <code>RECURRING</code>.</li><li><code>amount</code> (BigDecimal, required) — total invoice amount over all items. Caller-supplied; not recomputed by the server. With <code>usingVAT=false</code> this is net + VAT; with <code>usingVAT=true</code> it is the sum of the gross item amounts.</li><li><code>usingVAT</code> (boolean) — GUI checkbox <em>\"VAT included in amount of each item\"</em>. Controls whether item <code>price</code>/<code>amount</code> are VAT-inclusive (<code>true</code>, gross) or VAT-exclusive (<code>false</code>, net). It does <strong>not</strong> switch VAT on/off (that is the company's VAT registration). Use <code>GET /core/latest/company-configuration/including-vat</code> for the company default. See <em>VAT handling</em> below.</li><li><code>usingExportVat</code> (boolean, optional) — GUI checkbox <em>\"Export\"</em>. When <code>true</code>, the invoice is an export: set every <code>orderItems[].vat.rate</code> to <code>0</code> so no VAT is charged. Defaults to <code>false</code>.</li><li><code>subject</code> (String, optional) — invoice subject/title.</li><li><code>ourReference</code> / <code>yourReference</code> (String, optional) — reference texts.</li><li><code>companyCityAndDate</code> (String, optional) — city and date line printed on invoice.</li><li><code>closeAndSignature</code> (String, optional) — closing text and signature block.</li><li><code>printedFileId</code> (String, optional) — document ID of uploaded PDF from partner system.</li></ul><br/><strong>Nested fields — <code>order</code> (required):</strong><ul><li><code>order.id</code> (long) — must be <code>0</code> for new orders.</li><li><code>order.orderNumber</code> (int, required) — unique order number; must be &gt; 0 (validated). Obtain from <code>POST /core/v1/orders/next-order-number</code> (not idempotent — each call advances the counter).</li><li><code>order.orderName</code> (String, optional) — order description.</li><li><code>order.companyId</code> (long, required) — company ID from bearer token scope.</li><li><code>order.customer</code> (object, required) — existing customer; obtain from <code>GET /core/v1/customers</code>. Must include <code>customer.id</code>, <code>customer.company</code> (with addresses), and <code>customer.customerType</code> (<code>COMPANY</code> or <code>PERSON</code>).</li></ul><br/><strong>Nested fields — <code>orderItems[]</code> (required, at least 1):</strong><ul><li><code>orderItems[].position</code> (int) — line item position (1-based).</li><li><code>orderItems[].itemNumer</code> (String) — article number. <strong>The field name is <code>itemNumer</code>, not <code>itemNumber</code></strong> — this spelling is the literal wire field name of the KLARA order-management model and is what the backend accepts. It is not a typo in this documentation. The article lookup endpoints expose the same value under the name <code>articleNumber</code>.</li><li><code>orderItems[].description</code> (String) — item description.</li><li><code>orderItems[].quantity</code> (double) — quantity.</li><li><code>orderItems[].unit</code> (String) — unit of measure (e.g. <code>Unit</code>, <code>Hour</code>).</li><li><code>orderItems[].price</code> (double) — unit price (negative for credit notes). VAT-inclusive (gross) when <code>usingVAT=true</code>, VAT-exclusive (net) when <code>usingVAT=false</code>. Both variants are available from the article lookup APIs.</li><li><code>orderItems[].discount</code> (double) — discount percentage.</li><li><code>orderItems[].amount</code> (double) — line total = <code>quantity × price × (1 − discount/100)</code>, rounded to the nearest 0.05. Gross or net following <code>usingVAT</code> (same basis as <code>price</code>).</li><li><code>orderItems[].tag</code> (String, <strong>accepted but not persisted</strong>) — the <code>order_item</code> table has no column for it, so a value sent here is silently discarded and does not influence booking. The server derives it from the article master data on the recurring-invoice run only.</li><li><code>orderItems[].vatCase</code> (String, <strong>accepted but not persisted</strong>) — <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>. Same as <code>tag</code>: no column, discarded on this endpoint.</li><li><code>orderItems[].articleType</code> (String, <strong>accepted but not persisted</strong>) — <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>. Same as <code>tag</code>: no column, discarded on this endpoint.</li><li><code>orderItems[].vat</code> (object) — VAT details: <code>vatCode</code>, <code>rate</code>, <code>description</code>, <code>masterId</code>. For an export invoice (<code>usingExportVat=true</code>) set <code>rate=0</code> and the export/zero <code>vatCode</code>. <strong>This is the VAT code that is actually stored</strong> — the sibling <code>orderItems[].vatCode</code> is a convenience mirror that is not persisted, so do not send the two with conflicting values.</li><li><code>orderItems[].id</code> (long) — must be <code>0</code> for new items.</li></ul><br/><strong>Nested fields — <code>documentAddress</code> / <code>mailingAddress</code> (optional):</strong><ul><li><code>documentAddress</code> (object) — address block printed on the invoice document. Derived from the customer when omitted; send it only to print an address other than the customer's default.</li><li><code>documentAddress.customerId</code> (long) — customer the address belongs to.</li><li><code>documentAddress.customerType</code> (String) — <code>COMPANY</code> or <code>PERSON</code>.</li><li><code>documentAddress.address</code> (object) — the postal address to print (same shape as <code>customer.company.addresses[]</code>, including <code>homeNumber</code> and <code>city.cityName18</code>/<code>cityName27</code>).</li><li><code>documentAddress.companyName</code> / <code>personFirstName</code> / <code>personLastName</code> / <code>salutation</code> (String) — recipient name parts printed above the address.</li><li><code>mailingAddress</code> (object) — address used for postal delivery, same shape as <code>documentAddress</code>. Both are resolved against the customer's stored addresses and referenced by id; the invoice does not keep a private copy of the values sent.</li></ul><br/><strong>VAT handling — the server does not recalculate amounts.</strong> Unlike the KLARA GUI (which recomputes line amounts, VAT and totals whenever you toggle the <em>\"VAT included in amount of each item\"</em> or <em>\"Export\"</em> checkbox), this endpoint stores the amounts you send <em>verbatim</em> and performs no VAT recalculation or consistency check. Send <code>orderItems[].price</code>, <code>orderItems[].amount</code>, <code>orderItems[].vat</code> and the document <code>amount</code> already consistent with the two flags:<ul><li><code>usingVAT=false</code> (VAT-exclusive) — <code>price</code>/<code>amount</code> are net; document <code>amount</code> = net + VAT.</li><li><code>usingVAT=true</code> (VAT-inclusive) — <code>price</code>/<code>amount</code> are gross (VAT already inside); document <code>amount</code> = sum of gross item amounts.</li><li><code>usingExportVat=true</code> (export) — set every <code>orderItems[].vat.rate</code> to <code>0</code>; VAT = 0 and document <code>amount</code> = sum of net item amounts.</li></ul>To reproduce the GUI figures exactly: per line <code>amount = round0.05(quantity × price × (1 − discount/100))</code>; VAT per rate group = <code>amount × rate/100</code> when VAT-exclusive, or <code>amount × (rate/100) / (1 + rate/100)</code> when VAT-inclusive — each rounded to the nearest 0.05 (Swiss commercial rounding). Article unit prices for the inclusive, exclusive and export cases come from the article lookup APIs above (each article exposes both a VAT-inclusive and a VAT-exclusive price); pick the one matching <code>usingVAT</code>/<code>usingExportVat</code>.<br/><br/><strong>Nested fields — <code>attachments[]</code> (optional):</strong><ul><li><code>attachments[].fileId</code> (String) — document file ID uploaded via partner system.</li><li><code>attachments[].orderDetailId</code> (long) — set to <code>0</code> for new invoices.</li><li><code>attachments[].id</code> (long) — set to <code>0</code> for new attachments.</li></ul><br/><strong>Nested fields — <code>openPositionsLinkedToInvoice[]</code> (optional, for reconciliation):</strong><ul><li><code>openPositionsLinkedToInvoice[].bookingTypeCode</code> (String) — <code>AR_PREPAYMENT</code> or <code>AR_CREDITNOTE</code>.</li><li><code>openPositionsLinkedToInvoice[].bookingDetailUri</code> (String) — internal URI of the booking detail to reconcile (format: <code>/…/{tenant-id}/companies/{companyId}/bookings/{bookingId}/booking-details/{detailId}</code>).</li><li><code>openPositionsLinkedToInvoice[].partialPaymentAmount</code> (BigDecimal) — amount to offset from this open position.</li></ul><br/><strong>Validation rules:</strong><ul><li><code>paymentDate</code> must be on or after <code>documentDate</code> (when amount &gt; 0).</li><li><code>order.orderNumber</code> must be &gt; 0.</li><li><code>invoiceCode</code> must be unique within the company.</li><li><code>status</code> must not be null.</li><li>IBAN format is validated when provided.</li><li>When status is <code>SENT</code>, credit notes (negative total) are not allowed.</li><li>Each <code>orderItems[].tag</code> must be present when status triggers booking (<code>INVOICED</code>/<code>SENT</code>).</li></ul><br/><strong>Server-managed fields (ignored on input, populated on output):</strong> <code>vatDate</code>, <code>lastModified</code>, <code>createDate</code>, <code>bookingDueDate</code>, <code>bookingNumbers</code>, <code>businessCaseId</code>, <code>bookingStatus</code>, <code>bookingMessage</code>, <code>bookingSealed</code>, <code>fiscalYearHasCreatedAuto</code>, <code>createBy</code>, <code>issuedDate</code>.",
           "content": {
             "application/json": {
               "schema": {
@@ -9083,6 +9087,25 @@
                     ],
                     "attachments": [],
                     "openPositionsLinkedToInvoice": [],
+                    "documentAddress": {
+                      "customerId": 40,
+                      "customerType": "COMPANY",
+                      "companyName": "A. Bassi AG",
+                      "address": {
+                        "id": 280,
+                        "companyName": "A. Bassi AG",
+                        "type": "COMPANY",
+                        "addressType": "WORK",
+                        "street": "Ahornstrasse",
+                        "homeNumber": "12",
+                        "city": {
+                          "id": 3713,
+                          "addressPostcode": "8962",
+                          "cityName18": "Bergdietikon",
+                          "cityName27": "Bergdietikon"
+                        }
+                      }
+                    },
                     "subject": "Test create invoice",
                     "usingVAT": true,
                     "orderType": "INVOICE",
@@ -11300,8 +11323,10 @@
           },
           "addressLines": {
             "description": "The address lines for this Address",
+            "pattern": "\\S",
             "type": "string",
-            "example": "Chemin de la Caquerette 12"
+            "example": "Chemin de la Caquerette 12",
+            "nullable": false
           },
           "addressType": {
             "description": "The type of address, could be [PRIVATE, WORK, SHIPPING]. For company, address type <strong>MUST</strong> be <strong>PRIVATE</strong>.",
@@ -11318,7 +11343,7 @@
             "nullable": false
           },
           "cityZipCode": {
-            "description": "The postal code of a city for this address",
+            "description": "The postal code of the city for this address. <strong>Required for Switzerland addresses</strong> (countryIso2Code = CH), where it is matched against the KLARA city register together with cityName; a missing or non-matching combination is rejected with 400. Ignored for every other country, where cityName is taken as given. Conditional on another field, so it is not marked required.",
             "type": "string",
             "example": "3003"
           },
@@ -12140,19 +12165,7 @@
                 "$ref": "#/components/schemas/LegalForm"
               },
               {
-                "description": "Legal form of a company. Can be one of the following: <ul><li>Limited liability company(GmbH)</li><li>Public limited company (AG)</li><li>Individually owned company (EU)</li><li>Association (V)</li><li>Simple partnership (EG)</li><li>General partnership (KG)</li><li>Limited partnership (KDG)</li><li>Cooperative company (G)</li><li>Foundation (S)</li><li>OR</li></ul>",
-                "enum": [
-                  "GmbH",
-                  "AG",
-                  "OR",
-                  "EU",
-                  "V",
-                  "EG",
-                  "KG",
-                  "KDG",
-                  "G",
-                  "S"
-                ],
+                "description": "Legal form of the company. Send the value as one of the LegalForm constants below; the German abbreviation in brackets is also accepted on input, but responses always carry the constant. <ul><li><code>LIMITED_LIABILITY</code> - limited liability company (GmbH)</li><li><code>CORPORATION</code> - public limited company (AG)</li><li><code>INDIVIDUALLY_OWNED_COMPANY</code> - individually owned company (EU)</li><li><code>ASSOCIATION</code> - association (V)</li><li><code>SIMPLE_PARTNERSHIP</code> - simple partnership (EG)</li><li><code>GENERAL_PARTNERSHIP</code> - general partnership (KG)</li><li><code>LIMITED_PARTNERSHIP</code> - limited partnership (KDG)</li><li><code>COOPERATIVE_COMPANY</code> - cooperative company (G)</li><li><code>FOUNDATION</code> - foundation (S)</li><li><code>OR</code> - simple company under the Swiss Code of Obligations (OR)</li><li><code>IOER</code> - institution of public law</li></ul>",
                 "example": "LIMITED_LIABILITY",
                 "nullable": false
               }
@@ -12410,7 +12423,7 @@
             }
           },
           "addresses": {
-            "description": "Address list of this company, atleast one should be add",
+            "description": "Postal addresses of this company. At least one address is required when creating or updating a customer with customerType = COMPANY - omitting it is rejected with 400. Not marked required here because existing customers created before this rule may still be returned without an address.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Address"
@@ -12728,7 +12741,7 @@
         }
       },
       "Customer": {
-        "description": "A customer.",
+        "description": "A customer - either a natural person or a company. customerType selects which: PERSON requires the person object and ignores company; COMPANY requires company and ignores person. This is a conditional requirement, so neither field appears in this schema's required list - supplying neither, or the wrong one for the given customerType, returns 400 with code model.invalid.",
         "required": [
           "customerType"
         ],
@@ -12746,7 +12759,7 @@
                 "$ref": "#/components/schemas/Person"
               },
               {
-                "description": "The Person object for when the customer type is Person."
+                "description": "The Person object. Supply this - and omit company - when customerType is PERSON. Exactly one of person and company must be present, selected by customerType; the other is ignored. Because which one is mandatory depends on another field, this cannot be marked required in this schema - omitting it when customerType = PERSON is rejected with 400 (Person object must be entered)."
               }
             ]
           },
@@ -12756,7 +12769,7 @@
                 "$ref": "#/components/schemas/Company"
               },
               {
-                "description": "The Company object for when the customer type is Person."
+                "description": "The Company object. Supply this - and omit person - when customerType is COMPANY. See person for the mutual-exclusivity rule; omitting this when customerType = COMPANY is rejected with 400 (Company object must be entered)."
               }
             ]
           },
@@ -12927,12 +12940,7 @@
                 "$ref": "#/components/schemas/EmailType"
               },
               {
-                "description": "Type of this email",
-                "enum": [
-                  "PRIVATE",
-                  "WORK",
-                  "OFFICE"
-                ],
+                "description": "Type of this email address. The full set of accepted values is the EmailType schema.",
                 "example": "PRIVATE",
                 "nullable": false
               }
@@ -13615,7 +13623,7 @@
         }
       },
       "InvoiceCreateRequest": {
-        "description": "Request body of <code>POST</code> and <code>PUT /core/v1/invoices</code>. Carries every field of the <code>Invoice</code> model plus the nested order, line item, attachment and reconciliation blocks.<br/><br/><strong>Field names that look like typos but are not:</strong> <code>orderItems[].itemNumer</code> (article number), <code>...city.cityName18</code> / <code>cityName27</code> (Swiss Post 18- and 27-character city names) and <code>...address.homeNumber</code> (house number) are the literal wire field names accepted by the backend. <code>itemNumber</code>, <code>houseNumber</code> and similar corrected spellings are <strong>not</strong> accepted.<br/><br/><strong>VAT:</strong> set the code on <code>orderItems[].vat.vatCode</code> and nowhere else — it is the only VAT field this endpoint stores. A line that puts a code on the sibling <code>orderItems[].vatCode</code> and leaves <code>vat.vatCode</code> empty is rejected with <code>400 invoice.vat_code_missing</code> rather than booked at 0%. Omitting the code entirely is allowed: the server takes it from <code>vat.rate</code> when you sent one, from the article otherwise, and a company that is not liable for VAT needs none. To state a zero rate explicitly — on an export invoice, for instance — send the <code>\"0\"</code> (\"No VAT\") code.<br/><br/><strong><code>orderItems[].vat.rate</code> identifies the code; it does not set the percentage.</strong> A company's VAT configuration normally holds one code per rate, so a rate alone is enough — including one from an earlier release, such as 7.7. Only if two of the company's codes share the rate are you asked for <code>vat.vatCode</code>. What is finally stored and booked is always the rate the code resolves to on the date the booking uses (<code>servicePeriodFrom</code>, else <code>deliveryDate</code>, else <code>documentDate</code>), which is the only way the invoice document and the accounting record are guaranteed to state the same percentage. If you send both a code and a rate, the rate must be one the code has carried in some release — 2.5 or 2.6 for <code>\"1\"</code>, not 8.1 — or the request is rejected with <code>400 invoice.vat_rate_mismatch</code>. The sibling <code>orderItems[].vatCode</code>, <code>vatCase</code>, <code>articleType</code> and <code>tag</code> are accepted but not persisted, and <code>vatType</code> does not exist at all. Leave <code>hasCompanyVat</code> out: the server derives the company's VAT liability itself.",
+        "description": "Request body of <code>POST</code> and <code>PUT /core/v1/invoices</code>. Carries every field of the <code>Invoice</code> model plus the nested order, line item, attachment and reconciliation blocks.<br/><br/><strong>Field names that look like typos but are not:</strong> <code>orderItems[].itemNumer</code> (article number), <code>...city.cityName18</code> / <code>cityName27</code> (Swiss Post 18- and 27-character city names) and <code>...address.homeNumber</code> (house number) are the literal wire field names accepted by the backend. <code>itemNumber</code>, <code>houseNumber</code> and similar corrected spellings are <strong>not</strong> accepted.<br/><br/><strong>VAT:</strong> set the code on <code>orderItems[].vat.vatCode</code> and nowhere else — it is the only VAT field this endpoint stores. A line that puts a code on the sibling <code>orderItems[].vatCode</code> and leaves <code>vat.vatCode</code> empty is rejected with <code>400 invoice.vat_code_missing</code> rather than booked at 0%. Omitting the code entirely is allowed: the server takes it from <code>vat.rate</code> when you sent one, from the article otherwise, and a company that is not liable for VAT needs none. To state a zero rate explicitly — on an export invoice, for instance — send the <code>\"0\"</code> (\"No VAT\") code.<br/><br/><strong><code>orderItems[].vat.rate</code> identifies the code, and must be the rate in force on the document's date.</strong> A company's VAT configuration normally holds one code per rate, so a rate alone is enough; only if two of the company's codes share it on that date are you asked for <code>vat.vatCode</code>. The date is the one the booking uses — <code>servicePeriodFrom</code>, else <code>deliveryDate</code>, else <code>documentDate</code>.<br/><br/>Rates change between releases, and a rate from another one is rejected rather than replaced: sending 8.1 on a document dated after that rate ended gives <code>400 invoice.vat_rate_mismatch</code> naming the rate that does apply, so you can invoice a total you calculated yourself. The same holds when you send a code and a rate together — they must agree on that date. Omit <code>vat.rate</code> entirely and the server fills it in from the code and the date, which is the shape that never needs revisiting when a rate changes. The sibling <code>orderItems[].vatCode</code>, <code>vatCase</code>, <code>articleType</code> and <code>tag</code> are accepted but not persisted, and <code>vatType</code> does not exist at all. Leave <code>hasCompanyVat</code> out: the server derives the company's VAT liability itself.",
         "required": [
           "invoiceCode",
           "order",
@@ -13899,7 +13907,7 @@
             }
           },
           "openPositionsLinkedToInvoice": {
-            "description": "Open positions (prepayments, credit notes) offset against this invoice.",
+            "description": "Open positions (prepayments, credit notes) offset against this invoice. Persisted through a dedicated path rather than with the invoice row itself.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InvoiceOpenPositionLink"
@@ -13911,7 +13919,7 @@
                 "$ref": "#/components/schemas/InvoiceDocumentAddress"
               },
               {
-                "description": "Address block printed on the invoice document. Derived from the customer when omitted."
+                "description": "Address block printed on the invoice document. Derived from the customer when omitted. Resolved against the customer's stored addresses and kept as a reference — the invoice records which address was used, it does not keep a private copy of the values you send."
               }
             ]
           },
@@ -13921,7 +13929,7 @@
                 "$ref": "#/components/schemas/InvoiceDocumentAddress"
               },
               {
-                "description": "Address used for postal delivery. Derived from the customer when omitted."
+                "description": "Address used for postal delivery. Derived from the customer when omitted. Resolved and referenced the same way as <code>documentAddress</code>."
               }
             ]
           },
@@ -14316,22 +14324,22 @@
             ]
           },
           "vatCode": {
-            "description": "VAT code of the line. Convenience mirror of <code>vat.vatCode</code>.",
+            "description": "VAT code of the line. Convenience mirror of <code>vat.vatCode</code>. <strong>Not persisted on this endpoint</strong> — the value that is stored comes from <code>vat.vatCode</code>. Do not send the two with different values: this field is silently discarded, so a mismatch results in the <code>vat.vatCode</code> value being booked.",
             "type": "string",
             "example": "1"
           },
           "vatCase": {
-            "description": "VAT treatment of the line. Allowed values: <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>.",
+            "description": "VAT treatment of the line. Allowed values: <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>. <strong>Accepted but not persisted on this endpoint</strong> — the <code>order_item</code> table has no column for it. It is populated by the server only on the recurring-invoice run, from the article master data.",
             "type": "string",
             "example": "TAXABLE_SUPPLY"
           },
           "articleType": {
-            "description": "Article category. Allowed values: <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>.",
+            "description": "Article category. Allowed values: <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>. <strong>Accepted but not persisted on this endpoint</strong> — the <code>order_item</code> table has no column for it. It is populated by the server only on the recurring-invoice run, from the article master data.",
             "type": "string",
             "example": "SERVICE"
           },
           "tag": {
-            "description": "Accounting tag of the line. <strong>Required for booking</strong> — must not be empty when <code>status</code> is <code>INVOICED</code> or <code>SENT</code>.",
+            "description": "Accounting tag of the line. <strong>Accepted but not persisted on this endpoint</strong> — the <code>order_item</code> table has no column for it, so a value sent here is silently discarded. It is derived by the server from the article master data on the recurring-invoice run. Booking behaviour is therefore not influenced by this field on <code>POST</code>/<code>PUT</code>.",
             "type": "string",
             "example": "3400"
           },
@@ -14363,7 +14371,7 @@
             "example": "SET-001"
           },
           "inventorySelections": {
-            "description": "Inventory selections (serial numbers, storage places) for stock-managed articles.",
+            "description": "Inventory selections (serial numbers, storage places) for stock-managed articles. Persisted through a dedicated path rather than with the line itself, so the serial numbers you send are validated separately — an invalid serial number fails the request even though the surrounding line is accepted.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/InvoiceInventorySelection"
@@ -14656,6 +14664,7 @@
         }
       },
       "LegalForm": {
+        "description": "Legal form of a company. The values below are what this API returns. On input the German abbreviation (GmbH, AG, EU, V, EG, KG, KDG, G, S, OR, IOER) is also accepted, case-insensitively.",
         "enum": [
           "LIMITED_LIABILITY",
           "CORPORATION",
@@ -15154,7 +15163,7 @@
             "example": "2020-01-20"
           },
           "addresses": {
-            "description": "Address list of this person",
+            "description": "Postal addresses of this person. At least one address is required when creating or updating a customer with customerType = PERSON - omitting it is rejected with 400. Not marked required here because existing customers created before this rule may still be returned without an address.",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Address"
@@ -15204,13 +15213,7 @@
                 "$ref": "#/components/schemas/PhoneType"
               },
               {
-                "description": "Type of this phone number. For company, only <strong>OFFICE</strong> type is supported",
-                "enum": [
-                  "PRIVATE",
-                  "OFFICE",
-                  "MOBILE",
-                  "WORK"
-                ],
+                "description": "Type of this phone number. For company, only <strong>OFFICE</strong> type is supported. The full set of accepted values is the PhoneType schema.",
                 "example": "PRIVATE",
                 "nullable": false
               }
@@ -15832,8 +15835,9 @@
             "type": "string"
           },
           "businessCaseId": {
-            "description": "Reference to the business-case document (workflow id) that produced this booking, when applicable.",
-            "type": "string"
+            "description": "Id of the KLARA business case that produced this booking. Set by the server and ignored on input: a booking created through this API never belongs to a business case, so leave it empty. This is not the business case template code (use businessCase for a label). A non-numeric value is rejected with 400 booking.business_case_id_invalid.",
+            "type": "string",
+            "readOnly": true
           },
           "relatedBookingHeaderLinks": {
             "description": "URIs of bookings that are related to this one (e.g. payment ↔ invoice, original ↔ delimitation).",
@@ -16984,16 +16988,7 @@
                 "$ref": "#/components/schemas/PricePlan"
               },
               {
-                "description": "Specify how the subscription is paid. <br><ul><li> SINGLE: Pay once for the whole subscription period. </li><li> VOLUME: Pay once for the whole subscription period and pay for each volume. </li><li> MONTHLY: Pay monthly for the subscription period. </li><li> QUARTERLY: Pay quarterly for the subscription period. </li><li> YEARLY: Pay yearly for the subscription period. </li><li> FREE: Free subscription. </li><li> PAY_PER_USE: Pay for each usage. </li></ul>",
-                "enum": [
-                  "SINGLE",
-                  "VOLUME",
-                  "MONTHLY",
-                  "QUARTERLY",
-                  "YEARLY",
-                  "FREE",
-                  "PAY_PER_USE"
-                ],
+                "description": "Specify how the subscription is paid. The full set of accepted values is the PricePlan schema. <br><ul><li> SINGLE: Pay once for the whole subscription period. </li><li> VOLUME: Pay once for the whole subscription period and pay for each volume. </li><li> MONTHLY: Pay monthly for the subscription period. </li><li> QUARTERLY: Pay quarterly for the subscription period. </li><li> YEARLY: Pay yearly for the subscription period. </li><li> FREE: Free subscription. </li><li> PAY_PER_USE: Pay for each usage. </li></ul>",
                 "example": "MONTHLY"
               }
             ]

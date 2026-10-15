@@ -124,11 +124,12 @@ It is not the shape of the authentication endpoints as a group. What the authent
 
 Two of the entries above are not the application speaking. A `429` body comes from the gateway, not from the API, so it is outside this contract and may look like none of these shapes. And where a status declares no body, a gateway may still add one; that too is outside the contract.
 
-The contract names 5 error codes of its own, in the `code` field of the error body:
+The contract names 6 error codes of its own, in the `code` field of the error body:
 
 | Code | Status | Meaning | Where |
 |---|---|---|---|
 | `auth.credentials_missing` | `401` | Neither an Authorization: Bearer header nor an API key header was present on the request. | 3 operations |
+| `booking.business_case_id_invalid` | `400` | businessCaseId was set but is not a numeric business case id. Leave it empty when creating a booking; use businessCase for a label. | 1 operation |
 | `booking.status_not_allowed` | `400` | bookingStatus was neither BOOKED nor PLANNED. | 1 operation |
 | `invoice.id_must_be_zero` | `400` | The request body carried a non-zero id. This operation only creates invoices; use PUT /core/v1/invoices to modify an existing one. | 1 operation |
 | `invoice.vat_code_missing` | `400` | At least one orderItems[] entry set VAT on vatType, vatCase or the top-level vatCode while leaving vat.vatCode empty. Only vat.vatCode is stored, so that line would have been booked at 0%. Move the code to vat.vatCode, or send "0" ("No VAT") for a position that genuinely carries none. | 2 operations |

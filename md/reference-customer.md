@@ -183,7 +183,7 @@ Creates a new customer's additional address
 | `addressLines` | string | yes | The address lines for this Address |
 | `addressType` | string | yes | The type of address, could be [PRIVATE, WORK, SHIPPING]. For company, address type MUST be PRIVATE. |
 | `cityName` | string | yes | Name of this City |
-| `cityZipCode` | string | no | The postal code of a city for this address |
+| `cityZipCode` | string | no | The postal code of the city for this address. Required for Switzerland addresses (countryIso2Code = CH), where it is matched against the KLARA city register together with cityName; a missing or non-matching combination is rejected with 400. Ignored for every other country, where cityName is taken as given. Conditional on another field, so it is not marked required. |
 | `countryIso2Code` | string | yes | 2 letter country code. For company, only accept Switzerland |
 | `countryIso3Code` | string | no | 3 letter country code. For company, only accept Switzerland |
 | `countryNumericCode` | string | no | ISO-numeric code. For company, only accept Switzerland |
@@ -252,7 +252,7 @@ Updates a Address
 | `addressLines` | string | yes | The address lines for this Address |
 | `addressType` | string | yes | The type of address, could be [PRIVATE, WORK, SHIPPING]. For company, address type MUST be PRIVATE. |
 | `cityName` | string | yes | Name of this City |
-| `cityZipCode` | string | no | The postal code of a city for this address |
+| `cityZipCode` | string | no | The postal code of the city for this address. Required for Switzerland addresses (countryIso2Code = CH), where it is matched against the KLARA city register together with cityName; a missing or non-matching combination is rejected with 400. Ignored for every other country, where cityName is taken as given. Conditional on another field, so it is not marked required. |
 | `countryIso2Code` | string | yes | 2 letter country code. For company, only accept Switzerland |
 | `countryIso3Code` | string | no | 3 letter country code. For company, only accept Switzerland |
 | `countryNumericCode` | string | no | ISO-numeric code. For company, only accept Switzerland |
