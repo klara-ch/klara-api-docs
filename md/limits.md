@@ -54,7 +54,7 @@ Whether `Retry-After` is sent is being confirmed. Do not depend on it yet.
 
 ### Pagination
 
-9 endpoints accept pagination parameters:
+13 endpoints accept pagination parameters:
 
 | Endpoint | Parameters |
 |---|---|
@@ -65,7 +65,11 @@ Whether `Retry-After` is sent is being confirmed. Do not depend on it yet.
 | GET `/core/latest/articles/search` | `limit`, `offset` |
 | GET `/core/v1/accounting/business-case-templates` | `limit`, `offset` |
 | GET `/core/v1/accounting/master-vats` | `limit`, `offset` |
+| GET `/core/v1/accounting/tags` | `limit`, `offset` |
+| GET `/core/v1/bank-transactions` | `limit`, `offset` |
+| GET `/core/v1/bookings` | `limit`, `offset` |
 | GET `/core/v1/customers` | `limit`, `offset` |
+| GET `/core/v1/customers/{customerId}/open-positions` | `limit`, `offset` |
 | GET `/core/v1/invoices` | `limit`, `offset` |
 
 Three properties of pagination that decide whether a run is reliable.
@@ -84,21 +88,25 @@ Three properties of pagination that decide whether a run is reliable.
 
 #### Free-text search
 
-7 endpoints take a search term and match it against several fields at once. This is the only way to find a record without knowing an id.
+11 endpoints take a search term and match it against several fields at once. This is the only way to find a record without knowing an id.
 
 | Endpoint | Parameter |
 |---|---|
 | GET `/core/latest/article-categories` | `keyword`, `search-key` |
 | GET `/core/latest/article-filters` | `keyword`, `search-key` |
 | GET `/core/latest/articles/search` | `keyword`, `search-key` |
+| GET `/core/v1/accounting/tags` | `search-key` |
 | GET `/core/v1/bank-reconciliation/open-positions` | `general-search`, `search-key` |
+| GET `/core/v1/bank-transactions` | `search-key` |
+| GET `/core/v1/bookings` | `search-key` |
 | GET `/core/v1/customers` | `search-key` |
+| GET `/core/v1/customers/{customerId}/open-positions` | `search-key` |
 | GET `/core/v1/employees/short-info` | `search-key` |
 | GET `/core/v1/invoices` | `search-key` |
 
 #### Filtering by field
 
-32 endpoints narrow the result by a field value, 75 parameters in total. Filtering is not searching: you have to know the value you are filtering on.
+36 endpoints narrow the result by a field value, 87 parameters in total. Filtering is not searching: you have to know the value you are filtering on.
 
 | Endpoint | Parameters |
 |---|---|
@@ -118,13 +126,17 @@ Three properties of pagination that decide whether a run is reliable.
 | GET `/core/v1/accounting/business-cases/v2` | `businessCaseTemplateId`, `dateForFilteringCompanyVat`, `dateForFilteringFiscalYear`, `group-insurance-by-insurer`, `snippet-id`, `snippet-value` |
 | GET `/core/v1/accounting/currencies/exchange-rate` | `exchange-date`, `from-currency-code` |
 | GET `/core/v1/accounting/master-vats` | `code`, `current-period`, `default-vat`, `includeHiddenVatCase` |
+| GET `/core/v1/accounting/tags` | `include-combinations` |
 | GET `/core/v1/accounting/vat-profile` | `date` |
 | GET `/core/v1/accounting/vat-suggestions` | `accountCode`, `amount`, `amountKind`, `date`, `direction`, `vatCase` |
 | GET `/core/v1/bank-reconciliation/open-positions` | `action`, `booking-type-codes`, `crdr-type`, `credit-card-not-reconciled`, `invoice-date`, `partner`, `payment-date`, `payment-date-from`, `payment-date-to`, `position-status`, `tags` |
+| GET `/core/v1/bank-transactions` | `bank-account-id`, `booking-date-from`, `booking-date-to`, `direction` |
+| GET `/core/v1/bookings` | `amount-from`, `amount-to`, `booking-date-from`, `booking-date-to`, `tags` |
 | POST `/core/v1/bookings` | `autoCalculateVat`, `confirmDontMindClosingFiscalYear`, `ignore-unsubscripted-dates` |
 | PUT `/core/v1/bookings/{id}/documents` | `ignore-unsubscripted-dates` |
 | GET `/core/v1/company-bank-accounts` | `iban-number`, `type` |
 | GET `/core/v1/customers` | `status` |
+| GET `/core/v1/customers/{customerId}/open-positions` | `position-type`, `reference-date` |
 | GET `/core/v1/employees/short-info` | `filter-by-status`, `status`, `workplace-ids` |
 | GET `/core/v1/invoices` | `booking-status`, `status` |
 | PUT `/core/v1/invoices` | `confirmDontMindClosingFiscalYear` |
@@ -137,4 +149,4 @@ Three properties of pagination that decide whether a run is reliable.
 
 #### Sorting
 
-3 endpoints accept a sort order: `/core/v1/accounting/business-case-templates`, `/core/v1/employees/short-info`, `/core/v1/invoices`. Everywhere else the order is not guaranteed, which matters when you page through a large collection.
+7 endpoints accept a sort order: `/core/v1/accounting/business-case-templates`, `/core/v1/accounting/tags`, `/core/v1/bank-transactions`, `/core/v1/bookings`, `/core/v1/customers/{customerId}/open-positions`, `/core/v1/employees/short-info`, `/core/v1/invoices`. Everywhere else the order is not guaranteed, which matters when you page through a large collection.

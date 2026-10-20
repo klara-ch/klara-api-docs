@@ -18,7 +18,7 @@ A KLARA business account offers nine assignable roles, plus Object manager and m
 >
 > For the Public API the two hold **identical** permissions. The difference exists only in user management, payments and billing, none of which the API exposes. Choosing External user over Administrator therefore buys you nothing in terms of least privilege. If you want a narrow key, pick one of the specialist roles below.
 
-| Role in KLARA | Technical name | Endpoints reachable, of 98 |
+| Role in KLARA | Technical name | Endpoints reachable, of 103 |
 |---|---|---|
 | Administrator | `company_administrator` | 95 |
 | External user | `external_user` | 95 |

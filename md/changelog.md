@@ -8,6 +8,20 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
+#### 20 October 2026 · 5 new
+
+#### New
+
+- GET `/core/v1/accounting/tags` — List the tags used on bookings.
+
+- GET `/core/v1/bank-transactions` — List bank transactions that are not reconciled yet.
+
+- GET `/core/v1/bookings` — Search the journal: list bookings by text, booking date, amount or tag.
+
+- GET `/core/v1/bookings/{bookingId}` — Read one booking with all its debit and credit lines.
+
+- GET `/core/v1/customers/{customerId}/open-positions` — List the open items of one customer or supplier.
+
 #### 7 October 2026 · 3 changed · breaking
 
 > **Warning: Breaking changes**

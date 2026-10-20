@@ -58,12 +58,12 @@ Replacing `/core/latest/` with `/core/v1/` in the path is the whole migration. R
 
 | Verb | Used for | Endpoints |
 |---|---|---|
-| GET | Retrieving resources | 56 |
+| GET | Retrieving resources | 61 |
 | PUT | Replacing a resource completely | 10 |
 | POST | Creating resources, and some actions such as `/send` | 25 |
 | DELETE | Removing a resource | 7 |
 
-98 endpoints in total, which is the same number as in the reference below and in the downloadable specification.
+103 endpoints in total, which is the same number as in the reference below and in the downloadable specification.
 
 The KLARA API does not use `PATCH`. To change part of a resource, send a complete `PUT`. Read the current state first if you do not hold it.
 
@@ -95,17 +95,17 @@ Ask for what the endpoint returns. `Accept: application/json` is correct almost 
 
 | Media type | Endpoints | Which ones |
 |---|---|---|
-| `application/json` | 98 | every endpoint that has one |
+| `application/json` | 103 | every endpoint that has one |
 | `application/octet-stream` | 2 | `GET /core/latest/articles/{article-id}/images/{image-id}` `POST /core/latest/payroll-interface-file` |
 | `application/pdf` | 1 | `POST /core/v1/invoices/{id}/printed-document` |
 
 ### What an error body contains
 
-The specification declares 447 error responses on 98 operations. Every one of them declares a body, so you can generate a type for the error case and read the `code` and the `uuid` from it.
+The specification declares 473 error responses on 103 operations. Every one of them declares a body, so you can generate a type for the error case and read the `code` and the `uuid` from it.
 
 | Schema | Fields | Error responses | Operations |
 |---|---|---|---|
-| `ErrorMessage` | `code`, `createdTime`, `detail`, `message`, `uuid` | 428 | 98 |
+| `ErrorMessage` | `code`, `createdTime`, `detail`, `message`, `uuid` | 454 | 103 |
 | `ErrorResponse` | `error`, `error_description` | 19 | 5 |
 
 The OAuth-style pair `error` and `error_description` is declared on 5 operations:
@@ -124,16 +124,23 @@ It is not the shape of the authentication endpoints as a group. What the authent
 
 Two of the entries above are not the application speaking. A `429` body comes from the gateway, not from the API, so it is outside this contract and may look like none of these shapes. And where a status declares no body, a gateway may still add one; that too is outside the contract.
 
-The contract names 6 error codes of its own, in the `code` field of the error body:
+The contract names 13 error codes of its own, in the `code` field of the error body:
 
 | Code | Status | Meaning | Where |
 |---|---|---|---|
 | `auth.credentials_missing` | `401` | Neither an Authorization: Bearer header nor an API key header was present on the request. | 3 operations |
+| `banktransaction.booking_date_invalid` | `400` | booking-date-from or booking-date-to was not an ISO date of the form yyyy-MM-dd, or booking-date-to was before booking-date-from. | 1 operation |
+| `booking.amount_range_invalid` | `400` | amount-to was below amount-from. | 1 operation |
+| `booking.booking_date_invalid` | `400` | booking-date-from or booking-date-to was not an ISO date of the form yyyy-MM-dd, or booking-date-to was before booking-date-from. | 1 operation |
 | `booking.business_case_id_invalid` | `400` | businessCaseId was set but is not a numeric business case id. Leave it empty when creating a booking; use businessCase for a label. | 1 operation |
 | `booking.status_not_allowed` | `400` | bookingStatus was neither BOOKED nor PLANNED. | 1 operation |
+| `booking.unknown` | `404` | No booking with this id exists in the caller's company. | 1 operation |
 | `invoice.id_must_be_zero` | `400` | The request body carried a non-zero id. This operation only creates invoices; use PUT /core/v1/invoices to modify an existing one. | 1 operation |
 | `invoice.vat_code_missing` | `400` | At least one orderItems[] entry set VAT on vatType, vatCase or the top-level vatCode while leaving vat.vatCode empty. Only vat.vatCode is stored, so that line would have been booked at 0%. Move the code to vat.vatCode, or send "0" ("No VAT") for a position that genuinely carries none. | 2 operations |
 | `invoice.vat_rate_mismatch` | `400` | At least one orderItems[] entry sent a vat.rate that is not the rate of its vat.vatCode. The booking always uses the code's rate, so the invoice document would state a different percentage than the accounting record. Send the matching rate, or omit vat.rate and let the server fill it in. | 2 operations |
+| `openposition.reference_date_invalid` | `400` | reference-date was not an ISO date of the form yyyy-MM-dd. Omit it to use today. | 1 operation |
+| `request.sort_direction_unsupported` | `400` | sort-direction=ASC was sent to an operation whose order is fixed; only DESC is available. | 1 operation |
+| `request.sort_field_invalid` | `400` | sort-field was not one of the values the operation documents. The message lists the accepted values. | 4 operations |
 
 That list is not exhaustive and is not meant to be: a failure detected by a downstream service carries that service's own code. Branch on the HTTP status, treat an unknown code as a generic error of that status, and log the code and the `uuid` for a support request.
 

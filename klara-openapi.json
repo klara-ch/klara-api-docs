@@ -6766,6 +6766,175 @@
         ]
       }
     },
+    "/core/v1/accounting/tags": {
+      "get": {
+        "tags": [
+          "Accounting"
+        ],
+        "summary": "List the tags used on bookings.",
+        "description": "Returns the tags that occur on the booking lines of the caller's company, the same tags KLARA suggests when a tag is entered in the journal, a booking template or a business case. All booking lines count, whatever the booking status and fiscal year; tags that exist only on a booking template or a business case are not included. Each tag is returned once; a booking line can carry several tags, which are listed separately. Spellings are kept as entered, so <code>Marketing</code> and <code>marketing</code> are two entries. A single tag never contains a comma, because the comma separates the tags of a booking line. With <code>include-combinations=true</code> the list also contains each combination of tags as stored on a booking line, joined with a comma and a space (for example <code>Marketing, Zurich</code>), which is what the KLARA entry screens suggest; a name containing a comma is such a combination. Use the names as <code>tags</code> of a booking line in <code>createBookingV1</code>, or as <code>tags</code> filter in <code>listBankReconciliationOpenPositionsV1</code>, so new bookings reuse the existing spelling; join several tags with a comma without a space (<code>Marketing,Zurich</code>). Unlike the generic description of <code>search-key</code>, this operation splits the search text into words and keeps the tags that contain every word, case-insensitive (<code>zur mark</code> finds <code>Marketing, Zurich</code>). Characters are compared as written: <code>Zurich</code> does not find <code>Zürich</code>. Uses the standard collection parameters: <code>search-key</code>, <code>offset</code> (default 0), <code>limit</code> (default 50, maximum 100), <code>sort-field</code> (only and default <code>NAME</code>) and <code>sort-direction</code> (default DESC, Z to A; pass <code>ASC</code> for alphabetical order). Names are compared ignoring case and by character code, so letters with umlauts or accents sort after <code>z</code>. The number of tags matching the filters, ignoring <code>offset</code> and <code>limit</code>, is returned in the <code>X-Total-Count</code> header; to read everything, repeat the call with <code>offset</code> increased by <code>limit</code> until <code>X-Total-Count</code> is reached. To count the tags only, call with <code>limit=1</code> and read <code>X-Total-Count</code>. This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the <code>ACCOUNTING</code> permission on the company; otherwise the endpoint returns <code>403</code>.",
+        "operationId": "listBookingTagsV1",
+        "parameters": [
+          {
+            "name": "include-combinations",
+            "in": "query",
+            "description": "Also return each combination of tags as stored on one booking line, joined with a comma and a space, as the KLARA entry screens suggest them. <code>true</code> or <code>false</code> (default), case-insensitive.",
+            "required": false,
+            "schema": {
+              "default": "false",
+              "type": "boolean",
+              "example": true
+            },
+            "example": true
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size. Defaults to <code>50</code>; hard cap <code>100</code>. Requests above the cap are rejected with <code>400</code>.",
+            "schema": {
+              "default": "50",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "example": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "0-based pagination offset — the number of rows to skip before the returned page. Defaults to <code>0</code>. Combine with <code>limit</code> to walk the full collection.",
+            "schema": {
+              "default": "0",
+              "minimum": 0,
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "search-key",
+            "in": "query",
+            "description": "Free-text search. The fields searched are documented per endpoint. Matches are case-insensitive substring matches. Maximum length 256 characters.",
+            "schema": {
+              "maxLength": 256,
+              "type": "string",
+              "example": "müller"
+            }
+          },
+          {
+            "name": "sort-direction",
+            "in": "query",
+            "description": "Sort direction. Allowed values: <code>ASC</code>, <code>DESC</code>. Defaults to <code>DESC</code>.",
+            "schema": {
+              "default": "DESC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string",
+              "example": "DESC"
+            }
+          },
+          {
+            "name": "sort-field",
+            "in": "query",
+            "description": "Field to order the result by. The accepted values are listed per endpoint; an unknown value is rejected with <code>400</code>. Each endpoint documents the default it applies, chosen so that paging with <code>offset</code> / <code>limit</code> is stable.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of tags, ordered by name in <code>sort-direction</code> (default DESC, Z to A). Empty array when the company has no tagged booking lines or nothing matches <code>search-key</code>.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Number of tags matching the filters, ignoring <code>offset</code> and <code>limit</code>.",
+                "style": "simple",
+                "schema": {
+                  "format": "int64",
+                  "type": "integer",
+                  "example": 42
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicApiBookingTag"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "<code>sort-field</code> is not <code>NAME</code>, or a parameter is outside its bounds (<code>include-combinations</code> not true or false, <code>search-key</code> longer than 256 characters, <code>offset</code> negative, <code>limit</code> outside 1-100, <code>sort-direction</code> not ASC or DESC).<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>request.sort_field_invalid</code> — sort-field was not one of the values the operation documents. The message lists the accepted values.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "x-error-codes": [
+              {
+                "code": "request.sort_field_invalid",
+                "meaning": "sort-field was not one of the values the operation documents. The message lists the accepted values."
+              }
+            ]
+          },
+          "401": {
+            "description": "No Authorization header found or invalid token<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user is not allowed to access this company data<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "API rate limit exceeded<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong on our side while processing the request. Please kindly contact our support.<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/core/v1/accounting/vat-profile": {
       "get": {
         "tags": [
@@ -7488,7 +7657,445 @@
         ]
       }
     },
+    "/core/v1/bank-transactions": {
+      "get": {
+        "tags": [
+          "Accounting"
+        ],
+        "summary": "List bank transactions that are not reconciled yet.",
+        "description": "Returns the bank transactions of the caller's company that are not reconciled yet, as listed in KLARA under Accounting &gt; Bank reconciliation. Only transactions of the company's bank accounts are returned, each with the <code>bankAccountId</code> from <code>listCompanyBankAccounts</code>; transactions of a bank account that no longer exists are left out, as in KLARA. To find the accounts of one bank, read <code>swissBank.name</code> in <code>listCompanyBankAccounts</code>. Credit card transactions are not included. A transaction counts as reconciled as soon as it is booked, also when it only partly settles an open item; reconciled transactions are never returned. An empty result for a payment reference therefore means either that no such payment arrived or that it is already reconciled; for the payment status of an invoice use <code>listBankReconciliationOpenPositionsV1</code> with <code>position-status</code>. Amounts are the full amounts of the bank entry and always positive; <code>direction</code> tells whether money was received (<code>CREDIT</code>) or paid out (<code>DEBIT</code>). <code>amount</code> is set for entries in CHF. For entries in any other currency, including WIR (<code>CHW</code>), <code>amount</code> is empty and the amount is in <code>foreignAmount</code> with the currency in <code>foreignCurrency</code>; no CHF equivalent is provided. There is no server-side total: to sum amounts, read all pages sorted by <code>ID</code> ascending, and keep in mind that transactions reconciled in the meantime drop out of the list. Use <code>paymentReference</code>, <code>remittanceText</code> and <code>counterpartyName</code> to find the matching open item, for example with <code>listBankReconciliationOpenPositionsV1</code> (use <code>action=filter</code> there so that all conditions apply; money received matches receivables, money paid out matches payables). Reconciling a transaction through the public API is not available yet; the <code>id</code> identifies the transaction for that future operation. Filter with <code>bank-account-id</code>, <code>booking-date-from</code> and <code>booking-date-to</code> (booking date, inclusive, <code>yyyy-MM-dd</code>) and <code>direction</code>; unlike the generic description of <code>search-key</code>, it matches counterparty name, remittance text, payment reference or additional information (contains, case-insensitive, spaces are not ignored). Sort with <code>sort-field</code> <code>BOOKING_DATE</code> (default), <code>VALUE_DATE</code>, <code>AMOUNT</code> or <code>ID</code>; ties are ordered by <code>ID</code>, empty values come last. Uses the standard collection parameters: <code>search-key</code>, <code>offset</code> (default 0), <code>limit</code> (default 50, maximum 100), <code>sort-field</code> and <code>sort-direction</code> (default DESC, newest first). The number of transactions matching the filters, ignoring <code>offset</code> and <code>limit</code>, is returned in the <code>X-Total-Count</code> header; to read everything, repeat the call with <code>offset</code> increased by <code>limit</code> until <code>X-Total-Count</code> is reached. This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the <code>ACCOUNTING</code> permission on the company, and <code>FINANCE_BANK_ACCOUNT</code> to read the bank accounts (every role with <code>ACCOUNTING</code> holds it); otherwise the endpoint returns <code>403</code>.",
+        "operationId": "listBankTransactionsV1",
+        "parameters": [
+          {
+            "name": "bank-account-id",
+            "in": "query",
+            "description": "Only transactions of this company bank account, as returned by <code>listCompanyBankAccounts</code>. An id that is not a bank account of the company returns an empty list.",
+            "required": false,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer",
+              "example": 3
+            },
+            "example": 3
+          },
+          {
+            "name": "booking-date-from",
+            "in": "query",
+            "description": "Only transactions booked on or after this date, ISO <code>yyyy-MM-dd</code>.",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+              "example": "2026-10-01"
+            },
+            "example": "2026-10-01"
+          },
+          {
+            "name": "booking-date-to",
+            "in": "query",
+            "description": "Only transactions booked on or before this date, ISO <code>yyyy-MM-dd</code>; not before <code>booking-date-from</code>.",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+              "example": "2026-10-15"
+            },
+            "example": "2026-10-15"
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "description": "<code>CREDIT</code> for money received, <code>DEBIT</code> for money paid out; both when omitted. Case-insensitive.",
+            "required": false,
+            "schema": {
+              "enum": [
+                "CREDIT",
+                "DEBIT"
+              ],
+              "type": "string",
+              "example": "CREDIT"
+            },
+            "example": "CREDIT"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size. Defaults to <code>50</code>; hard cap <code>100</code>. Requests above the cap are rejected with <code>400</code>.",
+            "schema": {
+              "default": "50",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "example": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "0-based pagination offset — the number of rows to skip before the returned page. Defaults to <code>0</code>. Combine with <code>limit</code> to walk the full collection.",
+            "schema": {
+              "default": "0",
+              "minimum": 0,
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "search-key",
+            "in": "query",
+            "description": "Free-text search. The fields searched are documented per endpoint. Matches are case-insensitive substring matches. Maximum length 256 characters.",
+            "schema": {
+              "maxLength": 256,
+              "type": "string",
+              "example": "müller"
+            }
+          },
+          {
+            "name": "sort-direction",
+            "in": "query",
+            "description": "Sort direction. Allowed values: <code>ASC</code>, <code>DESC</code>. Defaults to <code>DESC</code>.",
+            "schema": {
+              "default": "DESC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string",
+              "example": "DESC"
+            }
+          },
+          {
+            "name": "sort-field",
+            "in": "query",
+            "description": "Field to order the result by. The accepted values are listed per endpoint; an unknown value is rejected with <code>400</code>. Each endpoint documents the default it applies, chosen so that paging with <code>offset</code> / <code>limit</code> is stable.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of transactions, ordered by <code>sort-field</code>. Empty array when the company has no bank account or no unreconciled transaction matches.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Number of transactions matching the filters, ignoring <code>offset</code> and <code>limit</code>.",
+                "style": "simple",
+                "schema": {
+                  "format": "int64",
+                  "type": "integer",
+                  "example": 42
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicApiBankTransaction"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "<code>booking-date-from</code> or <code>booking-date-to</code> is not an ISO date or the range is inverted, <code>sort-field</code> is not one of the documented values, or a parameter is outside its bounds (<code>bank-account-id</code> below 1, <code>direction</code> not CREDIT or DEBIT, <code>search-key</code> longer than 256 characters, <code>offset</code> negative, <code>limit</code> outside 1-100, <code>sort-direction</code> not ASC or DESC).<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>request.sort_field_invalid</code> — sort-field was not one of the values the operation documents. The message lists the accepted values.</li><li><code>banktransaction.booking_date_invalid</code> — booking-date-from or booking-date-to was not an ISO date of the form yyyy-MM-dd, or booking-date-to was before booking-date-from.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "x-error-codes": [
+              {
+                "code": "request.sort_field_invalid",
+                "meaning": "sort-field was not one of the values the operation documents. The message lists the accepted values."
+              },
+              {
+                "code": "banktransaction.booking_date_invalid",
+                "meaning": "booking-date-from or booking-date-to was not an ISO date of the form yyyy-MM-dd, or booking-date-to was before booking-date-from."
+              }
+            ]
+          },
+          "401": {
+            "description": "No Authorization header found or invalid token<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user is not allowed to access this company data<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "API rate limit exceeded<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong on our side while processing the request. Please kindly contact our support.<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/core/v1/bookings": {
+      "get": {
+        "tags": [
+          "Accounting"
+        ],
+        "summary": "Search the journal: list bookings by text, booking date, amount or tag.",
+        "description": "Returns the bookings of the caller's company, as listed in KLARA under Accounting &gt; Journal, newest first (booking date, then id, both descending). Each entry is the booking header: <code>title</code> (the text of the first booking line), <code>totalAmount</code> (sum of the credit lines), dates, document ids and internal comment. The debit and credit lines are not part of this list; read them per booking with <code>getBookingV1</code> and the <code>id</code>. The list covers all fiscal years and every booking status (planned, booked, locked, sealed, inactive), like the journal; filter by booking date for one year, and use <code>listCurrentCompanyFinancialYearsV1</code> when a request means a fiscal year. A booking that consists only of delimitation lines is not listed, and delimitation lines never satisfy a filter. <code>search-key</code> is split into words at spaces and keeps the bookings in which any word occurs (contains, case-insensitive, no umlaut or accent folding, so <code>Miete</code> also finds <code>Mieter</code>) in the description of a booking line (the title is the first one) or in the stored internal comment (HTML markup included). A word that is a number also finds bookings with exactly that account code on a line, the booking with that id, and bookings linked to that booking; there is no filter for an account code alone. <code>booking-date-from</code> and <code>booking-date-to</code> filter by booking date (inclusive, <code>yyyy-MM-dd</code>). <code>amount-from</code> and <code>amount-to</code> keep bookings with at least one line whose amount is in the range (both inclusive; for more than 1000 send <code>amount-from=1000.01</code>); this is the line amount, not <code>totalAmount</code>. <code>tags</code> takes a comma-separated list and keeps bookings with a line that carries any of the tags (contains, case-insensitive: <code>Marketing</code> also finds <code>Online-Marketing</code>; there is no exact match); take the names from <code>listBookingTagsV1</code>. All conditions are checked per line: a booking is listed if one of its lines meets the amount and tag conditions and the search matches that line or the booking header. Uses the standard collection parameters: <code>search-key</code>, <code>offset</code> (default 0), <code>limit</code> (default 50, maximum 100); the order is fixed, <code>sort-field</code> accepts only <code>BOOKING_DATE</code> and <code>sort-direction</code> only <code>DESC</code> (<code>ASC</code> answers 400). The number of bookings matching the filters, ignoring <code>offset</code> and <code>limit</code>, is returned in the <code>X-Total-Count</code> header; to only count, call with <code>limit=1</code>. To read everything, repeat the call with <code>offset</code> increased by <code>limit</code> until <code>X-Total-Count</code> is reached; new bookings appear at the start and shift later pages, so fix <code>booking-date-to</code> for a stable export and remove duplicates by <code>id</code>. This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the <code>ACCOUNTING</code> permission on the company; otherwise the endpoint returns <code>403</code>.",
+        "operationId": "listBookingsV1",
+        "parameters": [
+          {
+            "name": "amount-from",
+            "in": "query",
+            "description": "Only bookings with at least one line whose amount is at least this value (CHF, line amounts are always positive). Applies to a line, not to the booking amount.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "example": 100
+            },
+            "example": 100
+          },
+          {
+            "name": "amount-to",
+            "in": "query",
+            "description": "Only bookings with at least one line whose amount is at most this value; not below <code>amount-from</code>. Applies to the same line as <code>amount-from</code>.",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "example": 5000
+            },
+            "example": 5000
+          },
+          {
+            "name": "booking-date-from",
+            "in": "query",
+            "description": "Only bookings with a booking date on or after this date, ISO <code>yyyy-MM-dd</code>.",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+              "example": "2026-01-01"
+            },
+            "example": "2026-01-01"
+          },
+          {
+            "name": "booking-date-to",
+            "in": "query",
+            "description": "Only bookings with a booking date on or before this date, ISO <code>yyyy-MM-dd</code>; not before <code>booking-date-from</code>.",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+              "example": "2026-12-31"
+            },
+            "example": "2026-12-31"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size. Defaults to <code>50</code>; hard cap <code>100</code>. Requests above the cap are rejected with <code>400</code>.",
+            "schema": {
+              "default": "50",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "example": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "0-based pagination offset — the number of rows to skip before the returned page. Defaults to <code>0</code>. Combine with <code>limit</code> to walk the full collection.",
+            "schema": {
+              "default": "0",
+              "minimum": 0,
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "search-key",
+            "in": "query",
+            "description": "Free-text search. The fields searched are documented per endpoint. Matches are case-insensitive substring matches. Maximum length 256 characters.",
+            "schema": {
+              "maxLength": 256,
+              "type": "string",
+              "example": "müller"
+            }
+          },
+          {
+            "name": "sort-direction",
+            "in": "query",
+            "description": "Sort direction. Allowed values: <code>ASC</code>, <code>DESC</code>. Defaults to <code>DESC</code>.",
+            "schema": {
+              "default": "DESC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string",
+              "example": "DESC"
+            }
+          },
+          {
+            "name": "sort-field",
+            "in": "query",
+            "description": "Field to order the result by. The accepted values are listed per endpoint; an unknown value is rejected with <code>400</code>. Each endpoint documents the default it applies, chosen so that paging with <code>offset</code> / <code>limit</code> is stable.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "Comma-separated tags; keeps bookings with a line carrying any of them (contains, case-insensitive). Tag names come from <code>listBookingTagsV1</code>.",
+            "required": false,
+            "schema": {
+              "maxLength": 256,
+              "type": "string",
+              "example": "Marketing,Zurich"
+            },
+            "example": "Marketing,Zurich"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of bookings, newest first. Empty array when no booking matches.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Number of bookings matching the filters, ignoring <code>offset</code> and <code>limit</code>.",
+                "style": "simple",
+                "schema": {
+                  "format": "int64",
+                  "type": "integer",
+                  "example": 42
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicApiBookingSummary"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "<code>booking-date-from</code> or <code>booking-date-to</code> is not an ISO date or the range is inverted, <code>amount-to</code> is below <code>amount-from</code>, <code>sort-field</code> is not <code>BOOKING_DATE</code>, <code>sort-direction</code> is <code>ASC</code>, or a parameter is outside its bounds (<code>amount-from</code> or <code>amount-to</code> not a decimal number, <code>search-key</code> or <code>tags</code> longer than 256 characters, <code>offset</code> negative, <code>limit</code> outside 1-100, <code>sort-direction</code> not ASC or DESC).<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>request.sort_field_invalid</code> — sort-field was not one of the values the operation documents. The message lists the accepted values.</li><li><code>request.sort_direction_unsupported</code> — sort-direction=ASC was sent to an operation whose order is fixed; only DESC is available.</li><li><code>booking.booking_date_invalid</code> — booking-date-from or booking-date-to was not an ISO date of the form yyyy-MM-dd, or booking-date-to was before booking-date-from.</li><li><code>booking.amount_range_invalid</code> — amount-to was below amount-from.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "x-error-codes": [
+              {
+                "code": "request.sort_field_invalid",
+                "meaning": "sort-field was not one of the values the operation documents. The message lists the accepted values."
+              },
+              {
+                "code": "request.sort_direction_unsupported",
+                "meaning": "sort-direction=ASC was sent to an operation whose order is fixed; only DESC is available."
+              },
+              {
+                "code": "booking.booking_date_invalid",
+                "meaning": "booking-date-from or booking-date-to was not an ISO date of the form yyyy-MM-dd, or booking-date-to was before booking-date-from."
+              },
+              {
+                "code": "booking.amount_range_invalid",
+                "meaning": "amount-to was below amount-from."
+              }
+            ]
+          },
+          "401": {
+            "description": "No Authorization header found or invalid token<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user is not allowed to access this company data<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "API rate limit exceeded<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong on our side while processing the request. Please kindly contact our support.<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
       "post": {
         "tags": [
           "Accounting"
@@ -7542,7 +8149,7 @@
           }
         ],
         "requestBody": {
-          "description": "The booking to create, including its at-least-two balanced debit/credit lines.<br/><br/><strong>Prerequisite APIs — call these first to obtain valid values:</strong><br/><ul><li><code>GET /core/v1/accounting/accounts</code> → provides valid <code>accountCode</code> values (e.g. 1020, 1100, 2000, 3200). Only use this endpoint when you want to implement a seperate combobox with a flat master account list without sub-account context.</li><li><code>GET /core/v1/accounting/accounts/account-displaying</code> → provide full details about all valid, selectable accounts (combine name, combine code, master account, sub-account details when available). <strong>PREFERRED</strong> to use this endpoint as the booking line for some account code <strong>MUST</strong> include sub-account links if the sub-account exists.</li><li><code>POST /core/latest/companies/{company-id}/documents</code> → upload supporting documents (invoices, receipts, bank statements) and collect the returned <code>documentId</code> values to populate <code>documentIds</code>. <strong>This step should be done BEFORE invoking the booking creation</strong>. <strong>Important:</strong> when calling this endpoint for booking creation, always use <code>category = LIABILITY_UPLOAD</code> — no other category is permitted in this context (the documents are automatically moved to <code>LIABILITIES</code> when the booking is created successfully). The GUI for booking creation must always provide a document-upload step using the <code>LIABILITY_UPLOAD</code> category.</li><li><code>GET /core/v1/accounting/booking-types</code> → provides valid <code>bookingTypeCode</code> values (e.g. AR_PAYMENT, AP_INVOICE, GENERAL_LEDGER)</li><li><code>GET /core/latest/vat-cases</code> → provides VAT case IDs for the <code>vat_case</code> link key</li><li><code>GET /core/v1/accounting/master-vats</code> → provides master VAT rate IDs for the <code>vat_rate</code> link key</li><li><code>GET /core/v1/accounting/vat-suggestions?direction=PURCHASE|SALE&amp;amount=…&amp;date=…</code> → <strong>RECOMMENDED for VAT.</strong> Returns ready-to-use bundles; from the <code>recommended</code> row copy <code>vatCaseLink</code> and <code>vatRateLink</code> straight into the line's <code>links</code> (comma-joined) and <code>vatAccountCode</code> onto the line. Use with <code>autoCalculateVat=true</code> (see VAT auto-calculation below).</li><li><code>GET /core/v1/accounting/vat-profile?date=…</code> → the company VAT regime (effective vs net-tax-rate). Informational: it explains how the server will split the amount; you do not copy it into the booking.</li></ul><strong>Top-level fields:</strong><br/><ul><li><code>id</code> (long) — Server-assigned. Set to <code>0</code> for new bookings.</li><li><code>companyId</code> (long) — Server-derived from token. Set to <code>0</code>.</li><li><code>bookingDate</code> (string, yyyy-MM-ddT00:00:00Z, <strong>required</strong>) — Must fall in an open fiscal year.</li><li><code>documentIds</code> (array of string) — IDs of attached documents (gather from <code>POST /core/latest/companies/{company-id}/documents</code> with <code>category = LIABILITY_UPLOAD</code>). The documents are automatically moved to <code>LIABILITIES</code> on success booking creation. <strong>A GUI implementing booking creation must always provide a document-upload step</strong> — omitting it is only acceptable for purely internal adjustments where no document exists, in which case <code>documentIds</code> may be left empty (<code>[]</code>).</li><li><code>internalComment</code> (string) — Internal note visible only to accounting users.</li><li><code>bookingStatus</code> (string) — Allowed: <code>DRAFT</code>, <code>BOOKED</code>, <code>CANCELLED</code>.</li><li><code>bookingDetails</code> (array, <strong>required</strong>) — At least 2 balanced debit/credit lines (see below).</li><li><code>expand</code> (boolean) — UI hint. Use <code>false</code>.</li><li><code>viewDocument</code> (boolean) — UI hint. Use <code>false</code>.</li></ul><strong>bookingDetails[] fields:</strong><br/><ul><li><code>id</code> (long) — Server-assigned. Set to <code>0</code>.</li><li><code>seq</code> (int) — Line order starting at 0.</li><li><code>accountCode</code> (int, <strong>required</strong>) — From <code>GET /core/v1/accounting/accounts</code> or <code>GET /core/v1/accounting/accounts/account-displaying</code> (preferred; includes sub-account context when it exists).</li><li><code>crdrType</code> (string, <strong>required</strong>) — <code>DR</code> (debit) or <code>CR</code> (credit).</li><li><code>description</code> (string) — Free-text line description.</li><li><code>amount</code> (decimal, <strong>required</strong>) — Always positive. Total DR must equal total CR.</li><li><code>tags</code> (string, <strong>required</strong>) — Comma-separated list of string tags. Each tag should represent a topic that the booking line should be associated with, e.g. Operating Expenses. Tags are free-form and have no semantic meaning to KLARA; they are simply stored and returned as-is. Provide at least one tag per line.</li><li><code>links</code> (string) — Comma-separated structured links. Two uses: (a) sub-account entities for the line's account code (from <code>GET /core/v1/accounting/accounts/account-displaying</code>); and (b) VAT links <code>vat_case:…</code> + <code>vat_rate:…</code> (from <code>GET /core/v1/accounting/vat-suggestions</code>) when this line carries VAT. Can be empty when neither applies.</li><li><code>bookingTypeCode</code> (string) — From <code>GET /core/v1/accounting/booking-types</code>.</li><li><code>vatAccountCode</code> (int) — <strong>Only with <code>autoCalculateVat=true</code>.</strong> The account the generated VAT line posts to (e.g. 1170); from the <code>vatAccountCode</code> of a <code>vat-suggestions</code> row.</li><li><code>isExcludeVatAmount</code> (boolean) — <strong>Only with <code>autoCalculateVat=true</code>.</strong> <code>false</code> = <code>amount</code> includes VAT (gross); <code>true</code> = <code>amount</code> excludes VAT (net base).</li><li><code>isrReference</code> (string) — ISR/QR-bill reference. Empty if not applicable.</li><li><code>isrMember</code> (string) — ISR participant number. Empty if not applicable.</li><li><code>partnerIban</code> (string) — Counterpart IBAN for payments. Empty if not applicable.</li><li><code>vatBookingDetail</code> (boolean) — Set to <code>false</code> for manual lines.</li></ul><strong>VAT auto-calculation (<code>autoCalculateVat=true</code>) — book like the Manual booking GUI without doing VAT math:</strong><br/><ol><li>Call <code>GET /core/v1/accounting/vat-suggestions?direction=PURCHASE|SALE&amp;amount=&lt;gross&gt;&amp;date=&lt;bookingDate&gt;</code> and take the <code>recommended</code> row.</li><li>On the VAT-bearing line set: <code>links = \"&lt;vatCaseLink&gt;,&lt;vatRateLink&gt;\"</code> (both values verbatim from that row), <code>vatAccountCode = &lt;row.vatAccountCode&gt;</code>, <code>amount = &lt;your gross or net&gt;</code>, and <code>isExcludeVatAmount</code> matching the <code>amountKind</code> you queried (<code>false</code> = gross).</li><li><strong>Do NOT add the VAT counterpart line yourself</strong> — the server derives the net/VAT split and generates it (matching the row's <code>previewNet</code>/<code>previewVat</code>). Provide only your account line(s) + the balancing line.</li></ol>The split depends on the company VAT regime from <code>vat-profile</code> (effective → net + VAT line; net-tax-rate → flat-rate split; reverse-charge → an extra reverse VAT line). When <code>autoCalculateVat</code> is omitted/<code>false</code> you must instead pre-split and pre-compute every line yourself (see the \"Invoice received/sent\" examples).<br/><br/><strong>Rules:</strong> Minimum 2 lines; total DR = total CR (after server VAT expansion when <code>autoCalculateVat=true</code>); amounts always positive; bookingDate in open fiscal year.",
+          "description": "The booking to create, including its at-least-two balanced debit/credit lines.<br/><br/><strong>Prerequisite APIs — call these first to obtain valid values:</strong><br/><ul><li><code>GET /core/v1/accounting/accounts</code> → provides valid <code>accountCode</code> values (e.g. 1020, 1100, 2000, 3200). Only use this endpoint when you want to implement a seperate combobox with a flat master account list without sub-account context.</li><li><code>GET /core/v1/accounting/accounts/account-displaying</code> → provide full details about all valid, selectable accounts (combine name, combine code, master account, sub-account details when available). <strong>PREFERRED</strong> to use this endpoint as the booking line for some account code <strong>MUST</strong> include sub-account links if the sub-account exists.</li><li><code>POST /core/latest/companies/{company-id}/documents</code> → upload supporting documents (invoices, receipts, bank statements) and collect the returned <code>documentId</code> values to populate <code>documentIds</code>. <strong>This step should be done BEFORE invoking the booking creation</strong>. <strong>Important:</strong> when calling this endpoint for booking creation, always use <code>category = LIABILITY_UPLOAD</code> — no other category is permitted in this context (the documents are automatically moved to <code>LIABILITIES</code> when the booking is created successfully). The GUI for booking creation must always provide a document-upload step using the <code>LIABILITY_UPLOAD</code> category.</li><li><code>GET /core/v1/accounting/booking-types</code> → provides valid <code>bookingTypeCode</code> values (e.g. AR_PAYMENT, AP_INVOICE, GENERAL_LEDGER)</li><li><code>GET /core/v1/accounting/tags</code> (<code>listBookingTagsV1</code>) → the tags the company already uses on its booking lines; reuse their spelling in <code>tags</code> instead of creating a new variant</li><li><code>GET /core/latest/vat-cases</code> → provides VAT case IDs for the <code>vat_case</code> link key</li><li><code>GET /core/v1/accounting/master-vats</code> → provides master VAT rate IDs for the <code>vat_rate</code> link key</li><li><code>GET /core/v1/accounting/vat-suggestions?direction=PURCHASE|SALE&amp;amount=…&amp;date=…</code> → <strong>RECOMMENDED for VAT.</strong> Returns ready-to-use bundles; from the <code>recommended</code> row copy <code>vatCaseLink</code> and <code>vatRateLink</code> straight into the line's <code>links</code> (comma-joined) and <code>vatAccountCode</code> onto the line. Use with <code>autoCalculateVat=true</code> (see VAT auto-calculation below).</li><li><code>GET /core/v1/accounting/vat-profile?date=…</code> → the company VAT regime (effective vs net-tax-rate). Informational: it explains how the server will split the amount; you do not copy it into the booking.</li></ul><strong>Top-level fields:</strong><br/><ul><li><code>id</code> (long) — Server-assigned. Set to <code>0</code> for new bookings.</li><li><code>companyId</code> (long) — Server-derived from token. Set to <code>0</code>.</li><li><code>bookingDate</code> (string, yyyy-MM-ddT00:00:00Z, <strong>required</strong>) — Must fall in an open fiscal year.</li><li><code>documentIds</code> (array of string) — IDs of attached documents (gather from <code>POST /core/latest/companies/{company-id}/documents</code> with <code>category = LIABILITY_UPLOAD</code>). The documents are automatically moved to <code>LIABILITIES</code> on success booking creation. <strong>A GUI implementing booking creation must always provide a document-upload step</strong> — omitting it is only acceptable for purely internal adjustments where no document exists, in which case <code>documentIds</code> may be left empty (<code>[]</code>).</li><li><code>internalComment</code> (string) — Internal note visible only to accounting users.</li><li><code>bookingStatus</code> (string) — Allowed: <code>DRAFT</code>, <code>BOOKED</code>, <code>CANCELLED</code>.</li><li><code>bookingDetails</code> (array, <strong>required</strong>) — At least 2 balanced debit/credit lines (see below).</li><li><code>expand</code> (boolean) — UI hint. Use <code>false</code>.</li><li><code>viewDocument</code> (boolean) — UI hint. Use <code>false</code>.</li></ul><strong>bookingDetails[] fields:</strong><br/><ul><li><code>id</code> (long) — Server-assigned. Set to <code>0</code>.</li><li><code>seq</code> (int) — Line order starting at 0.</li><li><code>accountCode</code> (int, <strong>required</strong>) — From <code>GET /core/v1/accounting/accounts</code> or <code>GET /core/v1/accounting/accounts/account-displaying</code> (preferred; includes sub-account context when it exists).</li><li><code>crdrType</code> (string, <strong>required</strong>) — <code>DR</code> (debit) or <code>CR</code> (credit).</li><li><code>description</code> (string) — Free-text line description.</li><li><code>amount</code> (decimal, <strong>required</strong>) — Always positive. Total DR must equal total CR.</li><li><code>tags</code> (string, <strong>required</strong>) — Comma-separated list of string tags. Each tag should represent a topic that the booking line should be associated with, e.g. Operating Expenses. Tags are free-form and have no semantic meaning to KLARA; they are simply stored and returned as-is. Reuse the existing spelling from <code>listBookingTagsV1</code>, and separate several tags with a comma without a space (<code>Marketing,Zurich</code>). Provide at least one tag per line.</li><li><code>links</code> (string) — Comma-separated structured links. Two uses: (a) sub-account entities for the line's account code (from <code>GET /core/v1/accounting/accounts/account-displaying</code>); and (b) VAT links <code>vat_case:…</code> + <code>vat_rate:…</code> (from <code>GET /core/v1/accounting/vat-suggestions</code>) when this line carries VAT. Can be empty when neither applies.</li><li><code>bookingTypeCode</code> (string) — From <code>GET /core/v1/accounting/booking-types</code>.</li><li><code>vatAccountCode</code> (int) — <strong>Only with <code>autoCalculateVat=true</code>.</strong> The account the generated VAT line posts to (e.g. 1170); from the <code>vatAccountCode</code> of a <code>vat-suggestions</code> row.</li><li><code>isExcludeVatAmount</code> (boolean) — <strong>Only with <code>autoCalculateVat=true</code>.</strong> <code>false</code> = <code>amount</code> includes VAT (gross); <code>true</code> = <code>amount</code> excludes VAT (net base).</li><li><code>isrReference</code> (string) — ISR/QR-bill reference. Empty if not applicable.</li><li><code>isrMember</code> (string) — ISR participant number. Empty if not applicable.</li><li><code>partnerIban</code> (string) — Counterpart IBAN for payments. Empty if not applicable.</li><li><code>vatBookingDetail</code> (boolean) — Set to <code>false</code> for manual lines.</li></ul><strong>VAT auto-calculation (<code>autoCalculateVat=true</code>) — book like the Manual booking GUI without doing VAT math:</strong><br/><ol><li>Call <code>GET /core/v1/accounting/vat-suggestions?direction=PURCHASE|SALE&amp;amount=&lt;gross&gt;&amp;date=&lt;bookingDate&gt;</code> and take the <code>recommended</code> row.</li><li>On the VAT-bearing line set: <code>links = \"&lt;vatCaseLink&gt;,&lt;vatRateLink&gt;\"</code> (both values verbatim from that row), <code>vatAccountCode = &lt;row.vatAccountCode&gt;</code>, <code>amount = &lt;your gross or net&gt;</code>, and <code>isExcludeVatAmount</code> matching the <code>amountKind</code> you queried (<code>false</code> = gross).</li><li><strong>Do NOT add the VAT counterpart line yourself</strong> — the server derives the net/VAT split and generates it (matching the row's <code>previewNet</code>/<code>previewVat</code>). Provide only your account line(s) + the balancing line.</li></ol>The split depends on the company VAT regime from <code>vat-profile</code> (effective → net + VAT line; net-tax-rate → flat-rate split; reverse-charge → an extra reverse VAT line). When <code>autoCalculateVat</code> is omitted/<code>false</code> you must instead pre-split and pre-compute every line yourself (see the \"Invoice received/sent\" examples).<br/><br/><strong>Rules:</strong> Minimum 2 lines; total DR = total CR (after server VAT expansion when <code>autoCalculateVat=true</code>); amounts always positive; bookingDate in open fiscal year.",
           "content": {
             "application/json": {
               "schema": {
@@ -8033,6 +8640,127 @@
         ]
       }
     },
+    "/core/v1/bookings/{bookingId}": {
+      "get": {
+        "tags": [
+          "Accounting"
+        ],
+        "summary": "Read one booking with all its debit and credit lines.",
+        "description": "Returns one booking of the caller's company with all its lines, as shown when a booking is expanded in KLARA under Accounting &gt; Journal. Take the <code>bookingId</code> from <code>listBookingsV1</code> or from <code>connectedLines</code>; booking ids are unique within the tenant. The header carries the same <code>title</code> and <code>totalAmount</code> as in <code>listBookingsV1</code> (text of the line with position 1, sum of all credit lines). <code>lines</code> holds every line in the order KLARA shows them, including VAT lines (separate lines on the VAT account) and delimitation lines (<code>bookingType</code> <code>DELIMIT</code>); a booking that consists only of delimitation lines can be read here although <code>listBookingsV1</code> does not list it. Each line has its account (number and name), <code>side</code> (<code>DEBIT</code> or <code>CREDIT</code>) and <code>amount</code> in CHF (always positive), the posting text, tags, the kind of line (<code>bookingType</code>), the VAT rate, a foreign currency amount, the open-item state of invoice and payment lines with due date, paid date and <code>overdue</code>, the service period, and who changed the line last (<code>lastModifiedBy</code>: an e-mail address, an API key name or <code>SYSTEM</code>; <code>lastModifiedAt</code> in UTC; a line never changed shows its creation). <code>references</code> lists the objects a line refers to, with type, id and the name KLARA shows now: customers and suppliers (same ids as in <code>listCustomersV1</code>; the partner of an invoice or payment is on its <code>AR_*</code> or <code>AP_*</code> line), company bank accounts (<code>listCompanyBankAccounts</code>), bank transactions, VAT cases, invoices, payments, employees, social insurances, salary runs, tax-at-source cantons, KLARA's built-in gift-card and miscellaneous partner entries, and sub-accounts of the chart of accounts (with <code>category</code>); a name is missing when it could not be resolved. <code>connectedLines</code> lists the lines of other bookings a line is connected to: <code>RECONCILIATION</code> (a payment or bank reconciliation against an open item; listed on every line involved, so the invoice line lists each payment line and the payment line each invoice line), <code>DELIMITATION</code> (accrual), <code>PREPAYMENT_CLEARING</code>, <code>CREDIT_NOTE_CLEARING</code> and <code>MAIN_LINE</code> (the line this automatically created line was derived from, for example a VAT line booked with a payment that points to the revenue line of the invoice); read the connected booking with this operation and its <code>bookingId</code>. Not returned: the booking status (planned and inactive bookings are returned like booked ones, as the journal shows them), the amount still open on an open item (use <code>listCustomerOpenPositionsV1</code>), the VAT amount of a line, the amount a single reconciliation settled, and who changed the booking header (date, comment, documents). Reading the lines of many bookings takes one call per booking. Empty values and empty lists are left out. Account names and reference names follow <code>Accept-Language</code>. Returns <code>404</code> with code <code>booking.unknown</code> when no booking with this id exists in the caller's company; a booking of another company is answered the same way, to read it a token for that company is needed. A <code>bookingId</code> that is not a number also answers <code>404</code> (no such path). This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the <code>ACCOUNTING</code> permission on the company; otherwise the endpoint returns <code>403</code>; a <code>403</code> never means that the booking exists.",
+        "operationId": "getBookingV1",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "in": "path",
+            "description": "Id of the booking, from the <code>id</code> of <code>listBookingsV1</code>.",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer",
+              "example": 4321
+            },
+            "example": 4321
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "description": "Language of account names and reference names, as in KLARA (for example <code>de-CH</code>, <code>fr-CH</code>, <code>it-CH</code>, <code>en</code>); default the tenant's language.",
+            "schema": {
+              "type": "string",
+              "example": "de-CH"
+            },
+            "example": "de-CH"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The booking with all its lines.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicApiBookingWithLines"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "<code>bookingId</code> is below 1.<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No Authorization header found or invalid token<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user is not allowed to access this company data<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No booking with this id exists in the caller's company, or <code>bookingId</code> is not a number.<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>booking.unknown</code> — No booking with this id exists in the caller's company.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "x-error-codes": [
+              {
+                "code": "booking.unknown",
+                "meaning": "No booking with this id exists in the caller's company."
+              }
+            ]
+          },
+          "429": {
+            "description": "API rate limit exceeded<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong on our side while processing the request. Please kindly contact our support.<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/core/v1/bookings/{id}/documents": {
       "put": {
         "tags": [
@@ -8394,6 +9122,208 @@
           },
           "429": {
             "description": "API rate limit exceeded<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          },
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/core/v1/customers/{customerId}/open-positions": {
+      "get": {
+        "tags": [
+          "Accounting"
+        ],
+        "summary": "List the open items of one customer or supplier.",
+        "description": "Returns the open receivables (<code>position-type=RECEIVABLE</code>, default) or open payables (<code>position-type=PAYABLE</code>) of one customer or supplier of the caller's company, as shown in KLARA under Accounting &gt; Open positions. Each item carries the amount still open at <code>reference-date</code> (default: today) and its history: when it was booked, which payments, credit notes or prepayments were reconciled against it, which payment reminders were sent and when the next one is planned (receivables), or when the next payment is due (payables). Obtain <code>customerId</code> from <code>listCustomersV1</code>; suppliers are customers in KLARA and use the same id. An unknown id, an id of another company, or a partner without open items returns an empty list, so check the id with <code>listCustomersV1</code> if the list is unexpectedly empty. To cover all customers or suppliers, page through <code>listCustomersV1</code> and call this operation once per customer. Items that reduce the balance (credit notes and prepayments) carry a negative <code>openAmount</code> and <code>totalAmount</code>, so the sum of <code>openAmount</code> is the net amount still owed. <code>search-key</code> matches the posting text (contains, case-insensitive) or, when the whole text is a date of the form <code>dd.MM.yyyy</code>, the due date. Sort with <code>sort-field</code> <code>ID</code> (default), <code>DUE_DATE</code> or <code>OPEN_AMOUNT</code>; items without a value come last. Uses the standard collection parameters: <code>search-key</code>, <code>offset</code> (default 0), <code>limit</code> (default 50, maximum 100), <code>sort-field</code> and <code>sort-direction</code> (default DESC). The number of rows matching the filters, ignoring <code>offset</code> and <code>limit</code>, is returned in the <code>X-Total-Count</code> header; to read everything, repeat the call with <code>offset</code> increased by <code>limit</code> until <code>X-Total-Count</code> is reached. Do not use <code>listBankReconciliationOpenPositionsV1</code> for this purpose: it lists candidates for reconciling a bank or credit-card transaction, without reference date and without history. This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the <code>ACCOUNTING</code> permission on the company; otherwise the endpoint returns <code>403</code>.",
+        "operationId": "listCustomerOpenPositionsV1",
+        "parameters": [
+          {
+            "name": "customerId",
+            "in": "path",
+            "description": "Id of the customer or supplier, as returned by <code>listCustomersV1</code>.",
+            "required": true,
+            "schema": {
+              "format": "int64",
+              "minimum": 1,
+              "type": "integer",
+              "example": 37
+            },
+            "example": 37
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size. Defaults to <code>50</code>; hard cap <code>100</code>. Requests above the cap are rejected with <code>400</code>.",
+            "schema": {
+              "default": "50",
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer",
+              "example": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "0-based pagination offset — the number of rows to skip before the returned page. Defaults to <code>0</code>. Combine with <code>limit</code> to walk the full collection.",
+            "schema": {
+              "default": "0",
+              "minimum": 0,
+              "type": "integer",
+              "example": 0
+            }
+          },
+          {
+            "name": "position-type",
+            "in": "query",
+            "description": "<code>RECEIVABLE</code> for the amounts the customer owes the company (default), <code>PAYABLE</code> for the amounts the company owes the supplier. Case-insensitive.",
+            "required": false,
+            "schema": {
+              "default": "RECEIVABLE",
+              "enum": [
+                "RECEIVABLE",
+                "PAYABLE"
+              ],
+              "type": "string",
+              "example": "PAYABLE"
+            },
+            "example": "PAYABLE"
+          },
+          {
+            "name": "reference-date",
+            "in": "query",
+            "description": "Date at which the items must be open, ISO <code>yyyy-MM-dd</code>. Items booked after this date are left out and amounts paid after it count as open. Defaults to today (Europe/Zurich). Future dates are accepted.",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string",
+              "example": "2026-06-30"
+            },
+            "example": "2026-06-30"
+          },
+          {
+            "name": "search-key",
+            "in": "query",
+            "description": "Free-text search. The fields searched are documented per endpoint. Matches are case-insensitive substring matches. Maximum length 256 characters.",
+            "schema": {
+              "maxLength": 256,
+              "type": "string",
+              "example": "müller"
+            }
+          },
+          {
+            "name": "sort-direction",
+            "in": "query",
+            "description": "Sort direction. Allowed values: <code>ASC</code>, <code>DESC</code>. Defaults to <code>DESC</code>.",
+            "schema": {
+              "default": "DESC",
+              "enum": [
+                "ASC",
+                "DESC"
+              ],
+              "type": "string",
+              "example": "DESC"
+            }
+          },
+          {
+            "name": "sort-field",
+            "in": "query",
+            "description": "Field to order the result by. The accepted values are listed per endpoint; an unknown value is rejected with <code>400</code>. Each endpoint documents the default it applies, chosen so that paging with <code>offset</code> / <code>limit</code> is stable.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of open items, ordered by <code>sort-field</code>. Empty array when the customer has no open items or the id is unknown.",
+            "headers": {
+              "X-Total-Count": {
+                "description": "Number of open items matching the filters, ignoring <code>offset</code> and <code>limit</code>.",
+                "style": "simple",
+                "schema": {
+                  "format": "int64",
+                  "type": "integer",
+                  "example": 42
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicApiCustomerOpenPosition"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "<code>reference-date</code> is not an ISO date, <code>sort-field</code> is not one of the documented values, or a parameter is outside its bounds (<code>customerId</code> below 1, <code>position-type</code> not RECEIVABLE or PAYABLE, <code>search-key</code> longer than 256 characters, <code>offset</code> negative, <code>limit</code> outside 1-100, <code>sort-direction</code> not ASC or DESC).<br/><br/><strong>Error codes</strong> for this response (the <code>code</code> field of the response body):<ul><li><code>openposition.reference_date_invalid</code> — reference-date was not an ISO date of the form yyyy-MM-dd. Omit it to use today.</li><li><code>request.sort_field_invalid</code> — sort-field was not one of the values the operation documents. The message lists the accepted values.</li></ul>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            },
+            "x-error-codes": [
+              {
+                "code": "openposition.reference_date_invalid",
+                "meaning": "reference-date was not an ISO date of the form yyyy-MM-dd. Omit it to use today."
+              },
+              {
+                "code": "request.sort_field_invalid",
+                "meaning": "sort-field was not one of the values the operation documents. The message lists the accepted values."
+              }
+            ]
+          },
+          "401": {
+            "description": "No Authorization header found or invalid token<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The current user is not allowed to access this company data<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "API rate limit exceeded<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong on our side while processing the request. Please kindly contact our support.<br/><br/>Failures detected by a downstream service carry that service's own <code>code</code>, which this reference does not enumerate, so the <code>code</code> field may hold a value not documented here. Treat an unrecognised code as a generic failure of the status it arrives with, and do not branch on a code this reference does not list.",
             "content": {
               "application/json": {
                 "schema": {
@@ -9007,7 +9937,7 @@
           }
         ],
         "requestBody": {
-          "description": "<strong>Creates a new invoice for an existing customer.</strong> The <code>id</code> field must be <code>0</code> or omitted. This endpoint does not support updating existing invoices.<br/><br/><strong>Prerequisite APIs (call these first):</strong><ul><li><code>GET /core/v1/invoices/next-invoice-number</code> → provides <code>invoiceCode</code> and <code>invoiceNumber</code> (the next available invoice number for the company).</li><li><code>GET /core/v1/customers?search-key=...&amp;limit=...</code> → provides <code>order.customer.id</code>, <code>order.customer.company</code> (with addresses, emails), and <code>order.customer.customerType</code>.</li><li><code>GET /core/v1/company-bank-accounts</code> → provides <code>ibanNumberCHF</code> / <code>ibanNumberCHW</code> for payment accounts.</li><li><code>GET /core/latest/articles/search?keyword=...</code> → search articles by keyword for the autocomplete; provides <code>orderItems[].itemNumer</code>, <code>description</code>, <code>price</code>, <code>vat</code>, <code>unit</code>.</li><li><code>GET /core/latest/articles/article-numbers?article-numbers=...</code> → fetch full article data by article number(s) to fill <code>orderItems[]</code>.</li><li><code>GET /core/latest/articles/{article-id}/article-set-items</code> → expands article set/bundle into component line items for <code>orderItems[]</code>.</li><li><code>GET /core/v1/bank-reconciliation/open-positions</code> → lists customer's open prepayments / credit notes that can be reconciled; provides <code>openPositionsLinkedToInvoice[].bookingTypeCode</code>, <code>bookingDetailUri</code>, <code>partialPaymentAmount</code>.</li><li>(Optional) <code>POST /core/v1/orders/next-order-number</code> → provides <code>order.orderNumber</code>; each call advances the in-memory counter — call immediately before creating the invoice, not speculatively.</li><li>(Optional) <code>GET /core/latest/company-configuration/including-vat</code> → provides the company-level default for <code>usingVAT</code>; returns <code>false</code> when no configuration record exists.</li><li><code>printedFileId</code> (String, server-assigned) — populated automatically by <code>POST /core/v1/invoices/{id}/printed-document</code> after PDF generation; omit on creation.</li></ul><br/><strong>Field names that look like typos but are not.</strong> The following names are the literal wire field names accepted by the backend. The corrected-looking spellings are <strong>not</strong> accepted:<ul><li><code>orderItems[].itemNumer</code> — article number (<em>not</em> <code>itemNumber</code>). The article lookup endpoints expose the same value under the name <code>articleNumber</code>. Aligning the two names is tracked separately (LUZ-160625); until then <code>itemNumer</code> is the only accepted spelling.</li><li><code>...address.homeNumber</code> — house number (<em>not</em> <code>houseNumber</code>).</li><li><code>...city.cityName18</code> / <code>cityName27</code> — the 18- and 27-character city name variants of the Swiss Post address directory. Neither is a leftover.</li></ul><br/><strong>Top-level fields:</strong><ul><li><code>id</code> (long, required) — must be <code>0</code> for creation.</li><li><code>invoiceCode</code> (String, required) — unique invoice code; obtain from <code>GET /core/v1/invoices/next-invoice-number</code>.</li><li><code>orderType</code> (String, required) — must be <code>INVOICE</code>.</li><li><code>status</code> (String, required) — determines booking behavior (not delivery). Allowed: <code>DRAFT</code> (saves without booking), <code>INVOICED</code> (saves and books into accounting), <code>SENT</code> (saves and books; does <strong>not</strong> send/deliver the invoice).</li><li><code>postMethod</code> (String, optional) — distribution channel <strong>recorded on the invoice only</strong>; this endpoint does not deliver the invoice. Allowed: <code>A_POST</code>, <code>B_POST</code>, <code>SEND_EMAIL</code>, <code>PRINT_AND_MANUAL_SEND</code>, <code>EPOST</code>, <code>EBILL</code>.</li><li><code>documentDate</code> (date, required) — invoice issue date, format <code>yyyy-MM-dd</code>.</li><li><code>paymentDate</code> (date, required) — payment due date, must be on or after <code>documentDate</code>.</li><li><code>ibanNumberCHF</code> (String, conditional) — CHF IBAN for payment; required when booking is triggered.</li><li><code>ibanNumberCHW</code> (String, optional) — WIR IBAN for combined payments.</li><li><code>wirAcceptanceRate</code> (int, optional) — WIR acceptance percentage (0–100).</li><li><code>invoiceType</code> (String, required) — <code>MANUAL</code> or <code>RECURRING</code>.</li><li><code>amount</code> (BigDecimal, required) — total invoice amount over all items. Caller-supplied; not recomputed by the server. With <code>usingVAT=false</code> this is net + VAT; with <code>usingVAT=true</code> it is the sum of the gross item amounts.</li><li><code>usingVAT</code> (boolean) — GUI checkbox <em>\"VAT included in amount of each item\"</em>. Controls whether item <code>price</code>/<code>amount</code> are VAT-inclusive (<code>true</code>, gross) or VAT-exclusive (<code>false</code>, net). It does <strong>not</strong> switch VAT on/off (that is the company's VAT registration). Use <code>GET /core/latest/company-configuration/including-vat</code> for the company default. See <em>VAT handling</em> below.</li><li><code>usingExportVat</code> (boolean, optional) — GUI checkbox <em>\"Export\"</em>. When <code>true</code>, the invoice is an export: set every <code>orderItems[].vat.rate</code> to <code>0</code> so no VAT is charged. Defaults to <code>false</code>.</li><li><code>subject</code> (String, optional) — invoice subject/title.</li><li><code>ourReference</code> / <code>yourReference</code> (String, optional) — reference texts.</li><li><code>companyCityAndDate</code> (String, optional) — city and date line printed on invoice.</li><li><code>closeAndSignature</code> (String, optional) — closing text and signature block.</li><li><code>printedFileId</code> (String, optional) — document ID of uploaded PDF from partner system.</li></ul><br/><strong>Nested fields — <code>order</code> (required):</strong><ul><li><code>order.id</code> (long) — must be <code>0</code> for new orders.</li><li><code>order.orderNumber</code> (int, required) — unique order number; must be &gt; 0 (validated). Obtain from <code>POST /core/v1/orders/next-order-number</code> (not idempotent — each call advances the counter).</li><li><code>order.orderName</code> (String, optional) — order description.</li><li><code>order.companyId</code> (long, required) — company ID from bearer token scope.</li><li><code>order.customer</code> (object, required) — existing customer; obtain from <code>GET /core/v1/customers</code>. Must include <code>customer.id</code>, <code>customer.company</code> (with addresses), and <code>customer.customerType</code> (<code>COMPANY</code> or <code>PERSON</code>).</li></ul><br/><strong>Nested fields — <code>orderItems[]</code> (required, at least 1):</strong><ul><li><code>orderItems[].position</code> (int) — line item position (1-based).</li><li><code>orderItems[].itemNumer</code> (String) — article number. <strong>The field name is <code>itemNumer</code>, not <code>itemNumber</code></strong> — this spelling is the literal wire field name of the KLARA order-management model and is what the backend accepts. It is not a typo in this documentation. The article lookup endpoints expose the same value under the name <code>articleNumber</code>.</li><li><code>orderItems[].description</code> (String) — item description.</li><li><code>orderItems[].quantity</code> (double) — quantity.</li><li><code>orderItems[].unit</code> (String) — unit of measure (e.g. <code>Unit</code>, <code>Hour</code>).</li><li><code>orderItems[].price</code> (double) — unit price (negative for credit notes). VAT-inclusive (gross) when <code>usingVAT=true</code>, VAT-exclusive (net) when <code>usingVAT=false</code>. Both variants are available from the article lookup APIs.</li><li><code>orderItems[].discount</code> (double) — discount percentage.</li><li><code>orderItems[].amount</code> (double) — line total = <code>quantity × price × (1 − discount/100)</code>, rounded to the nearest 0.05. Gross or net following <code>usingVAT</code> (same basis as <code>price</code>).</li><li><code>orderItems[].tag</code> (String, <strong>accepted but not persisted</strong>) — the <code>order_item</code> table has no column for it, so a value sent here is silently discarded and does not influence booking. The server derives it from the article master data on the recurring-invoice run only.</li><li><code>orderItems[].vatCase</code> (String, <strong>accepted but not persisted</strong>) — <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>. Same as <code>tag</code>: no column, discarded on this endpoint.</li><li><code>orderItems[].articleType</code> (String, <strong>accepted but not persisted</strong>) — <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>. Same as <code>tag</code>: no column, discarded on this endpoint.</li><li><code>orderItems[].vat</code> (object) — VAT details: <code>vatCode</code>, <code>rate</code>, <code>description</code>, <code>masterId</code>. For an export invoice (<code>usingExportVat=true</code>) set <code>rate=0</code> and the export/zero <code>vatCode</code>. <strong>This is the VAT code that is actually stored</strong> — the sibling <code>orderItems[].vatCode</code> is a convenience mirror that is not persisted, so do not send the two with conflicting values.</li><li><code>orderItems[].id</code> (long) — must be <code>0</code> for new items.</li></ul><br/><strong>Nested fields — <code>documentAddress</code> / <code>mailingAddress</code> (optional):</strong><ul><li><code>documentAddress</code> (object) — address block printed on the invoice document. Derived from the customer when omitted; send it only to print an address other than the customer's default.</li><li><code>documentAddress.customerId</code> (long) — customer the address belongs to.</li><li><code>documentAddress.customerType</code> (String) — <code>COMPANY</code> or <code>PERSON</code>.</li><li><code>documentAddress.address</code> (object) — the postal address to print (same shape as <code>customer.company.addresses[]</code>, including <code>homeNumber</code> and <code>city.cityName18</code>/<code>cityName27</code>).</li><li><code>documentAddress.companyName</code> / <code>personFirstName</code> / <code>personLastName</code> / <code>salutation</code> (String) — recipient name parts printed above the address.</li><li><code>mailingAddress</code> (object) — address used for postal delivery, same shape as <code>documentAddress</code>. Both are resolved against the customer's stored addresses and referenced by id; the invoice does not keep a private copy of the values sent.</li></ul><br/><strong>VAT handling — the server does not recalculate amounts.</strong> Unlike the KLARA GUI (which recomputes line amounts, VAT and totals whenever you toggle the <em>\"VAT included in amount of each item\"</em> or <em>\"Export\"</em> checkbox), this endpoint stores the amounts you send <em>verbatim</em> and performs no VAT recalculation or consistency check. Send <code>orderItems[].price</code>, <code>orderItems[].amount</code>, <code>orderItems[].vat</code> and the document <code>amount</code> already consistent with the two flags:<ul><li><code>usingVAT=false</code> (VAT-exclusive) — <code>price</code>/<code>amount</code> are net; document <code>amount</code> = net + VAT.</li><li><code>usingVAT=true</code> (VAT-inclusive) — <code>price</code>/<code>amount</code> are gross (VAT already inside); document <code>amount</code> = sum of gross item amounts.</li><li><code>usingExportVat=true</code> (export) — set every <code>orderItems[].vat.rate</code> to <code>0</code>; VAT = 0 and document <code>amount</code> = sum of net item amounts.</li></ul>To reproduce the GUI figures exactly: per line <code>amount = round0.05(quantity × price × (1 − discount/100))</code>; VAT per rate group = <code>amount × rate/100</code> when VAT-exclusive, or <code>amount × (rate/100) / (1 + rate/100)</code> when VAT-inclusive — each rounded to the nearest 0.05 (Swiss commercial rounding). Article unit prices for the inclusive, exclusive and export cases come from the article lookup APIs above (each article exposes both a VAT-inclusive and a VAT-exclusive price); pick the one matching <code>usingVAT</code>/<code>usingExportVat</code>.<br/><br/><strong>Nested fields — <code>attachments[]</code> (optional):</strong><ul><li><code>attachments[].fileId</code> (String) — document file ID uploaded via partner system.</li><li><code>attachments[].orderDetailId</code> (long) — set to <code>0</code> for new invoices.</li><li><code>attachments[].id</code> (long) — set to <code>0</code> for new attachments.</li></ul><br/><strong>Nested fields — <code>openPositionsLinkedToInvoice[]</code> (optional, for reconciliation):</strong><ul><li><code>openPositionsLinkedToInvoice[].bookingTypeCode</code> (String) — <code>AR_PREPAYMENT</code> or <code>AR_CREDITNOTE</code>.</li><li><code>openPositionsLinkedToInvoice[].bookingDetailUri</code> (String) — internal URI of the booking detail to reconcile (format: <code>/…/{tenant-id}/companies/{companyId}/bookings/{bookingId}/booking-details/{detailId}</code>).</li><li><code>openPositionsLinkedToInvoice[].partialPaymentAmount</code> (BigDecimal) — amount to offset from this open position.</li></ul><br/><strong>Validation rules:</strong><ul><li><code>paymentDate</code> must be on or after <code>documentDate</code> (when amount &gt; 0).</li><li><code>order.orderNumber</code> must be &gt; 0.</li><li><code>invoiceCode</code> must be unique within the company.</li><li><code>status</code> must not be null.</li><li>IBAN format is validated when provided.</li><li>When status is <code>SENT</code>, credit notes (negative total) are not allowed.</li><li>Each <code>orderItems[].tag</code> must be present when status triggers booking (<code>INVOICED</code>/<code>SENT</code>).</li></ul><br/><strong>Server-managed fields (ignored on input, populated on output):</strong> <code>vatDate</code>, <code>lastModified</code>, <code>createDate</code>, <code>bookingDueDate</code>, <code>bookingNumbers</code>, <code>businessCaseId</code>, <code>bookingStatus</code>, <code>bookingMessage</code>, <code>bookingSealed</code>, <code>fiscalYearHasCreatedAuto</code>, <code>createBy</code>, <code>issuedDate</code>.",
+          "description": "<strong>Creates a new invoice for an existing customer.</strong> The <code>id</code> field must be <code>0</code> or omitted. This endpoint does not support updating existing invoices.<br/><br/><strong>Prerequisite APIs (call these first):</strong><ul><li><code>GET /core/v1/invoices/next-invoice-number</code> → provides <code>invoiceCode</code> and <code>invoiceNumber</code> (the next available invoice number for the company).</li><li><code>GET /core/v1/customers?search-key=...&amp;limit=...</code> → provides <code>order.customer.id</code>, <code>order.customer.company</code> (with addresses, emails), and <code>order.customer.customerType</code>.</li><li><code>GET /core/v1/company-bank-accounts</code> → provides <code>ibanNumberCHF</code> / <code>ibanNumberCHW</code> for payment accounts.</li><li><code>GET /core/latest/articles/search?keyword=...</code> → search articles by keyword for the autocomplete; provides <code>orderItems[].itemNumer</code>, <code>description</code>, <code>price</code>, <code>vat</code>, <code>unit</code>.</li><li><code>GET /core/latest/articles/article-numbers?article-numbers=...</code> → fetch full article data by article number(s) to fill <code>orderItems[]</code>.</li><li><code>GET /core/latest/articles/{article-id}/article-set-items</code> → expands article set/bundle into component line items for <code>orderItems[]</code>.</li><li><code>GET /core/v1/bank-reconciliation/open-positions</code> → lists customer's open prepayments / credit notes that can be reconciled; provides <code>openPositionsLinkedToInvoice[].bookingTypeCode</code>, <code>bookingDetailUri</code>, <code>partialPaymentAmount</code>.</li><li>(Optional) <code>POST /core/v1/orders/next-order-number</code> → provides <code>order.orderNumber</code>; each call advances the in-memory counter — call immediately before creating the invoice, not speculatively.</li><li>(Optional) <code>GET /core/latest/company-configuration/including-vat</code> → provides the company-level default for <code>usingVAT</code>; returns <code>false</code> when no configuration record exists.</li><li><code>printedFileId</code> (String, server-assigned) — populated automatically by <code>POST /core/v1/invoices/{id}/printed-document</code> after PDF generation; omit on creation.</li></ul><br/><strong>Field names that look like typos but are not.</strong> The following names are the literal wire field names accepted by the backend. The corrected-looking spellings are <strong>not</strong> accepted:<ul><li><code>orderItems[].itemNumer</code> — article number (<em>not</em> <code>itemNumber</code>). The article lookup endpoints expose the same value under the name <code>articleNumber</code>. Aligning the two names is tracked separately; until then <code>itemNumer</code> is the only accepted spelling.</li><li><code>...address.homeNumber</code> — house number (<em>not</em> <code>houseNumber</code>).</li><li><code>...city.cityName18</code> / <code>cityName27</code> — the 18- and 27-character city name variants of the Swiss Post address directory. Neither is a leftover.</li></ul><br/><strong>Top-level fields:</strong><ul><li><code>id</code> (long, required) — must be <code>0</code> for creation.</li><li><code>invoiceCode</code> (String, required) — unique invoice code; obtain from <code>GET /core/v1/invoices/next-invoice-number</code>.</li><li><code>orderType</code> (String, required) — must be <code>INVOICE</code>.</li><li><code>status</code> (String, required) — determines booking behavior (not delivery). Allowed: <code>DRAFT</code> (saves without booking), <code>INVOICED</code> (saves and books into accounting), <code>SENT</code> (saves and books; does <strong>not</strong> send/deliver the invoice).</li><li><code>postMethod</code> (String, optional) — distribution channel <strong>recorded on the invoice only</strong>; this endpoint does not deliver the invoice. Allowed: <code>A_POST</code>, <code>B_POST</code>, <code>SEND_EMAIL</code>, <code>PRINT_AND_MANUAL_SEND</code>, <code>EPOST</code>, <code>EBILL</code>.</li><li><code>documentDate</code> (date, required) — invoice issue date, format <code>yyyy-MM-dd</code>.</li><li><code>paymentDate</code> (date, required) — payment due date, must be on or after <code>documentDate</code>.</li><li><code>ibanNumberCHF</code> (String, conditional) — CHF IBAN for payment; required when booking is triggered.</li><li><code>ibanNumberCHW</code> (String, optional) — WIR IBAN for combined payments.</li><li><code>wirAcceptanceRate</code> (int, optional) — WIR acceptance percentage (0–100).</li><li><code>invoiceType</code> (String, required) — <code>MANUAL</code> or <code>RECURRING</code>.</li><li><code>amount</code> (BigDecimal, required) — total invoice amount over all items. Caller-supplied; not recomputed by the server. With <code>usingVAT=false</code> this is net + VAT; with <code>usingVAT=true</code> it is the sum of the gross item amounts.</li><li><code>usingVAT</code> (boolean) — GUI checkbox <em>\"VAT included in amount of each item\"</em>. Controls whether item <code>price</code>/<code>amount</code> are VAT-inclusive (<code>true</code>, gross) or VAT-exclusive (<code>false</code>, net). It does <strong>not</strong> switch VAT on/off (that is the company's VAT registration). Use <code>GET /core/latest/company-configuration/including-vat</code> for the company default. See <em>VAT handling</em> below.</li><li><code>usingExportVat</code> (boolean, optional) — GUI checkbox <em>\"Export\"</em>. When <code>true</code>, the invoice is an export: set every <code>orderItems[].vat.rate</code> to <code>0</code> so no VAT is charged. Defaults to <code>false</code>.</li><li><code>subject</code> (String, optional) — invoice subject/title.</li><li><code>ourReference</code> / <code>yourReference</code> (String, optional) — reference texts.</li><li><code>companyCityAndDate</code> (String, optional) — city and date line printed on invoice.</li><li><code>closeAndSignature</code> (String, optional) — closing text and signature block.</li><li><code>printedFileId</code> (String, optional) — document ID of uploaded PDF from partner system.</li></ul><br/><strong>Nested fields — <code>order</code> (required):</strong><ul><li><code>order.id</code> (long) — must be <code>0</code> for new orders.</li><li><code>order.orderNumber</code> (int, required) — unique order number; must be &gt; 0 (validated). Obtain from <code>POST /core/v1/orders/next-order-number</code> (not idempotent — each call advances the counter).</li><li><code>order.orderName</code> (String, optional) — order description.</li><li><code>order.companyId</code> (long, required) — company ID from bearer token scope.</li><li><code>order.customer</code> (object, required) — existing customer; obtain from <code>GET /core/v1/customers</code>. Must include <code>customer.id</code>, <code>customer.company</code> (with addresses), and <code>customer.customerType</code> (<code>COMPANY</code> or <code>PERSON</code>).</li></ul><br/><strong>Nested fields — <code>orderItems[]</code> (required, at least 1):</strong><ul><li><code>orderItems[].position</code> (int) — line item position (1-based).</li><li><code>orderItems[].itemNumer</code> (String) — article number. <strong>The field name is <code>itemNumer</code>, not <code>itemNumber</code></strong> — this spelling is the literal wire field name of the KLARA order-management model and is what the backend accepts. It is not a typo in this documentation. The article lookup endpoints expose the same value under the name <code>articleNumber</code>.</li><li><code>orderItems[].description</code> (String) — item description.</li><li><code>orderItems[].quantity</code> (double) — quantity.</li><li><code>orderItems[].unit</code> (String) — unit of measure (e.g. <code>Unit</code>, <code>Hour</code>).</li><li><code>orderItems[].price</code> (double) — unit price (negative for credit notes). VAT-inclusive (gross) when <code>usingVAT=true</code>, VAT-exclusive (net) when <code>usingVAT=false</code>. Both variants are available from the article lookup APIs.</li><li><code>orderItems[].discount</code> (double) — discount percentage.</li><li><code>orderItems[].amount</code> (double) — line total = <code>quantity × price × (1 − discount/100)</code>, rounded to the nearest 0.05. Gross or net following <code>usingVAT</code> (same basis as <code>price</code>).</li><li><code>orderItems[].tag</code> (String, <strong>accepted but not persisted</strong>) — the <code>order_item</code> table has no column for it, so a value sent here is silently discarded and does not influence booking. The server derives it from the article master data on the recurring-invoice run only.</li><li><code>orderItems[].vatCase</code> (String, <strong>accepted but not persisted</strong>) — <code>TAXABLE_SUPPLY</code>, <code>EXEMPT_SUPPLY</code>, <code>REVERSE_CHARGE</code>. Same as <code>tag</code>: no column, discarded on this endpoint.</li><li><code>orderItems[].articleType</code> (String, <strong>accepted but not persisted</strong>) — <code>PRODUCTION</code>, <code>PREPAYMENT</code>, <code>SERVICE</code>. Same as <code>tag</code>: no column, discarded on this endpoint.</li><li><code>orderItems[].vat</code> (object) — VAT details: <code>vatCode</code>, <code>rate</code>, <code>description</code>, <code>masterId</code>. For an export invoice (<code>usingExportVat=true</code>) set <code>rate=0</code> and the export/zero <code>vatCode</code>. <strong>This is the VAT code that is actually stored</strong> — the sibling <code>orderItems[].vatCode</code> is a convenience mirror that is not persisted, so do not send the two with conflicting values.</li><li><code>orderItems[].id</code> (long) — must be <code>0</code> for new items.</li></ul><br/><strong>Nested fields — <code>documentAddress</code> / <code>mailingAddress</code> (optional):</strong><ul><li><code>documentAddress</code> (object) — address block printed on the invoice document. Derived from the customer when omitted; send it only to print an address other than the customer's default.</li><li><code>documentAddress.customerId</code> (long) — customer the address belongs to.</li><li><code>documentAddress.customerType</code> (String) — <code>COMPANY</code> or <code>PERSON</code>.</li><li><code>documentAddress.address</code> (object) — the postal address to print (same shape as <code>customer.company.addresses[]</code>, including <code>homeNumber</code> and <code>city.cityName18</code>/<code>cityName27</code>).</li><li><code>documentAddress.companyName</code> / <code>personFirstName</code> / <code>personLastName</code> / <code>salutation</code> (String) — recipient name parts printed above the address.</li><li><code>mailingAddress</code> (object) — address used for postal delivery, same shape as <code>documentAddress</code>. Both are resolved against the customer's stored addresses and referenced by id; the invoice does not keep a private copy of the values sent.</li></ul><br/><strong>VAT handling — the server does not recalculate amounts.</strong> Unlike the KLARA GUI (which recomputes line amounts, VAT and totals whenever you toggle the <em>\"VAT included in amount of each item\"</em> or <em>\"Export\"</em> checkbox), this endpoint stores the amounts you send <em>verbatim</em> and performs no VAT recalculation or consistency check. Send <code>orderItems[].price</code>, <code>orderItems[].amount</code>, <code>orderItems[].vat</code> and the document <code>amount</code> already consistent with the two flags:<ul><li><code>usingVAT=false</code> (VAT-exclusive) — <code>price</code>/<code>amount</code> are net; document <code>amount</code> = net + VAT.</li><li><code>usingVAT=true</code> (VAT-inclusive) — <code>price</code>/<code>amount</code> are gross (VAT already inside); document <code>amount</code> = sum of gross item amounts.</li><li><code>usingExportVat=true</code> (export) — set every <code>orderItems[].vat.rate</code> to <code>0</code>; VAT = 0 and document <code>amount</code> = sum of net item amounts.</li></ul>To reproduce the GUI figures exactly: per line <code>amount = round0.05(quantity × price × (1 − discount/100))</code>; VAT per rate group = <code>amount × rate/100</code> when VAT-exclusive, or <code>amount × (rate/100) / (1 + rate/100)</code> when VAT-inclusive — each rounded to the nearest 0.05 (Swiss commercial rounding). Article unit prices for the inclusive, exclusive and export cases come from the article lookup APIs above (each article exposes both a VAT-inclusive and a VAT-exclusive price); pick the one matching <code>usingVAT</code>/<code>usingExportVat</code>.<br/><br/><strong>Nested fields — <code>attachments[]</code> (optional):</strong><ul><li><code>attachments[].fileId</code> (String) — document file ID uploaded via partner system.</li><li><code>attachments[].orderDetailId</code> (long) — set to <code>0</code> for new invoices.</li><li><code>attachments[].id</code> (long) — set to <code>0</code> for new attachments.</li></ul><br/><strong>Nested fields — <code>openPositionsLinkedToInvoice[]</code> (optional, for reconciliation):</strong><ul><li><code>openPositionsLinkedToInvoice[].bookingTypeCode</code> (String) — <code>AR_PREPAYMENT</code> or <code>AR_CREDITNOTE</code>.</li><li><code>openPositionsLinkedToInvoice[].bookingDetailUri</code> (String) — internal URI of the booking detail to reconcile (format: <code>/…/{tenant-id}/companies/{companyId}/bookings/{bookingId}/booking-details/{detailId}</code>).</li><li><code>openPositionsLinkedToInvoice[].partialPaymentAmount</code> (BigDecimal) — amount to offset from this open position.</li></ul><br/><strong>Validation rules:</strong><ul><li><code>paymentDate</code> must be on or after <code>documentDate</code> (when amount &gt; 0).</li><li><code>order.orderNumber</code> must be &gt; 0.</li><li><code>invoiceCode</code> must be unique within the company.</li><li><code>status</code> must not be null.</li><li>IBAN format is validated when provided.</li><li>When status is <code>SENT</code>, credit notes (negative total) are not allowed.</li><li>Each <code>orderItems[].tag</code> must be present when status triggers booking (<code>INVOICED</code>/<code>SENT</code>).</li></ul><br/><strong>Server-managed fields (ignored on input, populated on output):</strong> <code>vatDate</code>, <code>lastModified</code>, <code>createDate</code>, <code>bookingDueDate</code>, <code>bookingNumbers</code>, <code>businessCaseId</code>, <code>bookingStatus</code>, <code>bookingMessage</code>, <code>bookingSealed</code>, <code>fiscalYearHasCreatedAuto</code>, <code>createBy</code>, <code>issuedDate</code>.",
           "content": {
             "application/json": {
               "schema": {
@@ -15584,6 +16514,110 @@
           }
         }
       },
+      "PublicApiBankTransaction": {
+        "description": "A bank transaction of one of the company's bank accounts that is not reconciled yet.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Id of the bank transaction, used by the reconciliation operations.",
+            "type": "integer",
+            "example": 48213
+          },
+          "bankAccountId": {
+            "format": "int64",
+            "description": "Id of the company bank account the transaction belongs to, as returned by <code>listCompanyBankAccounts</code>.",
+            "type": "integer",
+            "example": 3
+          },
+          "iban": {
+            "description": "IBAN of the company bank account, without spaces.",
+            "type": "string",
+            "example": "CH9300762011623852957"
+          },
+          "bookingDate": {
+            "format": "date",
+            "description": "Booking date at the bank.",
+            "type": "string",
+            "example": "2026-10-14"
+          },
+          "valueDate": {
+            "format": "date",
+            "description": "Value date.",
+            "type": "string",
+            "example": "2026-10-14"
+          },
+          "direction": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiBankTransactionDirection"
+              },
+              {
+                "description": "<code>CREDIT</code> when money was received, <code>DEBIT</code> when money was paid out.",
+                "example": "CREDIT"
+              }
+            ]
+          },
+          "amount": {
+            "description": "Amount in CHF, always positive; the direction is in <code>direction</code>. Empty for transactions only in a foreign currency.",
+            "type": "number",
+            "example": 1250
+          },
+          "currency": {
+            "description": "Currency of the transaction.",
+            "type": "string",
+            "example": "CHF"
+          },
+          "foreignAmount": {
+            "description": "Amount in the foreign currency, if any; always positive.",
+            "type": "number",
+            "example": 1300
+          },
+          "foreignCurrency": {
+            "description": "Foreign currency, if any.",
+            "type": "string",
+            "example": "EUR"
+          },
+          "counterpartyName": {
+            "description": "Name of the payer (<code>CREDIT</code>) or payee (<code>DEBIT</code>), as delivered by the bank, or of the partner of a manually added transaction.",
+            "type": "string",
+            "example": "Muster AG"
+          },
+          "paymentReference": {
+            "description": "Structured payment reference: QR or ISR reference, or creditor reference (ISO 11649).",
+            "type": "string",
+            "example": "210000000003139471430009017"
+          },
+          "paymentReferenceType": {
+            "description": "Type of <code>paymentReference</code> as delivered by the bank, for example <code>QRR</code> or <code>SCOR</code>; empty when the reference was recognized in the free text.",
+            "type": "string",
+            "example": "QRR"
+          },
+          "remittanceText": {
+            "description": "Unstructured remittance information; several lines are joined with <code>;</code>.",
+            "type": "string",
+            "example": "Invoice 2026-104"
+          },
+          "additionalInfo": {
+            "description": "Additional information of the bank entry.",
+            "type": "string",
+            "example": "Payment QR-bill"
+          },
+          "endToEndId": {
+            "description": "End-to-end id set by the payer.",
+            "type": "string",
+            "example": "E2E-2026-104"
+          }
+        }
+      },
+      "PublicApiBankTransactionDirection": {
+        "description": "<code>CREDIT</code>: money received on the company bank account. <code>DEBIT</code>: money paid out from it.",
+        "enum": [
+          "CREDIT",
+          "DEBIT"
+        ],
+        "type": "string"
+      },
       "PublicApiBookingDetail": {
         "description": "One debit or credit line of a booking.",
         "required": [
@@ -15634,7 +16668,7 @@
             "example": 0
           },
           "tags": {
-            "description": "Comma-separated list of string tags. Each tag is free-form and should represent a topic that the booking line should be associated with. Provide at least one tag per line.",
+            "description": "Comma-separated list of string tags. Each tag is free-form and should represent a topic that the booking line should be associated with. Reuse the existing spelling from <code>listBookingTagsV1</code>; separate several tags with a comma without a space. Provide at least one tag per line.",
             "type": "string",
             "example": "project-alpha,q2",
             "nullable": false
@@ -15887,6 +16921,276 @@
           }
         }
       },
+      "PublicApiBookingLine": {
+        "description": "One debit or credit line of a booking.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Id of the line, as used by <code>connectedLines</code>.",
+            "type": "integer",
+            "example": 10230
+          },
+          "accountCode": {
+            "format": "int32",
+            "description": "Account number.",
+            "type": "integer",
+            "example": 1020
+          },
+          "accountName": {
+            "description": "Account name in the requested language.",
+            "type": "string",
+            "example": "Bank"
+          },
+          "side": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiBookingLineSide"
+              },
+              {
+                "description": "Side of the line.",
+                "example": "DEBIT"
+              }
+            ]
+          },
+          "amount": {
+            "description": "Amount in CHF, always positive.",
+            "type": "number",
+            "example": 2500
+          },
+          "description": {
+            "description": "Posting text of the line.",
+            "type": "string",
+            "example": "Rent October 2026"
+          },
+          "tags": {
+            "description": "Tags of the line.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "Zurich"
+            ]
+          },
+          "bookingType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiBookingTypeCode"
+              },
+              {
+                "description": "Kind of line, for example <code>GENERAL_LEDGER</code>, <code>AR_INVOICE</code> or <code>AP_PAYMENT</code>.",
+                "example": "GENERAL_LEDGER"
+              }
+            ]
+          },
+          "vatRate": {
+            "description": "VAT rate of the line in percent, if it has one. With the net tax rate method the net tax rate is shown in <code>vatRateText</code> in parentheses.",
+            "type": "number",
+            "example": 8.1
+          },
+          "vatRateText": {
+            "description": "VAT rate as KLARA shows it, for example <code>8.1%</code> or, with a net tax rate, <code>8.1% (6.2%)</code>.",
+            "type": "string",
+            "example": "8.1%"
+          },
+          "foreignCurrencyAmount": {
+            "description": "Amount in the foreign currency, if the line was booked in one.",
+            "type": "number",
+            "example": 2300
+          },
+          "foreignCurrency": {
+            "description": "Foreign currency, if any.",
+            "type": "string",
+            "example": "EUR"
+          },
+          "openItemStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiOpenPositionStatus"
+              },
+              {
+                "description": "Open-item state of an invoice, payment or credit note line.",
+                "example": "OPEN"
+              }
+            ]
+          },
+          "overdue": {
+            "description": "Present whenever <code>dueDate</code> is set: true when the due date is before today (Europe/Zurich), as the journal marks it. Also set on lines that are already paid, so check <code>openItemStatus</code> (<code>OPEN</code> or <code>PARTLY_PAID</code>) for items still to be paid. Missing without a due date.",
+            "type": "boolean",
+            "example": false
+          },
+          "dueDate": {
+            "format": "date",
+            "description": "Due date of the open item.",
+            "type": "string",
+            "example": "2026-11-15"
+          },
+          "paidDate": {
+            "format": "date",
+            "description": "Date the open item was paid.",
+            "type": "string",
+            "example": "2026-11-10"
+          },
+          "servicePeriodFrom": {
+            "format": "date",
+            "description": "Start of the service period, if set.",
+            "type": "string",
+            "example": "2026-10-01"
+          },
+          "servicePeriodTo": {
+            "format": "date",
+            "description": "End of the service period, if set.",
+            "type": "string",
+            "example": "2026-10-31"
+          },
+          "lastModifiedBy": {
+            "description": "Who last changed the line: the e-mail address of the user, the name of an API key, or <code>SYSTEM</code> (automatic bookings). A line never changed shows who created it. Changes to the booking header (date, comment, documents) are not reflected.",
+            "type": "string",
+            "example": "anna.muster@example.ch"
+          },
+          "lastModifiedAt": {
+            "format": "date-time",
+            "description": "When the line was last changed, in UTC; for a line never changed, when it was created.",
+            "type": "string",
+            "example": "2026-10-14T08:12:30.123Z"
+          },
+          "references": {
+            "description": "Objects the line refers to.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicApiBookingLineReference"
+            }
+          },
+          "connectedLines": {
+            "description": "Lines of other bookings this line is connected to.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicApiConnectedBookingLine"
+            }
+          }
+        }
+      },
+      "PublicApiBookingLineReference": {
+        "description": "An object a booking line refers to.",
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiBookingReferenceType"
+              },
+              {
+                "description": "Kind of object.",
+                "example": "CUSTOMER"
+              }
+            ]
+          },
+          "id": {
+            "description": "Id of the object. Customers and suppliers (one id space): as in <code>listCustomersV1</code>; company bank accounts: as in <code>listCompanyBankAccounts</code>; bank transactions: as in <code>listBankTransactionsV1</code> (unreconciled only); VAT cases: as in the VAT case list; tax-at-source cantons: KLARA's canton id; gift cards and miscellaneous partners: KLARA's fixed entry; a sub-account: the id of the sub-account of the chart of accounts; other types: KLARA's internal id.",
+            "type": "string",
+            "example": "1042"
+          },
+          "category": {
+            "description": "Only for <code>SUB_ACCOUNT</code>: the kind of sub-account, for example <code>cash</code>, <code>receivable</code>, <code>payable</code> or <code>tangible_asset</code>.",
+            "type": "string",
+            "example": "cash"
+          },
+          "name": {
+            "description": "Name of the object as KLARA shows it on the line now (resolved when the booking is read, not stored at posting time), in the requested language. Missing when it could not be resolved.",
+            "type": "string",
+            "example": "Muster AG"
+          }
+        }
+      },
+      "PublicApiBookingLineSide": {
+        "description": "Side of a booking line: DEBIT or CREDIT.",
+        "enum": [
+          "DEBIT",
+          "CREDIT"
+        ],
+        "type": "string"
+      },
+      "PublicApiBookingReferenceType": {
+        "description": "Kind of object a booking line refers to.",
+        "enum": [
+          "CUSTOMER",
+          "SUPPLIER",
+          "BANK_ACCOUNT",
+          "BANK_TRANSACTION",
+          "VAT_CASE",
+          "INVOICE",
+          "PAYMENT",
+          "EMPLOYEE",
+          "SOCIAL_INSURANCE",
+          "SALARY_RUN",
+          "TAX_AT_SOURCE",
+          "GIFT_CARD",
+          "VARIOUS",
+          "SUB_ACCOUNT"
+        ],
+        "type": "string"
+      },
+      "PublicApiBookingSummary": {
+        "description": "A booking of the journal, without its debit and credit lines.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Id of the booking, as shown in the journal in brackets after the title.",
+            "type": "integer",
+            "example": 4321
+          },
+          "bookingDate": {
+            "format": "date",
+            "description": "Booking date.",
+            "type": "string",
+            "example": "2026-10-14"
+          },
+          "documentDate": {
+            "format": "date",
+            "description": "Document date, if set.",
+            "type": "string",
+            "example": "2026-10-10"
+          },
+          "title": {
+            "description": "Text of the first booking line, as shown as the title in the journal.",
+            "type": "string",
+            "example": "Rent October 2026"
+          },
+          "totalAmount": {
+            "description": "Booking amount in CHF: the sum of the credit lines.",
+            "type": "number",
+            "example": 2500
+          },
+          "documentIds": {
+            "description": "Ids of the documents attached to the booking.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "98213"
+            ]
+          },
+          "internalComment": {
+            "description": "Internal comment as entered in KLARA. It may contain HTML; escape it before rendering.",
+            "type": "string",
+            "example": "Paid by e-banking"
+          }
+        }
+      },
+      "PublicApiBookingTag": {
+        "description": "A tag used on at least one booking line of the company.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Tag as used on booking lines, for example as <code>tags</code> of a booking line in <code>createBookingV1</code>. With <code>include-combinations=true</code> also a combination of tags as stored on one booking line, joined with a comma and a space.",
+            "type": "string",
+            "example": "Marketing"
+          }
+        }
+      },
       "PublicApiBookingType": {
         "description": "A master booking type from KLARA's global accounting catalog.",
         "type": "object",
@@ -15918,6 +17222,83 @@
             "description": "Localized human-readable description of the booking type. Resolved against the request's <code>Accept-Language</code> header; falls back to the German translation when no translation exists for the requested language.",
             "type": "string",
             "example": "Kreditorenrechnung"
+          }
+        }
+      },
+      "PublicApiBookingTypeCode": {
+        "enum": [
+          "GENERAL_LEDGER",
+          "AP_INVOICE",
+          "AP_PAYMENT",
+          "AR_INVOICE",
+          "AR_PAYMENT",
+          "AP_PREPAYMENT",
+          "AP_PREPAYUSE",
+          "AR_PREPAYMENT",
+          "AR_PREPAYUSE",
+          "AR_CREDITNOTE",
+          "AR_CREDITUSE",
+          "AP_CREDITNOTE",
+          "AP_CREDITUSE",
+          "AMORTIZATION",
+          "SELLOFF_AMORTIZATION",
+          "DELIMIT"
+        ],
+        "type": "string"
+      },
+      "PublicApiBookingWithLines": {
+        "description": "A booking with all its debit and credit lines.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Id of the booking, as in <code>listBookingsV1</code>.",
+            "type": "integer",
+            "example": 4321
+          },
+          "bookingDate": {
+            "format": "date",
+            "description": "Booking date.",
+            "type": "string",
+            "example": "2026-10-14"
+          },
+          "documentDate": {
+            "format": "date",
+            "description": "Document date, if set.",
+            "type": "string",
+            "example": "2026-10-10"
+          },
+          "title": {
+            "description": "Text of the first booking line, as shown as the title in the journal and in <code>listBookingsV1</code>.",
+            "type": "string",
+            "example": "Rent October 2026"
+          },
+          "totalAmount": {
+            "description": "Booking amount in CHF: the sum of all credit lines (delimitation lines included), as in <code>listBookingsV1</code>.",
+            "type": "number",
+            "example": 2500
+          },
+          "documentIds": {
+            "description": "Ids of the documents attached to the booking.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "98213"
+            ]
+          },
+          "internalComment": {
+            "description": "Internal comment as entered in KLARA. It may contain HTML; escape it before rendering.",
+            "type": "string",
+            "example": "Paid by e-banking"
+          },
+          "lines": {
+            "description": "All debit and credit lines, in the order KLARA shows them, including VAT lines and delimitation lines.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicApiBookingLine"
+            }
           }
         }
       },
@@ -16154,10 +17535,121 @@
           }
         }
       },
+      "PublicApiConnectedBookingLine": {
+        "description": "A line of another booking this line is connected to. Read that booking with <code>getBookingV1</code> and its <code>bookingId</code>.",
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiConnectedBookingLineType"
+              },
+              {
+                "description": "How the lines are connected.",
+                "example": "RECONCILIATION"
+              }
+            ]
+          },
+          "bookingId": {
+            "format": "int64",
+            "description": "Id of the connected booking.",
+            "type": "integer",
+            "example": 4388
+          },
+          "lineId": {
+            "format": "int64",
+            "description": "Id of the connected line within that booking; missing when the connection points to the booking as a whole.",
+            "type": "integer",
+            "example": 10231
+          }
+        }
+      },
+      "PublicApiConnectedBookingLineType": {
+        "description": "How a booking line is connected to a line of another booking: RECONCILIATION (a payment or bank reconciliation against an open item), DELIMITATION (accrual), PREPAYMENT_CLEARING, CREDIT_NOTE_CLEARING or MAIN_LINE (the line of another booking this automatically created line was derived from, for example a VAT line booked with a payment that points to the revenue line of the invoice). A reconciliation is listed on every line involved.",
+        "enum": [
+          "RECONCILIATION",
+          "DELIMITATION",
+          "PREPAYMENT_CLEARING",
+          "CREDIT_NOTE_CLEARING",
+          "MAIN_LINE"
+        ],
+        "type": "string"
+      },
       "PublicApiCrDrType": {
         "enum": [
           "CR",
           "DR"
+        ],
+        "type": "string"
+      },
+      "PublicApiCustomerOpenPosition": {
+        "description": "An open receivable or payable of one customer or supplier, with the amount still open at the requested reference date and its history.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "format": "int64",
+            "description": "Id of the open item (booking line). Stable; appears as <code>bookingDetailId</code> in the histories of other items it was reconciled with.",
+            "type": "integer",
+            "example": 98765
+          },
+          "postingText": {
+            "description": "Posting text of the item, as shown in the accounting UI.",
+            "type": "string",
+            "example": "Invoice 1000000000007 Consulting services"
+          },
+          "documentIds": {
+            "description": "Ids of the receipts attached to the booking; empty when none.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "4711"
+            ]
+          },
+          "dueDate": {
+            "format": "date",
+            "description": "Due date of the item; <code>null</code> when it has none.",
+            "type": "string",
+            "example": "2026-07-15"
+          },
+          "openAmount": {
+            "description": "Amount still open at the requested <code>reference-date</code>. Negative for items that reduce the balance (credit notes, prepayments).",
+            "type": "number",
+            "example": 1000
+          },
+          "totalAmount": {
+            "description": "Original amount of the item. Negative for items that reduce the balance (credit notes, prepayments).",
+            "type": "number",
+            "example": 1000
+          },
+          "bookingTypeCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiBookingTypeCode"
+              },
+              {
+                "description": "Booking type of the item, e.g. <code>AR_INVOICE</code>, <code>AR_CREDITNOTE</code>, <code>AP_INVOICE</code>, <code>AP_PREPAYMENT</code>.",
+                "example": "AR_INVOICE"
+              }
+            ]
+          },
+          "histories": {
+            "description": "Events of the item, oldest first, including planned ones.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicApiOpenPositionHistory"
+            }
+          }
+        }
+      },
+      "PublicApiDunningLevel": {
+        "description": "Dunning level: <code>FRIENDLY_REMINDER</code> (payment reminder), <code>FRIENDLY_REMINDER_2</code> (dunning level 1), <code>FRIENDLY_REMINDER_3</code> (dunning level 2), <code>ENFORCEMENT</code> (debt enforcement).",
+        "enum": [
+          "FRIENDLY_REMINDER",
+          "FRIENDLY_REMINDER_2",
+          "FRIENDLY_REMINDER_3",
+          "ENFORCEMENT"
         ],
         "type": "string"
       },
@@ -16385,6 +17877,84 @@
             "example": "Normalsatz 8.1 %"
           }
         }
+      },
+      "PublicApiOpenPositionHistory": {
+        "description": "One event in the history of an open item, including planned events (<code>happened = false</code>). Histories are ordered by <code>happenDate</code>, oldest first.",
+        "type": "object",
+        "properties": {
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiOpenPositionHistoryType"
+              },
+              {
+                "description": "Kind of event.",
+                "example": "PAYMENT"
+              }
+            ]
+          },
+          "happened": {
+            "description": "<code>true</code> when the event has taken place, <code>false</code> for a planned event (next payment reminder, next payment).",
+            "type": "boolean",
+            "example": true
+          },
+          "happenDate": {
+            "format": "date",
+            "description": "Date of the event, or the planned date when <code>happened</code> is false.",
+            "type": "string",
+            "example": "2026-07-20"
+          },
+          "dunningLevel": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicApiDunningLevel"
+              },
+              {
+                "description": "Dunning level. Only for <code>DUNNING</code> events.",
+                "example": "FRIENDLY_REMINDER"
+              }
+            ]
+          },
+          "documentLink": {
+            "description": "Only for <code>DUNNING</code> events that happened: reference of the reminder document as stored by KLARA, as a rule the numeric document id (the same kind of id as <code>documentIds</code>); entries from older KLARA versions may carry a legacy link instead.",
+            "type": "string",
+            "example": "4712"
+          },
+          "bookingDetailId": {
+            "format": "int64",
+            "description": "For <code>INVOICE</code>, <code>PAYMENT</code>, <code>PREPAYMENT</code> and <code>CREDITNOTE</code> events: id of the related booking line.",
+            "type": "integer",
+            "example": 98766
+          },
+          "amount": {
+            "description": "For reconciliation events and <code>NEXT_PAYMENT</code>: the amount.",
+            "type": "number",
+            "example": 500
+          }
+        }
+      },
+      "PublicApiOpenPositionHistoryType": {
+        "description": "Kind of event in the history of an open item. <code>CREATED</code>: the item was booked (invoice sent for receivables, invoice date for payables). <code>DUNNING</code>: payment reminder or dunning level (receivables only). <code>NEXT_PAYMENT</code>: planned payment of an overdue payable. <code>INVOICE</code>, <code>PAYMENT</code>, <code>PREPAYMENT</code>, <code>CREDITNOTE</code>: a booking reconciled against the item.",
+        "enum": [
+          "CREATED",
+          "DUNNING",
+          "NEXT_PAYMENT",
+          "INVOICE",
+          "PAYMENT",
+          "PREPAYMENT",
+          "CREDITNOTE"
+        ],
+        "type": "string"
+      },
+      "PublicApiOpenPositionStatus": {
+        "enum": [
+          "OPEN",
+          "PARTLY_PAID",
+          "PAID",
+          "PARTLY_CLEARED",
+          "CLEARED"
+        ],
+        "type": "string"
       },
       "PublicApiSuitableOpenPosition": {
         "description": "An accounting open-position booking detail line returned by the bank-reconciliation suggestion service. Carries the canonical booking-detail fields plus reconciliation-specific enrichments (partner-name display, business-case message id, computed open amount).",
