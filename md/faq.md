@@ -32,7 +32,7 @@ No. Despite the role name, KLARA Online Terminbuchung has no public endpoints. T
 
 #### Why do I get a 401 even though my API key is correct?
 
-Every endpoint that requires authentication accepts either an API key or a bearer token, so the method is not the problem. Check three things instead: the key belongs to the company whose data you are requesting, the header is spelled `X-API-KEY`, and the user behind the key holds the permission the endpoint needs. See [Roles & permissions](https://developer.klara.ch/#roles). Note that the token endpoints themselves take no authentication at all, listed under [Authentication](https://developer.klara.ch/#authentication).
+Check three things first: the key belongs to the company whose data you are requesting, the header is spelled `X-API-KEY`, and the user behind the key holds the permission the endpoint needs. See [Roles & permissions](https://developer.klara.ch/#roles). If all three are right and the call still fails, repeat it with a bearer token instead of the API key, and send only one of the two headers. If the bearer token works, please tell support which endpoint it was. Note that the token endpoints themselves take no authentication at all, listed under [Authentication](https://developer.klara.ch/#authentication).
 
 #### Why do ePost and eBill appear in a KLARA API?
 
