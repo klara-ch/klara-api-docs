@@ -414,6 +414,14 @@ PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` —
 
 ### Documentation changes
 
+#### 9 November 2026 · Bearer token for three endpoints, VAT notes updated
+
+- **Three endpoints currently need a bearer token.** Uploading a document, booking a document as paid and fetching the invoice PDF fail with an API key (`401` or `500`). Use a bearer token and send no `X-API-KEY` header. See the FAQ on `401`.
+
+- **`autoCalculateVat` no longer rejects bookings.** The temporary note about `400` errors is removed.
+
+- **Do not rely on the recommended VAT suggestion.** Choose the VAT rate and account yourself until the recommendation is corrected.
+
 #### 12 October 2026 · Fewer roles can create and send invoices
 
 **Breaking for existing keys.** This changed in the KLARA roles, not in the API contract, so the list of API changes above does not show it.

@@ -34,6 +34,8 @@ No. Despite the role name, KLARA Online Terminbuchung has no public endpoints. T
 
 Check three things first: the key belongs to the company whose data you are requesting, the header is spelled `X-API-KEY`, and the user behind the key holds the permission the endpoint needs. See [Roles & permissions](https://developer.klara.ch/#roles). If all three are right and the call still fails, repeat it with a bearer token instead of the API key, and send only one of the two headers. If the bearer token works, please tell support which endpoint it was. Note that the token endpoints themselves take no authentication at all, listed under [Authentication](https://developer.klara.ch/#authentication).
 
+**Three endpoints currently work only with a bearer token:** `POST /core/latest/companies/{company-id}/documents` (upload a document), `POST /core/v1/accounting/document-bookings/paid` (book a document as paid) and `POST /core/v1/invoices/{id}/printed-document` (invoice PDF). With an API key they return `401` or `500`. Use a bearer token and send no `X-API-KEY` header. A fix is planned.
+
 #### Why do ePost and eBill appear in a KLARA API?
 
 They are delivery channels for KLARA invoices, not separate products you need to integrate. See [Sending documents](https://developer.klara.ch/#delivery). If you are building on the ePost Communication Platform itself, you want [developer.epost.ch](https://developer.epost.ch).

@@ -78,7 +78,9 @@ Post a manual journal entry from your system into KLARA Accounting.
 
 - **`amount` is always positive.** The sign is carried by `crdrType`, which is `DR` or `CR`.
 
-- **Let the server do the VAT.** With `autoCalculateVat=true` it recalculates the way the manual booking screen does. **Currently, some bookings with this flag are rejected with `400`.** If that happens, send the booking without the flag and include the VAT line yourself.
+- **Let the server do the VAT.** With `autoCalculateVat=true` it recalculates the way the manual booking screen does.
+
+- **Do not take the recommended VAT suggestion blindly.** `GET /core/v1/accounting/vat-suggestions` marks one row with `recommended: true`. That recommendation is currently not reliable. Choose the VAT rate and the VAT account yourself.
 
 - **Two guards will reject otherwise valid bookings:** a date in a closing fiscal year, and a date outside the active KLARA Accounting subscription window. Both can be overridden with `confirmDontMindClosingFiscalYear` and `ignore-unsubscripted-dates`. Overriding is a business decision, not a technical one.
 
