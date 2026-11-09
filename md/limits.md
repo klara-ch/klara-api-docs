@@ -54,7 +54,7 @@ Whether `Retry-After` is sent is being confirmed. Do not depend on it yet.
 
 ### Pagination
 
-13 endpoints accept pagination parameters:
+16 endpoints accept pagination parameters:
 
 | Endpoint | Parameters |
 |---|---|
@@ -63,8 +63,11 @@ Whether `Retry-After` is sent is being confirmed. Do not depend on it yet.
 | GET `/core/latest/articles` | `limit`, `offset` |
 | GET `/core/latest/articles/article-and-variants` | `limit`, `offset` |
 | GET `/core/latest/articles/search` | `limit`, `offset` |
+| GET `/core/v1/accounting/accounts/{accountCode}/statement` | `limit`, `offset` |
 | GET `/core/v1/accounting/business-case-templates` | `limit`, `offset` |
+| GET `/core/v1/accounting/fiscal-years` | `limit`, `offset` |
 | GET `/core/v1/accounting/master-vats` | `limit`, `offset` |
+| GET `/core/v1/accounting/reports/general-ledger` | `limit`, `offset` |
 | GET `/core/v1/accounting/tags` | `limit`, `offset` |
 | GET `/core/v1/bank-transactions` | `limit`, `offset` |
 | GET `/core/v1/bookings` | `limit`, `offset` |
@@ -88,13 +91,16 @@ Three properties of pagination that decide whether a run is reliable.
 
 #### Free-text search
 
-11 endpoints take a search term and match it against several fields at once. This is the only way to find a record without knowing an id.
+14 endpoints take a search term and match it against several fields at once. This is the only way to find a record without knowing an id.
 
 | Endpoint | Parameter |
 |---|---|
 | GET `/core/latest/article-categories` | `keyword`, `search-key` |
 | GET `/core/latest/article-filters` | `keyword`, `search-key` |
 | GET `/core/latest/articles/search` | `keyword`, `search-key` |
+| GET `/core/v1/accounting/accounts/{accountCode}/statement` | `search-key` |
+| GET `/core/v1/accounting/fiscal-years` | `search-key` |
+| GET `/core/v1/accounting/reports/general-ledger` | `search-key` |
 | GET `/core/v1/accounting/tags` | `search-key` |
 | GET `/core/v1/bank-reconciliation/open-positions` | `general-search`, `search-key` |
 | GET `/core/v1/bank-transactions` | `search-key` |
@@ -106,7 +112,7 @@ Three properties of pagination that decide whether a run is reliable.
 
 #### Filtering by field
 
-36 endpoints narrow the result by a field value, 87 parameters in total. Filtering is not searching: you have to know the value you are filtering on.
+46 endpoints narrow the result by a field value, 129 parameters in total. Filtering is not searching: you have to know the value you are filtering on.
 
 | Endpoint | Parameters |
 |---|---|
@@ -122,10 +128,20 @@ Three properties of pagination that decide whether a run is reliable.
 | GET `/core/v1/accounting/accounts` | `legal-form` |
 | GET `/core/v1/accounting/accounts/account-displaying` | `legal-form` |
 | GET `/core/v1/accounting/accounts/by-code/{accountCode}` | `legal-form` |
+| GET `/core/v1/accounting/accounts/{accountCode}/statement` | `booking-types`, `date-from`, `date-to`, `include-delimitation`, `reference`, `tags`, `vat` |
+| GET `/core/v1/accounting/business-case-templates/{businessCaseTemplateId}/payment-sources` | `booking-date`, `payment-group` |
 | GET `/core/v1/accounting/business-cases` | `businessCaseTemplateId`, `dateForFilteringCompanyVat`, `dateForFilteringFiscalYear` |
 | GET `/core/v1/accounting/business-cases/v2` | `businessCaseTemplateId`, `dateForFilteringCompanyVat`, `dateForFilteringFiscalYear`, `group-insurance-by-insurer`, `snippet-id`, `snippet-value` |
 | GET `/core/v1/accounting/currencies/exchange-rate` | `exchange-date`, `from-currency-code` |
+| POST `/core/v1/accounting/document-bookings/paid` | `confirm-closing-fiscal-year` |
+| GET `/core/v1/accounting/fiscal-years` | `status` |
+| GET `/core/v1/accounting/kpis/income-expenses` | `date-from`, `date-to`, `include-delimitation` |
+| GET `/core/v1/accounting/kpis/spendings-and-earnings` | `compare-from`, `compare-to`, `date-from`, `date-to`, `include-delimitation` |
 | GET `/core/v1/accounting/master-vats` | `code`, `current-period`, `default-vat`, `includeHiddenVatCase` |
+| GET `/core/v1/accounting/reports/balance-sheet` | `account-search`, `compare-date`, `date`, `include-delimitation`, `sub-account-search` |
+| GET `/core/v1/accounting/reports/general-ledger` | `account-from`, `account-to`, `booking-types`, `date-from`, `date-to`, `include-delimitation`, `reference`, `tags`, `vat` |
+| GET `/core/v1/accounting/reports/partner-amounts` | `customer-id`, `to-date` |
+| GET `/core/v1/accounting/reports/profit-and-loss` | `account-search`, `compare-from`, `compare-to`, `date-from`, `date-to`, `include-delimitation`, `tag-search` |
 | GET `/core/v1/accounting/tags` | `include-combinations` |
 | GET `/core/v1/accounting/vat-profile` | `date` |
 | GET `/core/v1/accounting/vat-suggestions` | `accountCode`, `amount`, `amountKind`, `date`, `direction`, `vatCase` |
@@ -149,4 +165,4 @@ Three properties of pagination that decide whether a run is reliable.
 
 #### Sorting
 
-7 endpoints accept a sort order: `/core/v1/accounting/business-case-templates`, `/core/v1/accounting/tags`, `/core/v1/bank-transactions`, `/core/v1/bookings`, `/core/v1/customers/{customerId}/open-positions`, `/core/v1/employees/short-info`, `/core/v1/invoices`. Everywhere else the order is not guaranteed, which matters when you page through a large collection.
+10 endpoints accept a sort order: `/core/v1/accounting/accounts/{accountCode}/statement`, `/core/v1/accounting/business-case-templates`, `/core/v1/accounting/fiscal-years`, `/core/v1/accounting/reports/general-ledger`, `/core/v1/accounting/tags`, `/core/v1/bank-transactions`, `/core/v1/bookings`, `/core/v1/customers/{customerId}/open-positions`, `/core/v1/employees/short-info`, `/core/v1/invoices`. Everywhere else the order is not guaranteed, which matters when you page through a large collection.

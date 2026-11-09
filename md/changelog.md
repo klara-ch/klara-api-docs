@@ -8,6 +8,32 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
+#### 9 November 2026 · 11 new
+
+#### New
+
+- GET `/core/v1/accounting/accounts/{accountCode}/statement` — Get the statement of one account for a period: opening balance, all movements, closing balance.
+
+- GET `/core/v1/accounting/accounts/{accountCode}/sub-accounts` — List the sub-accounts of one account, for example the bank accounts of 1020.
+
+- GET `/core/v1/accounting/business-case-templates/{businessCaseTemplateId}/payment-sources` — List the payment sources a business case template offers for one payment group.
+
+- POST `/core/v1/accounting/document-bookings/paid` — Book an uploaded document through a business case as already paid.
+
+- GET `/core/v1/accounting/fiscal-years` — List the fiscal years of the company with their status.
+
+- GET `/core/v1/accounting/kpis/income-expenses` — Get the company's income and expenses per month for a period.
+
+- GET `/core/v1/accounting/kpis/spendings-and-earnings` — Get the company's spendings and earnings for a period, compared with a previous period.
+
+- GET `/core/v1/accounting/reports/balance-sheet` — Get the balance sheet at a date, optionally with a comparison date.
+
+- GET `/core/v1/accounting/reports/general-ledger` — Get the general ledger: the statements of all accounts for a period, page by page.
+
+- GET `/core/v1/accounting/reports/partner-amounts` — Get the open amounts and monthly payments of a customer or supplier, or of all partners.
+
+- GET `/core/v1/accounting/reports/profit-and-loss` — Get the profit and loss statement for a period, optionally with a comparison period.
+
 #### 20 October 2026 · 5 new
 
 #### New

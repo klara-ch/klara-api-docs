@@ -4,7 +4,7 @@
 
 ## Machine-readable formats
 
-- [OpenAPI specification](https://developer.klara.ch/klara-openapi.json): the contract, 103 operations, OpenAPI 3.0.3
+- [OpenAPI specification](https://developer.klara.ch/klara-openapi.json): the contract, 114 operations, OpenAPI 3.0.3
 - [Build information](https://developer.klara.ch/build-info.json): when this was built and from which source
 
 ## Guides
@@ -28,7 +28,7 @@
 
 Each file lists the operations of one area with parameters, request and response bodies, and the permission each operation needs.
 
-- [Accounting](https://developer.klara.ch/md/reference-accounting.md): 29 operations
+- [Accounting](https://developer.klara.ch/md/reference-accounting.md): 40 operations
 - [Accounting Interface](https://developer.klara.ch/md/reference-accounting-interface.md): 1 operation
 - [Article](https://developer.klara.ch/md/reference-article.md): 28 operations
 - [Authentication](https://developer.klara.ch/md/reference-authentication.md): 3 operations

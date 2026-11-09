@@ -17,7 +17,7 @@ The header takes an IETF language tag. The tags documented in the specification 
 
 ### Where it applies
 
-24 endpoints accept `Accept-Language`. Look for it in the parameter list of any endpoint in the [API reference](https://developer.klara.ch/#reference). It is most common across accounting: accounts, booking types, VAT types, VAT cases, business-case templates and financial years. It also affects `POST /core/v1/bookings`, where it selects the language of localised error messages, and the payroll endpoint that lists addable salary items.
+31 endpoints accept `Accept-Language`. Look for it in the parameter list of any endpoint in the [API reference](https://developer.klara.ch/#reference). It is most common across accounting: accounts, booking types, VAT types, VAT cases, business-case templates and financial years. It also affects `POST /core/v1/bookings`, where it selects the language of localised error messages, and the payroll endpoint that lists addable salary items.
 
 ### Building your own language picker
 
