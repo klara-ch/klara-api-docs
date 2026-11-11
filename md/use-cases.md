@@ -74,6 +74,8 @@ Post a manual journal entry from your system into KLARA Accounting.
 
 - **At least two lines, and they must balance.** Total debit must equal total credit or the downstream service rejects the posting.
 
+- **`bookingTitle` is not stored.** KLARA keeps no title of its own for a booking. The title it shows is the `description` of the line with the lowest `accountCode`, VAT lines excluded. To set the title, set that line's `description`.
+
 - **Required in the header:** `documentDate`, `bookingDate` and `bookingDetails`. **Required per line:** `accountCode`, `crdrType`, `description`, `amount`, `tags` and `bookingTypeCode`.
 
 - **`amount` is always positive.** The sign is carried by `crdrType`, which is `DR` or `CR`.

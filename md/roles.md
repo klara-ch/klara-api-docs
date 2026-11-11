@@ -12,7 +12,7 @@ An API key is linked to one or more KLARA roles. Any user holding that role can 
 
 ### What each role reaches
 
-A KLARA business account offers nine assignable roles, plus Object manager and myKLARA user behind a feature switch and Personal dossier with a Spay subscription. Eight of them matter for the API. The figures below count how many of the 97 documented endpoints each one can call.
+A KLARA business account offers nine assignable roles, plus Object manager and myKLARA user behind a feature switch and Personal dossier with a Spay subscription. Eight of them matter for the API. The figures below count how many of the documented endpoints each one can call.
 
 > **Warning: External user is not a smaller Administrator**
 >

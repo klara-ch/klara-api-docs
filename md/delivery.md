@@ -6,13 +6,15 @@ Part of the KLARA API documentation. Canonical page: https://developer.klara.ch/
 
 You do not have to decide how an invoice reaches your customer. Book it, then call `POST /core/v1/invoices/{id}/send` without a channel. KLARA routes it through `EPOST`, `EBILL`, `SEND_EMAIL` and Print&Send, and only fails if none of them can deliver.
 
+**Sending currently works only with a bearer token**, not with an API key. See the [FAQ](https://developer.klara.ch/#faq) on `401`.
+
 ### Smart delivery
 
 Omit the `channel` query parameter. There is no request body.
 
 ```
 curl -X POST "https://api.klara.ch/core/v1/invoices/42/send" \
-  -H "X-API-KEY: $KLARA_API_KEY" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Accept: application/json"
 ```
 
@@ -22,7 +24,7 @@ Pass `channel` as a query parameter to force exactly that channel. If the recipi
 
 ```
 curl -X POST "https://api.klara.ch/core/v1/invoices/42/send?channel=SEND_EMAIL" \
-  -H "X-API-KEY: $KLARA_API_KEY" \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Accept: application/json"
 ```
 

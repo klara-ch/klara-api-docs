@@ -241,6 +241,8 @@ List the payment sources a business case template offers for one payment group.
 Returns the sources the caller can choose for an already paid booking with this template and payment group, as the Booking Workflow offers them: bank accounts, cards, cash registers, transfer accounts, other persons, cashless payment accounts or employees of the company. Send the `id` as `paymentSourceId` to `bookDocumentAsPaidV1` with the same template, payment group and booking date. For `EMPLOYEE` each source also lists the `payrollDates` it can be reimbursed with. For `OTHER` the rows name the payment options without a source. The list is not paged; it is short. Read only. Tenant and company come from the token. The caller must hold the `ACCOUNTING` permission (an internal service); `EMPLOYEE` also needs `COMPENSATION_GET_EMPLOYEE` (an internal service), which `accountant` does not have.
 
 - operationId: `listBusinessCasePaymentSourcesV1`
+- Required permission: `ACCOUNTING`
+- Roles that carry it: Administrator, Buchhalter, External user
 
 **Parameters**
 
@@ -466,6 +468,8 @@ Book an uploaded document through a business case as already paid.
 Books one document from the booking queue through a business case template and marks it as paid from the chosen source, as the Booking Workflow does in the web app: it creates the booking with its VAT lines, links the business case and takes the document out of the queue. Supported templates are the expense templates with a supplier and the revenue templates with a customer that the Booking Workflow offers for the booking date (`listCurrentCompanyBusinessCaseTemplatesV1`); asset purchase, current account, transfer account, tax and social insurance templates answer `400 businesscase.template_not_supported`. Take `paymentSourceId` from `listBusinessCasePaymentSourcesV1`, and `vatCaseId` and `vatRateId` from the entries `vatCase` and `vatRate` of `hydrateBusinessCaseFromTemplateForSnippetV1`. Optional fields follow the Booking Workflow: `servicePeriodFrom`/`servicePeriodTo`, `dueDate`, `paymentPurpose`, `internalComment` and `text` are accepted only where the template and the payment option show that field, otherwise `400 businesscase.field_not_offered`; nothing is dropped silently. Booking texts are written in the language of `Accept-Language` (de, fr, it, en), English without it; send the language of the KLARA user. A document that is not in the booking queue or is already booked answers `409`. No operation undoes the booking. Tenant and company come from the token. Documents stored in the KLARA eArchive are not supported yet (`400 document.archive_not_supported`). Permissions: the caller must hold `ACCOUNTING` (an internal service), must have one of the roles `company_administrator`, `trusted_user`, `accountant`, `customer_relationship_manager` for the document checks (an internal service), and needs `FINANCE_GET_CUSTOMER` to read the partner (an internal service); the payment group `EMPLOYEE` also needs `COMPENSATION_GET_EMPLOYEE`, which `accountant` does not have. Agents: this call creates a booking in the general ledger and, for `EMPLOYEE`, a reimbursement request in payroll; ask the user for explicit confirmation first.
 
 - operationId: `bookDocumentAsPaidV1`
+- Required permission: `ACCOUNTING`, `FINANCE_GET_CUSTOMER` (all of them)
+- Roles that carry it: Administrator, Buchhalter, External user
 
 **Parameters**
 

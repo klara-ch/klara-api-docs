@@ -34,7 +34,11 @@ No. Despite the role name, KLARA Online Terminbuchung has no public endpoints. T
 
 Check three things first: the key belongs to the company whose data you are requesting, the header is spelled `X-API-KEY`, and the user behind the key holds the permission the endpoint needs. See [Roles & permissions](https://developer.klara.ch/#roles). If all three are right and the call still fails, repeat it with a bearer token instead of the API key, and send only one of the two headers. If the bearer token works, please tell support which endpoint it was. Note that the token endpoints themselves take no authentication at all, listed under [Authentication](https://developer.klara.ch/#authentication).
 
-**Three endpoints currently work only with a bearer token:** `POST /core/latest/companies/{company-id}/documents` (upload a document), `POST /core/v1/accounting/document-bookings/paid` (book a document as paid) and `POST /core/v1/invoices/{id}/printed-document` (invoice PDF). With an API key they return `401` or `500`. Use a bearer token and send no `X-API-KEY` header. A fix is planned.
+**Four endpoints currently work only with a bearer token:** `POST /core/latest/companies/{company-id}/documents` (upload a document), `POST /core/v1/accounting/document-bookings/paid` (book a document as paid), `POST /core/v1/invoices/{id}/printed-document` (invoice PDF) and `POST /core/v1/invoices/{id}/send` (send an invoice). With an API key they return `401` or `500`. Use a bearer token and send no `X-API-KEY` header.
+
+#### Can I restrict an API key to articles only?
+
+No. A key carries the roles chosen when it was created, and there is no role for articles only. The narrowest roles are **Zeit- und Materialrapporte**, which can read articles, and **Kundenbeziehungen**, which can read and write them. Both reach more than articles. See [Roles & permissions](https://developer.klara.ch/#roles).
 
 #### Why do ePost and eBill appear in a KLARA API?
 

@@ -414,6 +414,16 @@ PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` —
 
 ### Documentation changes
 
+#### 11 November 2026 · Permissions confirmed, sending needs a bearer token, booking title
+
+- **Permissions confirmed for two accounting endpoints.** Booking a document as paid and listing the payment sources of a business case template work for Administrator, External user and Buchhalter. For the payment group of employees, access to payroll is also needed, so Buchhalter receives `403` there.
+
+- **Sending an invoice also needs a bearer token for now.** The FAQ on `401` now lists four endpoints, and the examples under smart delivery use a bearer token.
+
+- **`bookingTitle` is not stored.** The title KLARA shows is the description of the line with the lowest account code, VAT lines excluded.
+
+- **New FAQ:** whether an API key can be restricted to articles.
+
 #### 9 November 2026 · Bearer token for three endpoints, VAT notes updated
 
 - **Three endpoints currently need a bearer token.** Uploading a document, booking a document as paid and fetching the invoice PDF fail with an API key (`401` or `500`). Use a bearer token and send no `X-API-KEY` header. See the FAQ on `401`.
