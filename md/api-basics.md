@@ -101,11 +101,11 @@ Ask for what the endpoint returns. `Accept: application/json` is correct almost 
 
 ### What an error body contains
 
-The specification declares 533 error responses on 114 operations. Every one of them declares a body, so you can generate a type for the error case and read the `code` and the `uuid` from it.
+The specification declares 535 error responses on 114 operations. Every one of them declares a body, so you can generate a type for the error case and read the `code` and the `uuid` from it.
 
 | Schema | Fields | Error responses | Operations |
 |---|---|---|---|
-| `ErrorMessage` | `code`, `createdTime`, `detail`, `message`, `uuid` | 514 | 114 |
+| `ErrorMessage` | `code`, `createdTime`, `detail`, `message`, `uuid` | 516 | 114 |
 | `ErrorResponse` | `error`, `error_description` | 19 | 5 |
 
 The OAuth-style pair `error` and `error_description` is declared on 5 operations:

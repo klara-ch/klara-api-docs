@@ -1092,7 +1092,7 @@ Records a manual journal entry against the authenticated caller's company and re
 | `documentIds` | array | no | Ids of supporting documents (uploaded files / e-mails) attached to this booking. |
 | `businessCase` | string | no | Free-text business case label shown on the journal. |
 | `snippets` | array | no | Snippet identifiers applied to this booking, copied from the booking template. |
-| `bookingStatus` | string | no | Status of the booking. Allowed values: DRAFT, BOOKED, CANCELLED. |
+| `bookingStatus` | string | yes | Status of the booking. Allowed values: BOOKED, PLANNED. One of `BOOKED`, `PLANNED`. |
 | `internalComment` | string | no | Internal comment, visible only to accounting users. |
 | `businessCaseId` | string | no | Id of the KLARA business case that produced this booking. Set by the server and ignored on input: a booking created through this API never belongs to a business case, so leave it empty. This is not the business case template code (use businessCase for a label). A non-numeric value is rejected with 400 booking.business_case_id_invalid. |
 | `relatedBookingHeaderLinks` | array | no | URIs of bookings that are related to this one (e.g. payment ↔ invoice, original ↔ delimitation). |
@@ -1102,7 +1102,7 @@ Records a manual journal entry against the authenticated caller's company and re
 | `bookingTemplateId` | integer (int64) | no | Id of the booking template the user picked when creating this entry. |
 | `bookingTitle` | string | no | Short title of the booking shown in lists. |
 | `totalAmount` | number | no | Sum of the absolute amounts of the booking lines, in the company main currency. |
-| `bookingTypeCode` | string | no | Business meaning of the booking. Allowed values include GENERAL_LEDGER, AR_INVOICE, AP_INVOICE, AR_PAYMENT, AP_PAYMENT, AR_CREDIT_NOTE, AP_CREDIT_NOTE. |
+| `bookingTypeCode` | object | no | Business meaning of the booking. One of `GENERAL_LEDGER`, `AP_INVOICE`, `AP_PAYMENT`, `AR_INVOICE`, `AR_PAYMENT`, `AP_PREPAYMENT`, `AP_PREPAYUSE`, `AR_PREPAYMENT`, `AR_PREPAYUSE`, `AR_CREDITNOTE`, `AR_CREDITUSE`, `AP_CREDITNOTE`. |
 
 **Responses**
 

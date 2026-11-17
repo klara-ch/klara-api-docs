@@ -8,6 +8,20 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
+#### 17 November 2026 · 3 changed · breaking
+
+> **Warning: Breaking changes**
+>
+> Existing integrations may be affected.
+
+#### Changed
+
+- POST `/core/v1/bookings` — request body changed; new required fields: `bookingStatus`
+
+- GET `/core/v2/tenants/individuals/profile` — new status codes: 403
+
+- POST `/core/v2/tenants/individuals/profile` — new status codes: 403
+
 #### 9 November 2026 · 11 new
 
 #### New
