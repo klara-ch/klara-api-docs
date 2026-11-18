@@ -10,7 +10,7 @@ Returns the bank accounts of the company resolved from the bearer JWT, optionall
 
 - operationId: `listCompanyBankAccounts`
 - Required permission: `FINANCE_BANK_ACCOUNT`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen, Mitarbeiter und Lohn
 
 **Parameters**
 
@@ -38,7 +38,7 @@ Returns a page of the company's invoices, newest first, with optional free-text 
 
 - operationId: `listInvoices`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -71,7 +71,7 @@ Creates a new invoice for an existing customer under the company resolved from t
 
 - operationId: `createInvoice`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -145,7 +145,7 @@ Updates a DRAFT invoice identified by `invoice.id` in the request body. Only inv
 
 - operationId: `updateInvoice`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -218,7 +218,7 @@ Returns the next available invoice number for the company resolved from the bear
 
 - operationId: `getNextInvoiceNumber`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Responses**
 
@@ -239,7 +239,7 @@ Returns the fully-enriched invoice document for the given `id` under the company
 
 - operationId: `getInvoiceById`
 - Required permission: `FINANCE_GET_INVOICE`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -266,7 +266,7 @@ Returns the invoice document as a binary `application/pdf` stream via the intern
 
 - operationId: `printInvoice`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -293,7 +293,7 @@ Sends an already-booked invoice to its recipient, synchronously, under the compa
 
 - operationId: `sendInvoice`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -322,7 +322,7 @@ Returns every order-management document of the company resolved from the bearer 
 
 - operationId: `listOrderDocumentsByTypeAndOrderNumber`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -350,7 +350,7 @@ Returns the next available sequence number and its formatted document code for t
 
 - operationId: `getNextDocumentNumber`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -377,7 +377,7 @@ Returns the numbering strategy configured for the given `order-type` of the comp
 
 - operationId: `getOrderNumberingConfiguration`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -404,7 +404,7 @@ Returns the next available business order number for the company resolved from t
 
 - operationId: `getNextOrderNumber`
 - Required permission: `FINANCE`
-- Roles that carry it: Administrator, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Externer Benutzer, Kundenbeziehungen
 
 **Responses**
 

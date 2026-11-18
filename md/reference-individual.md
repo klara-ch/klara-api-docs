@@ -9,6 +9,8 @@
 Returns the profile of the tenant the bearer token belongs to. The caller must hold the `LUZ_PROFILE` permission (enforced by an internal service); otherwise the endpoint returns `403`.
 
 - operationId: `getIndividualProfile`
+- Required permission: `LUZ_PROFILE`
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Mitarbeiter und Lohn, SmartSend, ePost Briefkasten
 
 **Responses**
 
@@ -28,6 +30,8 @@ Returns the profile of the tenant the bearer token belongs to. The caller must h
 Creates the profile of the tenant the bearer token belongs to, if it does not exist yet. The caller must hold the `LUZ_PROFILE` permission (enforced by an internal service); otherwise the endpoint returns `403`.
 
 - operationId: `createIndividualProfile`
+- Required permission: `LUZ_PROFILE`
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Mitarbeiter und Lohn, SmartSend, ePost Briefkasten
 
 **Responses**
 

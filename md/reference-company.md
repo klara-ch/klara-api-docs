@@ -10,7 +10,7 @@ Retrieve the business company of a tenant. Use your KLARA token from your userna
 
 - operationId: `findCompany`
 - Required permission: `COMPENSATION_COMPANY_INFO`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Objektmanager, Online Terminbuchung, Zeit- und Materialrapporte
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen, Mitarbeiter, Mitarbeiter und Lohn, Objektmanager, Online Terminbuchung, Print & Send, SmartSend, Zeit- und Materialrapporte, myKLARA Benutzer
 
 **Responses**
 
@@ -29,8 +29,8 @@ Create a KLARA business company
 A KLARA user might have multiple company tenants. Use this endpoint to create a business company and its correspondence tenant. Use your KLARA token from your username & password & tenant-id.
 
 - operationId: `createTenantAndBusinessCompany`
-- Required permission: `COMPENSATION`, `FINANCE_COMPANY_VAT`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Required permission: `COMPENSATION`, `FINANCE_COMPANY_VAT` (all of them)
+- Roles that carry it: Administrator, Externer Benutzer, Mitarbeiter und Lohn
 
 **Request body** (`application/json`, not marked required in the specification)
 
@@ -64,7 +64,7 @@ A KLARA user might have multiple tenants. Use this endpoint to update a KLARA bu
 
 - operationId: `updateCompany`
 - Required permission: `COMPENSATION`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, Externer Benutzer, Mitarbeiter und Lohn
 
 **Request body** (`application/json`, not marked required in the specification)
 

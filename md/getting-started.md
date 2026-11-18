@@ -18,7 +18,7 @@ Part of the KLARA API documentation. Canonical page: https://developer.klara.ch/
 
    > **Note: Which role does this guide need?**
    >
-   > The calls below require `ARTICLE_READ_ONLY`. These roles carry it: Zeit- und Materialrapporte, Online Terminbuchung, Mitarbeiter und Lohn, Kundenbeziehungen, Administrator, External user.
+   > The calls below require `ARTICLE_READ_ONLY`. These roles carry it: Zeit- und Materialrapporte, Online Terminbuchung, Mitarbeiter und Lohn, Kundenbeziehungen, Administrator, Externer Benutzer.
    >
    > **Zeit- und Materialrapporte** is the narrowest of them, so it is the least privilege choice for working through this page. Watch out for one that sounds right but is not: **Accountant** does not hold `ARTICLE_READ_ONLY`, so it cannot run the first call.
 

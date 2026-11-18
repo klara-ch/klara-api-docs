@@ -10,7 +10,7 @@ A KLARA user might have multiple subscriptions. Each subscription will enable a 
 
 - operationId: `createSubscription`
 - Required permission: `STORE_CUSTOMER`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung, Print & Send
 
 **Parameters**
 

@@ -10,7 +10,7 @@ Returns a lightweight directory of the authenticated company's employees (id, na
 
 - operationId: `listEmployeesShortInfo`
 - Required permission: `COMPENSATION_TIME_TRACKING`
-- Roles that carry it: Administrator, External user, Mitarbeiter und Lohn, Zeit- und Materialrapporte
+- Roles that carry it: Administrator, Externer Benutzer, Mitarbeiter, Mitarbeiter und Lohn, Zeit- und Materialrapporte
 
 **Parameters**
 
@@ -43,7 +43,7 @@ Adds a single salary item (Base / Percent / Quantity / Amount / Comments) to the
 
 - operationId: `addSalaryItem`
 - Required permission: `COMPENSATION`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, Externer Benutzer, Mitarbeiter und Lohn
 
 **Parameters**
 
@@ -80,7 +80,7 @@ Resolves the employee's main (latest) contract and its editable payslip, then re
 
 - operationId: `listAddableSalaryItems`
 - Required permission: `COMPENSATION`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn, Online Terminbuchung
+- Roles that carry it: Administrator, Externer Benutzer, Mitarbeiter und Lohn
 
 **Parameters**
 

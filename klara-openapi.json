@@ -19074,7 +19074,7 @@
               "SELLOFF_AMORTIZATION",
               "DELIMIT"
             ],
-            "type": "object",
+            "type": "string",
             "example": "GENERAL_LEDGER",
             "nullable": false
           },
@@ -19292,7 +19292,7 @@
               "SELLOFF_AMORTIZATION",
               "DELIMIT"
             ],
-            "type": "object",
+            "type": "string",
             "example": "GENERAL_LEDGER"
           }
         }

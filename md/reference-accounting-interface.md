@@ -10,7 +10,7 @@ Return the payroll accounting interface file for a given salary run or payslips 
 
 - operationId: `generatePayrollInterfaceFile`
 - Required permission: `ACCOUNTING_INTERFACE`
-- Roles that carry it: Administrator, External user, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Externer Benutzer, Mitarbeiter und Lohn
 
 **Parameters**
 

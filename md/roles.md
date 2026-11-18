@@ -12,57 +12,75 @@ An API key is linked to one or more KLARA roles. Any user holding that role can 
 
 ### What each role reaches
 
-A KLARA business account offers nine assignable roles, plus Object manager and myKLARA user behind a feature switch and Personal dossier with a Spay subscription. Eight of them matter for the API. The figures below count how many of the documented endpoints each one can call.
+A KLARA business account offers nine assignable roles, plus Object manager and myKLARA user behind a feature switch and Personal dossier with a Spay subscription. Thirteen roles can use the API. The figures below count how many of the documented endpoints each one can call.
 
-> **Warning: External user is not a smaller Administrator**
+> **Warning: Externer Benutzer is not a smaller Administrator**
 >
-> For the Public API the two hold **identical** permissions. The difference exists only in user management, payments and billing, none of which the API exposes. Choosing External user over Administrator therefore buys you nothing in terms of least privilege. If you want a narrow key, pick one of the specialist roles below.
+> For the Public API the two hold **identical** permissions. The difference exists only in user management, payments and billing, none of which the API exposes. Choosing Externer Benutzer over Administrator therefore buys you nothing in terms of least privilege. If you want a narrow key, pick one of the specialist roles below.
 
-| Role in KLARA | Technical name | Endpoints reachable, of 114 |
-|---|---|---|
-| Administrator | `company_administrator` | 95 |
-| External user | `external_user` | 95 |
-| Kundenbeziehungen | `customer_relationship_manager` | 77 |
-| Buchhalter | `accountant` | 44 |
-| Mitarbeiter und Lohn | `payroll_specialist` | 35 |
-| Online Terminbuchung | `booking` | 24 |
-| Zeit- und Materialrapporte | `reporter` | 21 |
-| Objektmanager | `object_manager` | 13 |
+| Role in KLARA | Technical name | Endpoints reachable, of 114 | On an API key |
+|---|---|---|---|
+| Administrator | `company_administrator` | 114 | yes |
+| Externer Benutzer | `trusted_user` | 114 | yes |
+| Kundenbeziehungen | `customer_relationship_manager` | 75 | yes |
+| Buchhalter | `accountant` | 59 | yes |
+| Mitarbeiter und Lohn | `payroll_specialist` | 37 | yes |
+| Zeit- und Materialrapporte | `reporter` | 21 | yes |
+| Online Terminbuchung | `booking` | 21 | yes |
+| ePost Briefkasten | `epost_letterbox` | 17 | yes, ePost My Business only |
+| SmartSend | `smart_send` | 15 | yes, ePost My Business only |
+| Mitarbeiter | `employee` | 15 | no, user login only (every employee has it automatically) |
+| Print & Send | `print_and_send_basic` | 14 | no, user login only (no longer offered) |
+| myKLARA Benutzer | `myklara_user` | 14 | yes, behind a feature switch |
+| Objektmanager | `object_manager` | 13 | yes, if asset management is enabled |
 
-Administrator and External user reach everything, which is exactly why neither belongs on an integration key unless the integration genuinely needs everything.
+Administrator and Externer Benutzer reach everything, which is exactly why neither belongs on an integration key unless the integration genuinely needs everything.
+
+### API key or user login?
+
+What a call can do depends on how it signs in.
+
+- **API key:** the call can do exactly what the roles chosen for the key allow.
+
+- **User login** (`POST /core/latest/token`): the call can do everything the user's roles allow. This includes two roles that cannot be chosen for an API key: *Mitarbeiter* (every employee has it automatically) and *Print & Send* (no longer offered, but some users still have it). A user can therefore reach endpoints that no API key reaches.
+
+- If a call sends both an API key and a user token, the API key is used.
+
+Two endpoints check the role itself, not a permission: the document upload (`POST /core/latest/companies/{company-id}/documents`) and marking a document booking as paid (`POST /core/v1/accounting/document-bookings/paid`). Their pages list the roles that are allowed.
 
 ### Which role carries which permission
 
-Eighteen permissions are in use across the documented endpoints. The **Endpoints** column counts how many of them check that permission. A tick means the role grants it.
+Nineteen permissions are in use across the documented endpoints. The **Endpoints** column counts how many of them check that permission. A tick means the role grants it.
 
-| Permission | Endpoints | Administrator | External user | Mitarbeiter und Lohn | Buchhalter | Kundenbeziehungen | Zeit- und Materialrapporte | Online Terminbuchung | Objektmanager |
-|---|---|---|---|---|---|---|---|---|---|
-| `ARTICLE` | 21 | ✓ | ✓ | – | – | ✓ | – | – | – |
-| `FINANCE` | 20 | ✓ | ✓ | – | – | ✓ | – | – | – |
-| `ACCOUNTING` | 13 | ✓ | ✓ | – | ✓ | – | – | – | – |
-| `ARTICLE_READ_ONLY` | 7 | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ | – |
-| `COMPENSATION` | 4 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | – |
-| `ACCOUNTING_GET_MASTER_VAT` | 3 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – |
-| `FINANCE_GET_CUSTOMER` | 3 | ✓ | ✓ | – | ✓ | ✓ | – | – | – |
-| `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE` | 2 | ✓ | ✓ | ✓ | ✓ | – | – | – | – |
-| `FINANCE_COMPANY_GET_VAT` | 2 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – |
-| `ACCOUNTING_GET_OPEN_POSITION` | 1 | ✓ | ✓ | – | ✓ | ✓ | – | – | – |
-| `ACCOUNTING_INTERFACE` | 1 | ✓ | ✓ | ✓ | – | – | – | – | – |
-| `COMPENSATION_COMPANY_INFO` | 1 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `COMPENSATION_TIME_TRACKING` | 1 | ✓ | ✓ | ✓ | – | – | ✓ | – | – |
-| `FINANCE_BANK_ACCOUNT` | 1 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – |
-| `FINANCE_COMPANY_VAT` | 1 | ✓ | ✓ | ✓ | ✓ | – | – | – | – |
-| `FINANCE_CREATE_CUSTOMER` | 1 | ✓ | ✓ | – | – | ✓ | – | – | – |
-| `FINANCE_GET_INVOICE` | 1 | ✓ | ✓ | – | ✓ | ✓ | – | – | – |
-| `STORE_CUSTOMER` | 1 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | – |
+| Permission | Endpoints | Administrator | Externer Benutzer | Mitarbeiter und Lohn | Buchhalter | Kundenbeziehungen | Zeit- und Materialrapporte | Online Terminbuchung | Objektmanager | ePost Briefkasten | SmartSend | Mitarbeiter | Print & Send | myKLARA Benutzer |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| `ACCOUNTING` | 29 | ✓ | ✓ | – | ✓ | – | – | – | – | – | – | – | – | – |
+| `ARTICLE` | 21 | ✓ | ✓ | – | – | ✓ | – | – | – | – | – | – | – | – |
+| `FINANCE` | 20 | ✓ | ✓ | – | – | ✓ | – | – | – | – | – | – | – | – |
+| `ARTICLE_READ_ONLY` | 7 | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ | – | – | – | – | – | – |
+| `COMPENSATION` | 4 | ✓ | ✓ | ✓ | – | – | – | – | – | – | – | – | – | – |
+| `FINANCE_GET_CUSTOMER` | 4 | ✓ | ✓ | – | ✓ | ✓ | – | – | – | ✓ | – | – | – | – |
+| `ACCOUNTING_GET_MASTER_VAT` | 3 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – | – | – | – | – | – |
+| `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE` | 2 | ✓ | ✓ | ✓ | ✓ | – | – | – | – | – | – | – | – | – |
+| `FINANCE_BANK_ACCOUNT` | 2 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – | – | – | – | – | – |
+| `FINANCE_COMPANY_GET_VAT` | 2 | ✓ | ✓ | ✓ | ✓ | ✓ | – | – | – | – | – | – | – | – |
+| `LUZ_PROFILE` | 2 | ✓ | ✓ | ✓ | ✓ | – | – | – | – | ✓ | ✓ | – | – | – |
+| `ACCOUNTING_GET_OPEN_POSITION` | 1 | ✓ | ✓ | – | ✓ | ✓ | – | – | – | – | – | – | – | – |
+| `ACCOUNTING_INTERFACE` | 1 | ✓ | ✓ | ✓ | – | – | – | – | – | – | – | – | – | – |
+| `COMPENSATION_COMPANY_INFO` | 1 | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | ✓ | ✓ | ✓ |
+| `COMPENSATION_TIME_TRACKING` | 1 | ✓ | ✓ | ✓ | – | – | ✓ | – | – | – | – | ✓ | – | – |
+| `FINANCE_COMPANY_VAT` | 1 | ✓ | ✓ | ✓ | ✓ | – | – | – | – | – | – | – | – | – |
+| `FINANCE_CREATE_CUSTOMER` | 1 | ✓ | ✓ | – | – | ✓ | – | – | – | – | – | – | – | – |
+| `FINANCE_GET_INVOICE` | 1 | ✓ | ✓ | – | ✓ | ✓ | – | – | – | – | – | – | – | – |
+| `STORE_CUSTOMER` | 1 | ✓ | ✓ | ✓ | ✓ | ✓ | – | ✓ | – | – | – | – | ✓ | – |
 
-Two things stand out. `ARTICLE` sits with Kundenbeziehungen alone, so only that role can write articles. And `COMPENSATION_COMPANY_INFO` is the single permission every role holds.
+One thing stands out. Apart from Administrator and Externer Benutzer, `ARTICLE` sits with Kundenbeziehungen alone, so only that role can write articles.
 
 ### Three rules that decide whether a call succeeds
 
 **Roles add up.** A user can hold several roles at once and gets the sum of their access. No role ever takes something away.
 
-**A permission replaces, it does not extend.** Where an endpoint requires `ARTICLE_READ_ONLY`, a token holding only `ARTICLE` is not accepted, and the reverse is equally true. Almost every endpoint checks exactly one permission. One does not: `POST /core/v2/tenants/companies` lists two, and whether both are required is not confirmed. Its reference entry says so.
+**A permission replaces, it does not extend.** Where an endpoint requires `ARTICLE_READ_ONLY`, a token holding only `ARTICLE` is not accepted, and the reverse is equally true. Almost every endpoint checks exactly one permission. Where an endpoint lists two, both are required, and its reference entry says so.
 
 **Every endpoint names the roles that carry its permission.** Under **Required permission** you find not only the constant but also the roles that grant it, so you do not have to work backwards from a list of constants.
 
@@ -80,7 +98,7 @@ Every endpoint in the [reference](https://developer.klara.ch/#reference) states 
 
 - **Only Kundenbeziehungen can write articles.** Every other role reaches at most `ARTICLE_READ_ONLY`. An integration that maintains articles needs that role or an Administrator.
 
-- **Buchhalter reads invoices one at a time, but cannot list or write them.** The role holds `FINANCE_GET_INVOICE`, which the single-invoice call checks, but not `FINANCE`, which the invoice list and every invoice write check. An integration that creates or sends invoices needs Administrator, External user or Kundenbeziehungen.
+- **Buchhalter reads invoices one at a time, but cannot list or write them.** The role holds `FINANCE_GET_INVOICE`, which the single-invoice call checks, but not `FINANCE`, which the invoice list and every invoice write check. An integration that creates or sends invoices needs Administrator, Externer Benutzer or Kundenbeziehungen.
 
 ### Endpoints that need no particular permission
 

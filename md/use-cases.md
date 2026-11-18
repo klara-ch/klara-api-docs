@@ -20,7 +20,7 @@ Turn an order in your system into a KLARA invoice. Five calls, of which three ar
 5. POST /core/v1/invoices                       → the created invoice with its id
 ```
 
-**Permissions needed for the whole flow:** `ARTICLE_READ_ONLY`, `FINANCE`, `FINANCE_BANK_ACCOUNT`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, External user, Kundenbeziehungen.
+**Permissions needed for the whole flow:** `ARTICLE_READ_ONLY`, `FINANCE`, `FINANCE_BANK_ACCOUNT`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, Externer Benutzer, Kundenbeziehungen.
 
 #### What to watch out for
 
@@ -47,7 +47,7 @@ A new buyer in your shop becomes a KLARA customer and an invoice. This is the in
 4. POST /core/v1/invoices/{id}/send       → deliver it
 ```
 
-**Permissions needed for the whole flow:** `ARTICLE_READ_ONLY`, `FINANCE`, `FINANCE_BANK_ACCOUNT`, `FINANCE_CREATE_CUSTOMER`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, External user, Kundenbeziehungen.
+**Permissions needed for the whole flow:** `ARTICLE_READ_ONLY`, `FINANCE`, `FINANCE_BANK_ACCOUNT`, `FINANCE_CREATE_CUSTOMER`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, Externer Benutzer, Kundenbeziehungen.
 
 #### What to watch out for
 
@@ -68,7 +68,7 @@ Post a manual journal entry from your system into KLARA Accounting.
 4. POST /core/v1/bookings                             → the persisted booking
 ```
 
-**Permissions needed for the whole flow:** `ACCOUNTING`, `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE`, `ACCOUNTING_GET_MASTER_VAT`. **Roles that cover all of it:** Administrator, External user, Buchhalter.
+**Permissions needed for the whole flow:** `ACCOUNTING`, `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE`, `ACCOUNTING_GET_MASTER_VAT`. **Roles that cover all of it:** Administrator, Externer Benutzer, Buchhalter.
 
 #### What to watch out for
 
@@ -97,7 +97,7 @@ Upload a receipt and attach it to an existing booking. Two calls.
 2. PUT  /core/v1/bookings/{id}/documents                → attach it to the booking
 ```
 
-**Permissions needed for the whole flow:** `ACCOUNTING`. **Roles that cover all of it:** Administrator, External user, Buchhalter. **Not yet established:** POST /core/latest/companies/{company-id}/documents. Plan for an Administrator key until this is confirmed.
+**Permissions needed for the whole flow:** `ACCOUNTING`. **Roles that cover all of it:** Administrator, Externer Benutzer, Buchhalter. `POST /core/latest/companies/{company-id}/documents` checks the role itself; allowed are Administrator, Externer Benutzer, Buchhalter, Kundenbeziehungen, Mitarbeiter, myKLARA Benutzer.
 
 #### What to watch out for
 
@@ -124,7 +124,7 @@ Articles    GET  /core/latest/articles?limit=…&offset=…    → page through 
             POST /core/latest/articles                     → create
 ```
 
-**Permissions needed for the whole flow:** `ARTICLE`, `ARTICLE_READ_ONLY`, `FINANCE_CREATE_CUSTOMER`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, External user, Kundenbeziehungen.
+**Permissions needed for the whole flow:** `ARTICLE`, `ARTICLE_READ_ONLY`, `FINANCE_CREATE_CUSTOMER`, `FINANCE_GET_CUSTOMER`. **Roles that cover all of it:** Administrator, Externer Benutzer, Kundenbeziehungen.
 
 #### What to watch out for
 
@@ -147,7 +147,7 @@ GET /core/v1/invoices?status=INVOICED&booking-status=OPEN   → invoiced and not
 GET /core/v1/invoices/{id}                                → the full invoice including booking status
 ```
 
-**Permissions needed for the whole flow:** `FINANCE`, `FINANCE_GET_INVOICE`. **Roles that cover all of it:** Administrator, External user, Kundenbeziehungen.
+**Permissions needed for the whole flow:** `FINANCE`, `FINANCE_GET_INVOICE`. **Roles that cover all of it:** Administrator, Externer Benutzer, Kundenbeziehungen.
 
 #### What to watch out for
 
@@ -173,7 +173,7 @@ GET /core/v1/accounting/master-vats?code=…             → specific VAT codes
 GET /core/v1/accounting/master-vats?default-vat=true   → the company defaults
 ```
 
-**Permissions needed for the whole flow:** `ACCOUNTING_GET_MASTER_VAT`. **Roles that cover all of it:** Administrator, External user, Mitarbeiter und Lohn, Buchhalter, Kundenbeziehungen.
+**Permissions needed for the whole flow:** `ACCOUNTING_GET_MASTER_VAT`. **Roles that cover all of it:** Administrator, Externer Benutzer, Mitarbeiter und Lohn, Buchhalter, Kundenbeziehungen.
 
 #### What to watch out for
 

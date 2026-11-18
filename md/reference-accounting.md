@@ -36,7 +36,7 @@ Returns a flat list of `AccountDisplaying` rows for every account in the caller'
 
 - operationId: `getAccountDisplayingV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -91,7 +91,7 @@ Returns the statement of one account of the caller's company, as KLARA shows it 
 
 - operationId: `getAccountStatementV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -132,7 +132,7 @@ Returns the sub-accounts of one account of the caller's company as KLARA lists t
 
 - operationId: `listSubAccountsV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -184,7 +184,7 @@ Returns the global catalog of business-case templates — the manual-journal cat
 
 - operationId: `listBusinessCaseTemplatesV1`
 - Required permission: `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE`
-- Roles that carry it: Administrator, Buchhalter, External user, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Mitarbeiter und Lohn
 
 **Parameters**
 
@@ -214,7 +214,7 @@ Returns one business-case template from the global KLARA catalog — a manual-jo
 
 - operationId: `getBusinessCaseTemplateByIdV1`
 - Required permission: `ACCOUNTING_GET_BUSINESS_CASE_TEMPLATE`
-- Roles that carry it: Administrator, Buchhalter, External user, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Mitarbeiter und Lohn
 
 **Parameters**
 
@@ -242,7 +242,7 @@ Returns the sources the caller can choose for an already paid booking with this 
 
 - operationId: `listBusinessCasePaymentSourcesV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -273,7 +273,7 @@ Loads the fully hydrated business-case aggregate the booking form needs: the tem
 
 - operationId: `hydrateBusinessCaseFromTemplateV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -304,7 +304,7 @@ Snippet-scoped variant of `GET /core/v1/accounting/business-cases`: hydrates onl
 
 - operationId: `hydrateBusinessCaseFromTemplateForSnippetV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -338,7 +338,7 @@ Loads the fully hydrated business-case aggregate that was previously persisted f
 
 - operationId: `getBusinessCaseByIdV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -367,7 +367,7 @@ Returns the dunning waiting periods configured for the authenticated caller's co
 
 - operationId: `getCurrentAccountingCompanyV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Responses**
 
@@ -388,7 +388,7 @@ Returns the manual-journal categories ("business-case templates") the caller's c
 
 - operationId: `listCurrentCompanyBusinessCaseTemplatesV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -415,7 +415,7 @@ Returns the company's currently active fiscal-year periods (status `OPEN` or `CL
 
 - operationId: `listCurrentCompanyFinancialYearsV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -442,7 +442,7 @@ Returns the Swiss National Bank reference rate that converts one unit of `from-c
 
 - operationId: `getExchangeRateV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -469,7 +469,7 @@ Books one document from the booking queue through a business case template and m
 
 - operationId: `bookDocumentAsPaidV1`
 - Required permission: `ACCOUNTING`, `FINANCE_GET_CUSTOMER` (all of them)
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -522,7 +522,7 @@ Returns the fiscal years of the caller's company as the KLARA fiscal-year screen
 
 - operationId: `listFiscalYearsV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -554,7 +554,7 @@ Returns the operating revenue (chart group 30, credit positive) and the operatin
 
 - operationId: `getIncomeExpensesV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -583,7 +583,7 @@ Returns, for the caller's company and the period `date-from` to `date-to`, the s
 
 - operationId: `getSpendingsAndEarningsV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -615,7 +615,7 @@ Returns the global master VAT catalog — the table of supported VAT rates with 
 
 - operationId: `listMasterVatsV1`
 - Required permission: `ACCOUNTING_GET_MASTER_VAT`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen, Mitarbeiter und Lohn
 
 **Parameters**
 
@@ -645,7 +645,7 @@ Returns the subset of the master VAT catalog whose validity range (`validFrom` /
 
 - operationId: `getCurrentMasterVatsV1`
 - Required permission: `ACCOUNTING_GET_MASTER_VAT`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen, Mitarbeiter und Lohn
 
 **Responses**
 
@@ -664,7 +664,7 @@ Loads a single master VAT row from KLARA's global master VAT catalog, identified
 
 - operationId: `getMasterVatByIdV1`
 - Required permission: `ACCOUNTING_GET_MASTER_VAT`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen, Mitarbeiter und Lohn
 
 **Parameters**
 
@@ -690,7 +690,7 @@ Returns the balance sheet of the caller's company at `date`, as KLARA shows it u
 
 - operationId: `getBalanceSheetV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -722,7 +722,7 @@ Returns the general ledger of the caller's company: for every account of the com
 
 - operationId: `getGeneralLedgerV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -763,7 +763,7 @@ Returns the figures of the open amount and payment charts of the customer view i
 
 - operationId: `getPartnerAmountsV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -791,7 +791,7 @@ Returns the profit and loss statement of the caller's company for the period `da
 
 - operationId: `getProfitAndLossV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -824,6 +824,8 @@ List the tags used on bookings.
 Returns the tags that occur on the booking lines of the caller's company, the same tags KLARA suggests when a tag is entered in the journal, a booking template or a business case. All booking lines count, whatever the booking status and fiscal year; tags that exist only on a booking template or a business case are not included. Each tag is returned once; a booking line can carry several tags, which are listed separately. Spellings are kept as entered, so `Marketing` and `marketing` are two entries. A single tag never contains a comma, because the comma separates the tags of a booking line. With `include-combinations=true` the list also contains each combination of tags as stored on a booking line, joined with a comma and a space (for example `Marketing, Zurich`), which is what the KLARA entry screens suggest; a name containing a comma is such a combination. Use the names as `tags` of a booking line in `createBookingV1`, or as `tags` filter in `listBankReconciliationOpenPositionsV1`, so new bookings reuse the existing spelling; join several tags with a comma without a space (`Marketing,Zurich`). Unlike the generic description of `search-key`, this operation splits the search text into words and keeps the tags that contain every word, case-insensitive (`zur mark` finds `Marketing, Zurich`). Characters are compared as written: `Zurich` does not find `Zürich`. Uses the standard collection parameters: `search-key`, `offset` (default 0), `limit` (default 50, maximum 100), `sort-field` (only and default `NAME`) and `sort-direction` (default DESC, Z to A; pass `ASC` for alphabetical order). Names are compared ignoring case and by character code, so letters with umlauts or accents sort after `z`. The number of tags matching the filters, ignoring `offset` and `limit`, is returned in the `X-Total-Count` header; to read everything, repeat the call with `offset` increased by `limit` until `X-Total-Count` is reached. To count the tags only, call with `limit=1` and read `X-Total-Count`. This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the `ACCOUNTING` permission on the company; otherwise the endpoint returns `403`.
 
 - operationId: `listBookingTagsV1`
+- Required permission: `ACCOUNTING`
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -855,7 +857,7 @@ Returns the company's VAT regime (effective vs net-tax-rate), billing method and
 
 - operationId: `getVatProfileV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -881,7 +883,7 @@ Turns a plain-language context — a purchase vs a sale — into ranked, copy-pa
 
 - operationId: `listVatSuggestionsV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -964,7 +966,7 @@ Returns the list of open booking-detail positions (AR / AP invoices, payments, p
 
 - operationId: `listBankReconciliationOpenPositionsV1`
 - Required permission: `ACCOUNTING_GET_OPEN_POSITION`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen
 
 **Parameters**
 
@@ -1002,6 +1004,8 @@ List bank transactions that are not reconciled yet.
 Returns the bank transactions of the caller's company that are not reconciled yet, as listed in KLARA under Accounting > Bank reconciliation. Only transactions of the company's bank accounts are returned, each with the `bankAccountId` from `listCompanyBankAccounts`; transactions of a bank account that no longer exists are left out, as in KLARA. To find the accounts of one bank, read `swissBank.name` in `listCompanyBankAccounts`. Credit card transactions are not included. A transaction counts as reconciled as soon as it is booked, also when it only partly settles an open item; reconciled transactions are never returned. An empty result for a payment reference therefore means either that no such payment arrived or that it is already reconciled; for the payment status of an invoice use `listBankReconciliationOpenPositionsV1` with `position-status`. Amounts are the full amounts of the bank entry and always positive; `direction` tells whether money was received (`CREDIT`) or paid out (`DEBIT`). `amount` is set for entries in CHF. For entries in any other currency, including WIR (`CHW`), `amount` is empty and the amount is in `foreignAmount` with the currency in `foreignCurrency`; no CHF equivalent is provided. There is no server-side total: to sum amounts, read all pages sorted by `ID` ascending, and keep in mind that transactions reconciled in the meantime drop out of the list. Use `paymentReference`, `remittanceText` and `counterpartyName` to find the matching open item, for example with `listBankReconciliationOpenPositionsV1` (use `action=filter` there so that all conditions apply; money received matches receivables, money paid out matches payables). Reconciling a transaction through the public API is not available yet; the `id` identifies the transaction for that future operation. Filter with `bank-account-id`, `booking-date-from` and `booking-date-to` (booking date, inclusive, `yyyy-MM-dd`) and `direction`; unlike the generic description of `search-key`, it matches counterparty name, remittance text, payment reference or additional information (contains, case-insensitive, spaces are not ignored). Sort with `sort-field` `BOOKING_DATE` (default), `VALUE_DATE`, `AMOUNT` or `ID`; ties are ordered by `ID`, empty values come last. Uses the standard collection parameters: `search-key`, `offset` (default 0), `limit` (default 50, maximum 100), `sort-field` and `sort-direction` (default DESC, newest first). The number of transactions matching the filters, ignoring `offset` and `limit`, is returned in the `X-Total-Count` header; to read everything, repeat the call with `offset` increased by `limit` until `X-Total-Count` is reached. This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the `ACCOUNTING` permission on the company, and `FINANCE_BANK_ACCOUNT` to read the bank accounts (every role with `ACCOUNTING` holds it); otherwise the endpoint returns `403`.
 
 - operationId: `listBankTransactionsV1`
+- Required permission: `ACCOUNTING`, `FINANCE_BANK_ACCOUNT` (all of them)
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -1035,6 +1039,8 @@ Search the journal: list bookings by text, booking date, amount or tag.
 Returns the bookings of the caller's company, as listed in KLARA under Accounting > Journal, newest first (booking date, then id, both descending). Each entry is the booking header: `title` (the text of the first booking line), `totalAmount` (sum of the credit lines), dates, document ids and internal comment. The debit and credit lines are not part of this list; read them per booking with `getBookingV1` and the `id`. The list covers all fiscal years and every booking status (planned, booked, locked, sealed, inactive), like the journal; filter by booking date for one year, and use `listCurrentCompanyFinancialYearsV1` when a request means a fiscal year. A booking that consists only of delimitation lines is not listed, and delimitation lines never satisfy a filter. `search-key` is split into words at spaces and keeps the bookings in which any word occurs (contains, case-insensitive, no umlaut or accent folding, so `Miete` also finds `Mieter`) in the description of a booking line (the title is the first one) or in the stored internal comment (HTML markup included). A word that is a number also finds bookings with exactly that account code on a line, the booking with that id, and bookings linked to that booking; there is no filter for an account code alone. `booking-date-from` and `booking-date-to` filter by booking date (inclusive, `yyyy-MM-dd`). `amount-from` and `amount-to` keep bookings with at least one line whose amount is in the range (both inclusive; for more than 1000 send `amount-from=1000.01`); this is the line amount, not `totalAmount`. `tags` takes a comma-separated list and keeps bookings with a line that carries any of the tags (contains, case-insensitive: `Marketing` also finds `Online-Marketing`; there is no exact match); take the names from `listBookingTagsV1`. All conditions are checked per line: a booking is listed if one of its lines meets the amount and tag conditions and the search matches that line or the booking header. Uses the standard collection parameters: `search-key`, `offset` (default 0), `limit` (default 50, maximum 100); the order is fixed, `sort-field` accepts only `BOOKING_DATE` and `sort-direction` only `DESC` (`ASC` answers 400). The number of bookings matching the filters, ignoring `offset` and `limit`, is returned in the `X-Total-Count` header; to only count, call with `limit=1`. To read everything, repeat the call with `offset` increased by `limit` until `X-Total-Count` is reached; new bookings appear at the start and shift later pages, so fix `booking-date-to` for a stable export and remove duplicates by `id`. This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the `ACCOUNTING` permission on the company; otherwise the endpoint returns `403`.
 
 - operationId: `listBookingsV1`
+- Required permission: `ACCOUNTING`
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -1070,7 +1076,7 @@ Records a manual journal entry against the authenticated caller's company and re
 
 - operationId: `createBookingV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -1102,7 +1108,7 @@ Records a manual journal entry against the authenticated caller's company and re
 | `bookingTemplateId` | integer (int64) | no | Id of the booking template the user picked when creating this entry. |
 | `bookingTitle` | string | no | Short title of the booking shown in lists. |
 | `totalAmount` | number | no | Sum of the absolute amounts of the booking lines, in the company main currency. |
-| `bookingTypeCode` | object | no | Business meaning of the booking. One of `GENERAL_LEDGER`, `AP_INVOICE`, `AP_PAYMENT`, `AR_INVOICE`, `AR_PAYMENT`, `AP_PREPAYMENT`, `AP_PREPAYUSE`, `AR_PREPAYMENT`, `AR_PREPAYUSE`, `AR_CREDITNOTE`, `AR_CREDITUSE`, `AP_CREDITNOTE`. |
+| `bookingTypeCode` | string | no | Business meaning of the booking. One of `GENERAL_LEDGER`, `AP_INVOICE`, `AP_PAYMENT`, `AR_INVOICE`, `AR_PAYMENT`, `AP_PREPAYMENT`, `AP_PREPAYUSE`, `AR_PREPAYMENT`, `AR_PREPAYUSE`, `AR_CREDITNOTE`, `AR_CREDITUSE`, `AP_CREDITNOTE`. |
 
 **Responses**
 
@@ -1122,6 +1128,8 @@ Read one booking with all its debit and credit lines.
 Returns one booking of the caller's company with all its lines, as shown when a booking is expanded in KLARA under Accounting > Journal. Take the `bookingId` from `listBookingsV1` or from `connectedLines`; booking ids are unique within the tenant. The header carries the same `title` and `totalAmount` as in `listBookingsV1` (text of the line with position 1, sum of all credit lines). `lines` holds every line in the order KLARA shows them, including VAT lines (separate lines on the VAT account) and delimitation lines (`bookingType` `DELIMIT`); a booking that consists only of delimitation lines can be read here although `listBookingsV1` does not list it. Each line has its account (number and name), `side` (`DEBIT` or `CREDIT`) and `amount` in CHF (always positive), the posting text, tags, the kind of line (`bookingType`), the VAT rate, a foreign currency amount, the open-item state of invoice and payment lines with due date, paid date and `overdue`, the service period, and who changed the line last (`lastModifiedBy`: an e-mail address, an API key name or `SYSTEM`; `lastModifiedAt` in UTC; a line never changed shows its creation). `references` lists the objects a line refers to, with type, id and the name KLARA shows now: customers and suppliers (same ids as in `listCustomersV1`; the partner of an invoice or payment is on its `AR_*` or `AP_*` line), company bank accounts (`listCompanyBankAccounts`), bank transactions, VAT cases, invoices, payments, employees, social insurances, salary runs, tax-at-source cantons, KLARA's built-in gift-card and miscellaneous partner entries, and sub-accounts of the chart of accounts (with `category`); a name is missing when it could not be resolved. `connectedLines` lists the lines of other bookings a line is connected to: `RECONCILIATION` (a payment or bank reconciliation against an open item; listed on every line involved, so the invoice line lists each payment line and the payment line each invoice line), `DELIMITATION` (accrual), `PREPAYMENT_CLEARING`, `CREDIT_NOTE_CLEARING` and `MAIN_LINE` (the line this automatically created line was derived from, for example a VAT line booked with a payment that points to the revenue line of the invoice); read the connected booking with this operation and its `bookingId`. Not returned: the booking status (planned and inactive bookings are returned like booked ones, as the journal shows them), the amount still open on an open item (use `listCustomerOpenPositionsV1`), the VAT amount of a line, the amount a single reconciliation settled, and who changed the booking header (date, comment, documents). Reading the lines of many bookings takes one call per booking. Empty values and empty lists are left out. Account names and reference names follow `Accept-Language`. Returns `404` with code `booking.unknown` when no booking with this id exists in the caller's company; a booking of another company is answered the same way, to read it a token for that company is needed. A `bookingId` that is not a number also answers `404` (no such path). This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the `ACCOUNTING` permission on the company; otherwise the endpoint returns `403`; a `403` never means that the booking exists.
 
 - operationId: `getBookingV1`
+- Required permission: `ACCOUNTING`
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -1150,7 +1158,7 @@ Replaces the set of supporting-document identifiers and the document date stored
 
 - operationId: `updateBookingDocumentsV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -1184,6 +1192,8 @@ List the open items of one customer or supplier.
 Returns the open receivables (`position-type=RECEIVABLE`, default) or open payables (`position-type=PAYABLE`) of one customer or supplier of the caller's company, as shown in KLARA under Accounting > Open positions. Each item carries the amount still open at `reference-date` (default: today) and its history: when it was booked, which payments, credit notes or prepayments were reconciled against it, which payment reminders were sent and when the next one is planned (receivables), or when the next payment is due (payables). Obtain `customerId` from `listCustomersV1`; suppliers are customers in KLARA and use the same id. An unknown id, an id of another company, or a partner without open items returns an empty list, so check the id with `listCustomersV1` if the list is unexpectedly empty. To cover all customers or suppliers, page through `listCustomersV1` and call this operation once per customer. Items that reduce the balance (credit notes and prepayments) carry a negative `openAmount` and `totalAmount`, so the sum of `openAmount` is the net amount still owed. `search-key` matches the posting text (contains, case-insensitive) or, when the whole text is a date of the form `dd.MM.yyyy`, the due date. Sort with `sort-field` `ID` (default), `DUE_DATE` or `OPEN_AMOUNT`; items without a value come last. Uses the standard collection parameters: `search-key`, `offset` (default 0), `limit` (default 50, maximum 100), `sort-field` and `sort-direction` (default DESC). The number of rows matching the filters, ignoring `offset` and `limit`, is returned in the `X-Total-Count` header; to read everything, repeat the call with `offset` increased by `limit` until `X-Total-Count` is reached. Do not use `listBankReconciliationOpenPositionsV1` for this purpose: it lists candidates for reconciling a bank or credit-card transaction, without reference date and without history. This is a read-only, idempotent operation without side effects. Tenant and company are derived from the bearer token and are never accepted from the URL or the request. The caller must hold the `ACCOUNTING` permission on the company; otherwise the endpoint returns `403`.
 
 - operationId: `listCustomerOpenPositionsV1`
+- Required permission: `ACCOUNTING`
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 
@@ -1217,7 +1227,7 @@ Returns the VAT clearing report of the caller's company for the requested calend
 
 - operationId: `getVatClearingReportByQuarterV1`
 - Required permission: `ACCOUNTING`
-- Roles that carry it: Administrator, Buchhalter, External user
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer
 
 **Parameters**
 

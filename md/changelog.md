@@ -8,15 +8,17 @@ What changed and when. Changes that can break an existing integration are marked
 
 ### API changes
 
-#### 17 November 2026 · 3 changed · breaking
-
-> **Warning: Breaking changes**
->
-> Existing integrations may be affected.
+#### 18 November 2026 · 1 changed
 
 #### Changed
 
-- POST `/core/v1/bookings` — request body changed; new required fields: `bookingStatus`
+- POST `/core/v1/bookings` — request body changed
+
+#### 17 November 2026 · 3 changed
+
+#### Changed
+
+- POST `/core/v1/bookings` — documentation correction: `bookingStatus` has always been required and accepts only `BOOKED` and `PLANNED`, the specification now lists it. Existing integrations are not affected
 
 - GET `/core/v2/tenants/individuals/profile` — new status codes: 403
 
@@ -427,6 +429,22 @@ PUT `/core/latest/customers/{customer-id}/additional-addresses/{address-id}` —
 - POST `/core/latest/generic-token` — moved from area Klara authentication generic to KLARA authentication generic
 
 ### Documentation changes
+
+#### 18 November 2026 · Roles and permissions completed, corrections
+
+- **Five more roles in the role table and the permission matrix:** ePost Briefkasten, SmartSend, Mitarbeiter, Print & Send and myKLARA Benutzer. The table now also says which roles an API key can carry.
+
+- **New: [API key or user login?](https://developer.klara.ch/#roles)** What a call can do depends on how it signs in. Mitarbeiter and Print & Send cannot be chosen for an API key, but a user login carries them.
+
+- **Permissions confirmed for seven endpoints** that said «not established»: the booking list and a single booking, accounting tags, the open positions of a customer, bank transactions, and reading and creating the individual profile.
+
+- **Correction: Buchhalter, Kundenbeziehungen and Online Terminbuchung do not hold `COMPENSATION`.** This page said they did. They have not held it since early September 2026.
+
+- **Uploading a document** lists the roles that are allowed, instead of «not yet established». Creating a company requires both of its permissions.
+
+- **Correction: `bookingStatus` was always required.** The API change of 17 November was marked as breaking, but the API has always accepted only `BOOKED` and `PLANNED`. Existing integrations are not affected. `bookingTypeCode` is a string, as the API has always sent and accepted it.
+
+- **External user is now called Externer Benutzer**, as in KLARA.
 
 #### 11 November 2026 · Permissions confirmed, sending needs a bearer token, booking title
 

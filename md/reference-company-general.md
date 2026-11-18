@@ -10,7 +10,7 @@ Returns whether invoice amounts for the company resolved from the bearer JWT are
 
 - operationId: `getCompanyIncludingVatSetting`
 - Required permission: `FINANCE_COMPANY_GET_VAT`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen, Mitarbeiter und Lohn
 
 **Responses**
 
@@ -28,7 +28,7 @@ Returns vat list of a company
 
 - operationId: `listCompanyVatLiabilities`
 - Required permission: `FINANCE_COMPANY_GET_VAT`
-- Roles that carry it: Administrator, Buchhalter, External user, Kundenbeziehungen, Mitarbeiter und Lohn
+- Roles that carry it: Administrator, Buchhalter, Externer Benutzer, Kundenbeziehungen, Mitarbeiter und Lohn
 
 **Parameters**
 
